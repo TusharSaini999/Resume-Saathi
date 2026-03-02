@@ -6,27 +6,27 @@ const tokenSchema = new mongoose.Schema(
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: [true, "User ID is required"],
     },
     token: {
       type: String,
-      required: true,
-      unique: true,
+      required: [true, "Token string is required"],
+      unique: true, // ensures uniqueness
       index: true,
     },
     type: {
       type: String,
-      required: true, // "email_verification", "password_reset"
+      required: [true, "Token type is required"], // e.g., "email_verification", "password_reset"
     },
     email_verified: {
       type: Boolean,
       default: false,
-      required: true,
+      required: [true, "Email verified flag is required"],
     },
     expires_at: {
       type: Date,
-      required: true,
-      index: { expires: 0 }, // <-- TTL index for auto-delete
+      required: [true, "Expiration date is required"],
+      index: { expires: 0 }, // TTL index → auto-delete document
     },
   },
   {
@@ -35,5 +35,15 @@ const tokenSchema = new mongoose.Schema(
   }
 );
 
+// Static method to handle unique index errors
+tokenSchema.statics.handleDuplicateKeyError = (err) => {
+  if (err.code === 11000) {
+    const key = Object.keys(err.keyValue).join(", ");
+    return new Error(`Duplicate token entry detected for field(s): ${key}`);
+  }
+  return err;
+};
+
+// Export model
 const Token = mongoose.model("Token", tokenSchema);
 export default Token;
