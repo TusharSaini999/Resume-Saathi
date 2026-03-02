@@ -38,7 +38,6 @@ const sessionSchema = new mongoose.Schema(
     },
   },
   {
-    collection: "sessions",
     timestamps: true,
     strict: true,
   }

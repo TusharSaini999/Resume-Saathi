@@ -30,7 +30,6 @@ const tokenSchema = new mongoose.Schema(
     },
   },
   {
-    collection: "token",
     timestamps: true,
     strict: true,
   }
