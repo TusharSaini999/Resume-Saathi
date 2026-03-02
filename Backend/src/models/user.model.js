@@ -2,9 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const { Schema } = mongoose;
-
-const authProviderSchema = new Schema(
+const authProviderSchema = new mongoose.Schema(
   {
     auth_provider: {
       type: String,
