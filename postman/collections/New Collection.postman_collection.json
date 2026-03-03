@@ -1,0 +1,24 @@
+{
+  "info": {
+    "_postman_id": "4bed87bf-7d66-474a-b2d4-d7c4e33716cc",
+    "name": "User",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "register",
+      "id": "1abf89f4-5226-40cb-890c-203992c03448",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{HOST_NAME}}register",
+          "host": [
+            "{{HOST_NAME}}register"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
