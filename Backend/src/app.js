@@ -46,8 +46,12 @@ app.use(express.static('public'));
 // Cookie parser
 app.use(cookieParser());
 
-import testRoute from './router/test.route.js';
+app.set('trust proxy', true);
 
+import testRoute from './router/test.route.js';
+import userRouter from './router/user.router.js';
+
+app.use('/api/v1/users', userRouter);
 app.use('/api/v1', testRoute);
 
 export default app;

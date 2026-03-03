@@ -32,7 +32,8 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-linkedin-oauth2": "^2.0.0",
     "pdf-parse": "^2.4.5",
-    "pdfjs-dist": "^5.4.624"
+    "pdfjs-dist": "^5.4.624",
+    "ua-parser-js": "^2.0.9"
   },
   "devDependencies": {
     "prettier": "^3.8.1"
