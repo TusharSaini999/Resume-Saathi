@@ -1899,7 +1899,7 @@
           "parentRelationship": "bbbc2f34-aaf4-45c2-bc83-d6cce0b705c1"
         },
         {
-          "name": "refresh_token",
+          "name": "token",
           "hackoladeMeta": {},
           "isActivated": true,
           "type": "string",
@@ -2681,15 +2681,15 @@
         "dataType": "",
         "shape": [
           {
-            "x": 4542,
+            "x": 4537,
             "y": 9492.68181818182
           },
           {
-            "x": 4684.402234636872,
+            "x": 4681.902234636872,
             "y": 9492.68181818182
           },
           {
-            "x": 4684.402234636872,
+            "x": 4681.902234636872,
             "y": 9066.914804469274
           },
           {
@@ -2855,7 +2855,7 @@
     "84ec5eb8-1e4b-46ed-bd3c-da149d493cbf": "sessions",
     "e8f08f46-0670-494f-bf15-03e36afc3ea8": "_id",
     "97fe3b86-1407-4c76-9c06-63ea2c45aea9": "user_id",
-    "54ad1d98-ace7-4ed4-8748-d30956a9a351": "refresh_token",
+    "54ad1d98-ace7-4ed4-8748-d30956a9a351": "token",
     "bbbc2f34-aaf4-45c2-bc83-d6cce0b705c1": "fk_users._id_to_sessions.user_id",
     "053bd1ef-7837-4c57-ab79-ac738ffe4b26": "browser",
     "dde745ec-38a5-45d6-a08e-8dfeb173b125": "os",
@@ -2899,7 +2899,7 @@
   "creationTS": "2026-02-24T14:05:19.298Z",
   "GUID": "7b489019-c49b-4d45-8c41-253d717dc96b",
   "isLineageEnabled": false,
-  "lastModifTS": "2026-02-26T08:31:25.216Z",
+  "lastModifTS": "2026-03-02T03:16:49.417Z",
   "persistenceSchemaVersion": "8",
   "isCreatedByPlugin": true,
   "pluginInformation": {
@@ -2993,7 +2993,7 @@
             "GUID": "84ec5eb8-1e4b-46ed-bd3c-da149d493cbf",
             "x": 4313,
             "y": 9386.18181818182,
-            "width": 229,
+            "width": 224,
             "height": 213,
             "color": {}
           }
