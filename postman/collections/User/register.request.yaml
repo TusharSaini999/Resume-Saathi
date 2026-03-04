@@ -1,0 +1,17 @@
+$kind: http-request
+name: register
+url: "{{HOST_NAME}}users/register"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"name\":\"Tushar Saini\",\r
+
+    \    \"email\":\"tusharsaini.in@gmail.com\",\r
+
+    \    \"password\":\"df3332dwdwe2w2wDSD\"\r
+
+    }"
+order: 1772594623027
+examples: ./.resources\register.resources\examples

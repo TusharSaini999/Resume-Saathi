@@ -8,3 +8,6 @@ export const COOKIE_OPTIONS = {
   sameSite: 'strict',
   maxAge: 365 * 24 * 60 * 60 * 1000, //1 year
 };
+export const EMAIL_VERIFICATION_TTL = 15 * 60 * 1000; //15 minutes
+export const PASSWORD_RESET_TTL = 10 * 60 * 1000; //10 minutes
+
