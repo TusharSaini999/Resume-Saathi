@@ -435,17 +435,23 @@ const listSessions = asyncHandler(async (req, res) => {
 //Kill a specific session
 const killSession = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const sessionId = req.params.sessionId;
+  const { sessionId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+    throw new ApiError(400, 'Invalid session id');
+  }
 
   const session = await Session.findOneAndUpdate(
     { _id: sessionId, user_id: userId, is_active: true },
     { is_active: false },
     { new: true }
   );
+
   if (!session) {
     throw new ApiError(404, 'Session not found');
   }
-  res.status(200).json(new ApiResponse(true, 200, 'Session killed successfully'));
+
+  return res.status(200).json(new ApiResponse(200, null, 'Session killed successfully'));
 });
 
 export {
