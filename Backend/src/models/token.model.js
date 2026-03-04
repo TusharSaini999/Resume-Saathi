@@ -18,11 +18,6 @@ const tokenSchema = new mongoose.Schema(
       type: String,
       required: [true, "Token type is required"], // e.g., "email_verification", "password_reset"
     },
-    email_verified: {
-      type: Boolean,
-      default: false,
-      required: [true, "Email verified flag is required"],
-    },
     expires_at: {
       type: Date,
       required: [true, "Expiration date is required"],
