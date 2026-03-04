@@ -185,7 +185,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
 
 //resend verification email
 const resendVerificationEmail = asyncHandler(async (req, res) => {
-  const {userId} = req.body;
+  const { userId } = req.body;
   if (!userId) {
     throw new ApiError(401, 'Unauthorized');
   }
@@ -202,5 +202,36 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
     .json(new ApiResponse(true, 200, 'Verification email resent successfully', email_resp));
 });
 
+//login user
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new ApiError(400, 'Email and password are required');
+  }
 
-export { createUser, verifyEmail, resendVerificationEmail };
+  const user = await User.findOne({ email }).select('+password');
+  if (!user) {
+    throw new ApiError(400, 'Invalid email or password');
+  }
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    throw new ApiError(400, 'Invalid email or password');
+  }
+  if (!user.email_verified) {
+    const sendEmail = await sendVerificationEmail(user);
+    return res.status(400).json(
+      new ApiResponse(true, 400, 'Login Successful but email not verified', {
+        ...user._doc,
+        ...sendEmail,
+      })
+    );
+  } else {
+    const token = await genrateSession(user, req);
+    res
+      .status(200)
+      .cookie('token', token, COOKIE_OPTIONS)
+      .json(new ApiResponse(true, 200, 'Login successful', { ...user._doc, token }));
+  }
+});
+
+export { createUser, verifyEmail, resendVerificationEmail, loginUser };
