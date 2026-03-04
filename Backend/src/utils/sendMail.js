@@ -1,8 +1,8 @@
 // @ts-nocheck
 import nodemailer from "nodemailer";
-import ApiError from "./apiError";
+import ApiError from "./apiError.js";
 
-export const sendMail = async ({ to, subject, text, html }) => {
+const sendMail = async ({ to, subject, text, html }) => {
   try {
     //  Create transporter
     const transporter = nodemailer.createTransport({
@@ -32,3 +32,5 @@ export const sendMail = async ({ to, subject, text, html }) => {
     throw new ApiError(500, "Failed to send email", [], err.stack);
   }
 };
+
+export default sendMail;

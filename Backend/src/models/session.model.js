@@ -1,32 +1,32 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 // Session Schema
 const sessionSchema = new mongoose.Schema(
   {
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "User ID is required"],
+      ref: 'User',
+      required: [true, 'User ID is required'],
     },
     token: {
       type: String,
-      required: [true, "Session token is required"],
+      required: [true, 'Session token is required'],
     },
     browser: {
       type: String,
-      required: [true, "Browser info is required"],
+      required: [true, 'Browser info is required'],
     },
     os: {
       type: String,
-      required: [true, "Operating system info is required"],
+      required: [true, 'Operating system info is required'],
     },
-    device_name: {
+    location: {
       type: String,
-      required: [true, "Device name is required"],
+      required: [true, 'location is required'],
     },
     ip_address: {
       type: String,
-      required: [true, "IP address is required"],
+      required: [true, 'IP address is required'],
     },
     is_active: {
       type: Boolean,
@@ -34,7 +34,7 @@ const sessionSchema = new mongoose.Schema(
     },
     expires_at: {
       type: Date,
-      required: [true, "Expiration date is required"],
+      required: [true, 'Expiration date is required'],
     },
   },
   {
@@ -54,5 +54,5 @@ sessionSchema.methods.isSessionActive = function () {
 };
 
 // Export model
-const Session = mongoose.model("Session", sessionSchema);
+const Session = mongoose.model('Session', sessionSchema);
 export default Session;

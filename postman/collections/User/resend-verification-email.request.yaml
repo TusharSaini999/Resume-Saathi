@@ -1,0 +1,13 @@
+$kind: http-request
+name: resend-verification-email
+url: "{{HOST_NAME}}users/resend-verification-email"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"userId\":\"69a7ec0da9fb86f2e6f46e4d\"\r
+
+    }"
+order: 1306695186893562
+examples: ./.resources\resend-verification-email.resources\examples

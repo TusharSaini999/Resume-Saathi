@@ -52,15 +52,6 @@
           "error": {}
         },
         {
-          "name": "email_verified",
-          "hackoladeMeta": {},
-          "isActivated": true,
-          "type": "boolean",
-          "GUID": "9f58b8da-5dd6-4325-afa4-2df76f245952",
-          "required": true,
-          "error": {}
-        },
-        {
           "name": "expires_at",
           "hackoladeMeta": {},
           "isActivated": true,
@@ -1926,12 +1917,12 @@
           "error": {}
         },
         {
-          "name": "device_name",
           "hackoladeMeta": {},
           "isActivated": true,
           "type": "string",
           "GUID": "6a3138d7-6761-4ddb-b92e-fc83fbda502f",
           "required": true,
+          "name": "location",
           "error": {}
         },
         {
@@ -2712,8 +2703,6 @@
     "f40950c9-6dd1-4bd7-8154-7bac79d7dcab": "_id",
     "117a8495-cb5d-475a-8cac-b00e257a409d": "user_id",
     "63b898c6-201e-4003-8839-a9a48e95406d": "token",
-    "7d92f02b-c9aa-4df8-9c35-7437483161d3": "type",
-    "9f58b8da-5dd6-4325-afa4-2df76f245952": "email_verified",
     "cb68db19-e18a-4f5a-9ab9-685c24ef5f19": "New Field",
     "4c295ea8-8bcf-4bc8-aade-2a8df69683ac": "New Field1",
     "042cd66b-b97f-4e45-8e68-b58fe48aeb0f": "New Field1",
@@ -2859,11 +2848,12 @@
     "bbbc2f34-aaf4-45c2-bc83-d6cce0b705c1": "fk_users._id_to_sessions.user_id",
     "053bd1ef-7837-4c57-ab79-ac738ffe4b26": "browser",
     "dde745ec-38a5-45d6-a08e-8dfeb173b125": "os",
-    "6a3138d7-6761-4ddb-b92e-fc83fbda502f": "device_name",
+    "6a3138d7-6761-4ddb-b92e-fc83fbda502f": "location",
     "19a80503-1173-4de5-af8a-098bb170775c": "ip_address",
     "a97832b6-5644-412c-93fd-d760c9c74b02": "is_active",
     "e3960f87-0024-40d2-9ff0-128f378f66af": "expires_at",
-    "3ac4a822-f8a3-456d-be13-3e1caea71f97": "created_at"
+    "3ac4a822-f8a3-456d-be13-3e1caea71f97": "created_at",
+    "7d92f02b-c9aa-4df8-9c35-7437483161d3": "type"
   },
   "definitions": {
     "type": "definitions",
@@ -2899,7 +2889,7 @@
   "creationTS": "2026-02-24T14:05:19.298Z",
   "GUID": "7b489019-c49b-4d45-8c41-253d717dc96b",
   "isLineageEnabled": false,
-  "lastModifTS": "2026-03-02T03:16:49.417Z",
+  "lastModifTS": "2026-03-04T04:30:17.894Z",
   "persistenceSchemaVersion": "8",
   "isCreatedByPlugin": true,
   "pluginInformation": {
