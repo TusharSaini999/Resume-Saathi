@@ -16,16 +16,19 @@ import {
 
 const userRouter = router.Router();
 
+// Public
 userRouter.post('/register', createUser);
 userRouter.get('/verify-email', verifyEmail);
 userRouter.post('/resend-verification-email', resendVerificationEmail);
 userRouter.post('/login', loginUser);
-userRouter.post('forgot-password', forgotPassword);
+userRouter.post('/forgot-password', forgotPassword);
 userRouter.post('/reset-password', resetPassword);
+
+// Protected
 userRouter.post('/change-password', verifyJwt, changePassword);
 userRouter.get('/sessions', verifyJwt, listSessions);
+userRouter.delete('/sessions/:sessionId', verifyJwt, killSession);
 userRouter.post('/logout', verifyJwt, logoutUser);
-userRouter.post('/logout-all', verifyJwt, logoutAllSessions);
-userRouter.get('/kill-specific-session', verifyJwt, killSession);
+userRouter.delete('/logout-all', verifyJwt, logoutAllSessions);
 
 export default userRouter;

@@ -1,9 +1,9 @@
 $kind: http-request
 name: verify-email
-url: "{{HOST_NAME}}users/verify-email?token=3c620cd34abc7435064b81797a1f30442c8\
-  c91ff3f8e3d089a81ca45d7a118e5"
+url: "{{HOST_NAME}}users/verify-email?token=427a7f7c9bf8e48b76cdfc721c1b292c59d\
+  ab5ea7929de185f5a9f254dda5c1f"
 method: GET
 queryParams:
-  token: 3c620cd34abc7435064b81797a1f30442c8c91ff3f8e3d089a81ca45d7a118e5
+  token: 427a7f7c9bf8e48b76cdfc721c1b292c59dab5ea7929de185f5a9f254dda5c1f
 order: 473673354797403
 examples: ./.resources\verify-email.resources\examples
