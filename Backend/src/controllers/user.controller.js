@@ -8,6 +8,7 @@ import { COOKIE_OPTIONS, EMAIL_VERIFICATION_TTL, PASSWORD_RESET_TTL } from '../c
 import sendEmail from '../utils/sendMail.js';
 import Token from '../models/token.model.js';
 import crypto from 'crypto';
+import mongoose from 'mongoose';
 
 //generate session
 const genrateSession = async (user, req) => {
@@ -52,7 +53,6 @@ const sendVerificationEmail = async (user) => {
     const tokenCreatedTime = new Date(existingToken.createdAt).getTime();
 
     if (now - tokenCreatedTime < EMAIL_VERIFICATION_TTL) {
-      console.log('Verification email already sent recently.');
       return { email_ExpiresAt: existingToken.expires_at, email_Send: true };
     }
   }
@@ -217,6 +217,7 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!isMatch) {
     throw new ApiError(400, 'Invalid email or password');
   }
+  user.password = undefined;
   if (!user.email_verified) {
     const sendEmail = await sendVerificationEmail(user);
     return res.status(400).json(
@@ -266,10 +267,15 @@ const forgotPassword = asyncHandler(async (req, res) => {
   });
 
   if (existingToken) {
-    throw new ApiError(
-      429,
-      'A password reset link has already been sent. Please check your email or wait until it expires.'
-    );
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          true,
+          200,
+          'If an account with this email exists, a password reset link has been sent.'
+        )
+      );
   }
 
   //Generate secure token
@@ -343,7 +349,9 @@ const resetPassword = asyncHandler(async (req, res) => {
   if (!token || !newPassword) {
     throw new ApiError(400, 'Token and new password are required');
   }
-
+  if (newPassword.length < 8) {
+    throw new ApiError(400, 'New password must be at least 8 characters');
+  }
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
   const tokenDoc = await Token.findOne({
@@ -357,7 +365,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndUpdate(
     tokenDoc.user_id,
     { password: newPassword },
-    { new: true }
+    { returnDocument: 'after' }
   );
   if (!user) {
     throw new ApiError(404, 'User not found');
@@ -374,7 +382,9 @@ const changePassword = asyncHandler(async (req, res) => {
   if (!currentPassword || !newPassword) {
     throw new ApiError(400, 'Current and new password are required');
   }
-
+  if (newPassword.length < 8) {
+    throw new ApiError(400, 'New password must be at least 8 characters');
+  }
   const user = await User.findById(userId).select('+password');
 
   if (!user) {
@@ -404,6 +414,9 @@ const changePassword = asyncHandler(async (req, res) => {
 //logout user
 const logoutUser = asyncHandler(async (req, res) => {
   const userId = req.user._id;
+  if (!userId) {
+    throw new ApiError(401, 'Unauthorized');
+  }
   const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
   await Session.updateMany(
     { user_id: userId, token: token, is_active: true },
@@ -418,6 +431,9 @@ const logoutUser = asyncHandler(async (req, res) => {
 //logout all sessions
 const logoutAllSessions = asyncHandler(async (req, res) => {
   const userId = req.user._id;
+  if (!userId) {
+    throw new ApiError(401, 'Unauthorized');
+  }
   await Session.updateMany({ user_id: userId, is_active: true }, { is_active: false });
   res
     .status(200)
@@ -428,6 +444,9 @@ const logoutAllSessions = asyncHandler(async (req, res) => {
 //List All Sessions for a user
 const listSessions = asyncHandler(async (req, res) => {
   const userId = req.user._id;
+  if (!userId) {
+    throw new ApiError(401, 'Unauthorized');
+  }
   const sessions = await Session.find({ user_id: userId }).sort({ createdAt: -1 });
   res.status(200).json(new ApiResponse(true, 200, 'Sessions retrieved successfully', sessions));
 });
@@ -436,7 +455,9 @@ const listSessions = asyncHandler(async (req, res) => {
 const killSession = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { sessionId } = req.params;
-
+  if (!userId) {
+    throw new ApiError(401, 'Unauthorized');
+  }
   if (!mongoose.Types.ObjectId.isValid(sessionId)) {
     throw new ApiError(400, 'Invalid session id');
   }

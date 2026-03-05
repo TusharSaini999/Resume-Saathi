@@ -6,12 +6,11 @@ body:
   type: json
   content: "{\r
 
-    \    \"name\":\"Tushar Saini\",\r
+    \    \"name\":\"Test 1\",\r
 
-    \    \"email\":\"tusharsaini.in@gmail.com\",\r
+    \    \"email\":\"testuser@example.com\",\r
 
-    \    \"password\":\"df3332dwdwe2w2wDSD\"\r
+    \    \"password\":\"test@1234\"\r
 
     }"
-order: 1772594623027
-examples: ./.resources\register.resources\examples
+order: 1000

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import ApiError from '../utils/apiError.js';
 
 const authProviderSchema = new mongoose.Schema(
   {
@@ -83,10 +84,12 @@ userSchema.pre('save', async function () {
 // Compare password
 userSchema.methods.comparePassword = async function (candidatePassword) {
   try {
-    if (!this.password) throw new Error('Password not set for this user');
+    if (!this.password) {
+      throw new ApiError(400, 'Invalid email or password');
+    }
     return await bcrypt.compare(candidatePassword, this.password);
   } catch (error) {
-    throw new Error('Password comparison failed');
+    throw new Error('Invalid email or password');
   }
 };
 
