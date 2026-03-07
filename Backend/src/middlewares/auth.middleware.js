@@ -1,7 +1,8 @@
 import User from '../models/user.model.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import ApiError from '../utils/apiError.js';
+import ApiError from '../utils/ApiError.js';
 import jwt from 'jsonwebtoken';
+import Session from '../models/session.model.js';
 
 const verifyJwt = asyncHandler(async (req, _, next) => {
   try {
@@ -15,7 +16,10 @@ const verifyJwt = asyncHandler(async (req, _, next) => {
 
     // Verify and decode the JWT
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
+    const session = await Session.findOne({ token, is_active: true });
+    if (!session) {
+      throw new ApiError(401, 'Invalid access token');
+    }
     // Fetch the user associated with the token
     const user = await User.findById(decodedToken.id);
     // If user does not exist, token is invalid

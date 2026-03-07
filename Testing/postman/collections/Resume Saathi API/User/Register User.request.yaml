@@ -1,0 +1,16 @@
+$kind: http-request
+name: Register User
+url: "{{HOST_NAME}}/users/register"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Test User",
+      "email": "testusergmail@gmail.com",
+      "password": "test@1234"
+    }
+order: 1000
+examples: ./.resources\Register User.resources\examples

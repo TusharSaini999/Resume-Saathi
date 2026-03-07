@@ -1,6 +1,9 @@
-import pdf from 'pdf-parse';
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+const pdf = require("pdf-parse");
 import fs from 'fs';
-import ApiError from 'ApiError.js';
+import ApiError from './ApiError.js';
 class PdfParese {
   async pdfParseText(filePath) {
     const dataBuffer = fs.readFileSync(filePath);

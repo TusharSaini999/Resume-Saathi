@@ -1,7 +1,7 @@
 import User from '../models/user.model.js';
 import Session from '../models/session.model.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import ApiError from '../utils/apiError.js';
+import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import { UAParser } from 'ua-parser-js';
 import { COOKIE_OPTIONS, EMAIL_VERIFICATION_TTL, PASSWORD_RESET_TTL } from '../constants.js';
@@ -159,7 +159,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndUpdate(
     tokenDoc.user_id,
     { email_verified: true }, // update
-    { new: true } // return updated document
+    { returnDocument: 'after' } // return updated document
   ).select('-password');
 
   if (!user) {
@@ -378,7 +378,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 const changePassword = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { currentPassword, newPassword } = req.body;
-
+  console.log('Change Password Request:', { userId, currentPassword, newPassword });
   if (!currentPassword || !newPassword) {
     throw new ApiError(400, 'Current and new password are required');
   }
@@ -386,7 +386,7 @@ const changePassword = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'New password must be at least 8 characters');
   }
   const user = await User.findById(userId).select('+password');
-
+  console.log('User found for password change:', user);
   if (!user) {
     throw new ApiError(404, 'User not found');
   }
@@ -400,7 +400,7 @@ const changePassword = asyncHandler(async (req, res) => {
   }
 
   const isMatch = await user.comparePassword(currentPassword);
-
+  console.log('Current password match:', isMatch);
   if (!isMatch) {
     throw new ApiError(400, 'Current password is incorrect');
   }
@@ -465,14 +465,14 @@ const killSession = asyncHandler(async (req, res) => {
   const session = await Session.findOneAndUpdate(
     { _id: sessionId, user_id: userId, is_active: true },
     { is_active: false },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   if (!session) {
     throw new ApiError(404, 'Session not found');
   }
 
-  return res.status(200).json(new ApiResponse(200, null, 'Session killed successfully'));
+  return res.status(200).json(new ApiResponse(true, 200, 'Session killed successfully'));
 });
 
 export {

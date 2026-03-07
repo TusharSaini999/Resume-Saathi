@@ -1,0 +1,3 @@
+$kind: collection
+description: User authentication and session management APIs
+order: 1000

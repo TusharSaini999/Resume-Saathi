@@ -1,0 +1,15 @@
+$kind: http-request
+name: Login User
+url: "{{HOST_NAME}}/users/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "email": "testusergmail@gmail.com",
+      "password": "Tushar1234"
+    }
+order: 2000
+examples: ./.resources\Login User.resources\examples

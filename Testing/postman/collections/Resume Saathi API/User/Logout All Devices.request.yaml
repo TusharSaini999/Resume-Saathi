@@ -1,0 +1,5 @@
+$kind: http-request
+url: "{{HOST_NAME}}/users/logout-all"
+method: DELETE
+order: 9000
+examples: ./.resources\Logout All Devices.resources\examples
