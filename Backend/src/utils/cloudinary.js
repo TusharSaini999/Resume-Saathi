@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
-import ApiError from './apiError';
+import ApiError from './ApiError.js';
 
 class Cloudinary {
   constructor() {
@@ -13,6 +13,7 @@ class Cloudinary {
 
   async fileUpload(file, folderName = 'resume_saathi') {
     try {
+      console.log('Uploading file to Cloudinary:', file);
       if (!file) {
         throw new Error('No file provided');
       }
@@ -20,15 +21,17 @@ class Cloudinary {
       // Upload file to Cloudinary
       const result = await cloudinary.uploader.upload(file.path, {
         folder: folderName,
-        resource_type: 'auto', // auto detect image/video
+        resource_type: 'raw', // auto detect image/video
+        format: "pdf",
       });
-
+      console.log('Cloudinary upload successful:', result);
       // Remove file from local storage after upload
       fs.unlinkSync(file.path);
 
       return result; // contains secure_url, public_id etc.
     } catch (error) {
       // Delete file if upload fails
+      console.error('Cloudinary upload failed:', error);
       if (file?.path && fs.existsSync(file.path)) {
         fs.unlinkSync(file.path);
       }

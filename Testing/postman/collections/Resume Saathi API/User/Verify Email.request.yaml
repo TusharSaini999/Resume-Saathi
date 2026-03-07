@@ -1,0 +1,9 @@
+$kind: http-request
+name: Verify Email
+url: "{{HOST_NAME}}/users/verify-email?token=a7df1a321e7813d44e43dfa058851afb3d\
+  eb886bfadfb18d0ccd63935a18a4e5"
+method: GET
+queryParams:
+  token: a7df1a321e7813d44e43dfa058851afb3deb886bfadfb18d0ccd63935a18a4e5
+order: 3000
+examples: ./.resources\Verify Email.resources\examples

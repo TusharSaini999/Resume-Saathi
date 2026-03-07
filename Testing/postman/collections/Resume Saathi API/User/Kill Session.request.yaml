@@ -1,0 +1,8 @@
+$kind: http-request
+name: Kill Session
+url: "{{HOST_NAME}}/users/sessions/:sessionId"
+method: DELETE
+pathVariables:
+  sessionId: 69ac4995434205fac04102df
+order: 10000
+examples: ./.resources\Kill Session.resources\examples

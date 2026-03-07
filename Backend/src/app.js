@@ -4,7 +4,6 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { PARAMETER_LIMIT, SIZE_LIMIT, URL_LIMIT } from './constants.js';
 
-
 const app = express();
 
 // Safe handling if CLIENT_URLS is not defined
@@ -50,8 +49,10 @@ app.set('trust proxy', true);
 
 import testRoute from './router/test.route.js';
 import userRouter from './router/user.router.js';
+import resumeRouter from './router/resume.router.js';
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1', testRoute);
+app.use('/api/v1/resumes', resumeRouter);
 
 export default app;

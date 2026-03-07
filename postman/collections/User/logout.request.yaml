@@ -1,6 +1,0 @@
-$kind: http-request
-name: logout
-url: "{{HOST_NAME}}users/logout"
-method: POST
-order: 4493663099666009
-examples: ./.resources\logout.resources\examples
