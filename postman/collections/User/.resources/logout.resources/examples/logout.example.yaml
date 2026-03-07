@@ -1,0 +1,37 @@
+$kind: http-example
+request:
+  url: "{{HOST_NAME}}users/logout"
+  method: POST
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    content-security-policy: "default-src 'self';base-uri 'self';font-src 'self'
+      https: data:;form-action 'self';frame-ancestors 'self';img-src 'self'
+      data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src
+      'self' https: 'unsafe-inline';upgrade-insecure-requests"
+    cross-origin-opener-policy: same-origin
+    cross-origin-resource-policy: same-origin
+    origin-agent-cluster: ?1
+    referrer-policy: no-referrer
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-content-type-options: nosniff
+    x-dns-prefetch-control: off
+    x-download-options: noopen
+    x-frame-options: SAMEORIGIN
+    x-permitted-cross-domain-policies: none
+    x-xss-protection: "0"
+    vary: Origin
+    access-control-allow-credentials: "true"
+    set-cookie: token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly;
+      SameSite=Strict
+    content-type: application/json; charset=utf-8
+    content-length: "63"
+    etag: W/"3f-YoG081DN4qbsoYjZPPAApulkGRA"
+    date: Thu, 05 Mar 2026 14:53:43 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+  body:
+    type: json
+    content: '{"success":true,"statusCode":200,"message":"Logout successful"}'
+order: 1772722426809
