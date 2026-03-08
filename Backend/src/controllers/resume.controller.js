@@ -19,16 +19,12 @@ const uploadResume = asyncHandler(async (req, res) => {
   if (!file) {
     throw new ApiError(400, 'No file uploaded');
   }
+  
+  const pdfParser = new PdfParese();
+  const pdfText = await pdfParser.getText(file.path);
+  const formatResume = await pdfParser.getAllPagesRawContent(file.path);
 
   const resUpload = await cloudinary.fileUpload(file);
-
-  console.log('Cloudinary upload result:', resUpload);
-  const pdf = new PdfParese();
-  const pdfText = await pdf.pdfParseText(file.path);
-  const formatResume = await pdf.getAllPagesRawContent(file.path);
-
-  console.log('PDF Text:', pdfText);
-  console.log('Formatted Resume:', formatResume);
 
   const resumeDoc = await ResumesCollection.create({
     user_id: userId,
@@ -48,7 +44,7 @@ const uploadResume = asyncHandler(async (req, res) => {
   if (!userRes) {
     throw new ApiError(500, 'Failed to update user with resume ID');
   }
-
+  
   res
     .status(201)
     .json(new ApiResponse(true, 'Resume uploaded successfully', { resume: resumeDoc }));

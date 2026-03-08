@@ -24,7 +24,6 @@ class Cloudinary {
         resource_type: 'raw', // auto detect image/video
         format: "pdf",
       });
-      console.log('Cloudinary upload successful:', result);
       // Remove file from local storage after upload
       fs.unlinkSync(file.path);
 
@@ -37,34 +36,6 @@ class Cloudinary {
       }
 
       throw new ApiError(500, 'File upload failed', [], error.stack);
-    }
-  }
-
-  async deleteFile(public_id) {
-    try {
-      const result = await cloudinary.uploader.destroy(public_id);
-      return result;
-    } catch (error) {
-      throw new ApiError(500, 'File deletion failed', [], error.stack);
-    }
-  }
-  async replaceFile(oldPublicId, newFile, folderName = 'uploads') {
-    try {
-      if (!newFile) {
-        throw new ApiError(400, 'No new file provided for replacement');
-      }
-
-      // Delete old file if exists
-      if (oldPublicId) {
-        await this.deleteFile(oldPublicId);
-      }
-
-      // Upload new file
-      const uploadedFile = await this.fileUpload(newFile, folderName);
-
-      return uploadedFile;
-    } catch (error) {
-      throw new ApiError(500, 'File replacement failed', [], error.stack);
     }
   }
 }
