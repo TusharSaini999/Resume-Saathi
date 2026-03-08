@@ -72,7 +72,7 @@ const userSchema = new mongoose.Schema(
 // Hash password before saving
 userSchema.pre('save', async function () {
   try {
-    if (!this.isModified('password')) return next();
+    if (!this.isModified('password')) return ;
 
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -85,7 +85,7 @@ userSchema.pre('findOneAndUpdate', async function () {
   try {
     const update = this.getUpdate();
 
-    if (!update.password) return next();
+    if (!update.password) return ;
 
     const salt = await bcrypt.genSalt(10);
     update.password = await bcrypt.hash(update.password, salt);

@@ -1,41 +1,54 @@
-import multer from 'multer';
-import path from 'path';
-import ApiError from '../utils/ApiError.js';
-import fs from 'fs';
-const uploadDir = path.resolve('uploads');
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import ApiError from "../utils/ApiError.js";
 
-// create folder if it does not exist
+// Upload directory
+const uploadDir = path.resolve("uploads");
+
+// Ensure uploads folder exists
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// Storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
 
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  filename: (req, file, cb) => {
+    const uniqueSuffix =
+      Date.now() + "-" + Math.round(Math.random() * 1e9);
+
+    const ext = path.extname(file.originalname).toLowerCase();
+
+    cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
   },
 });
 
+// File filter for PDF validation
 const fileFilter = (req, file, cb) => {
-  const allowedMime = 'application/pdf';
-  const allowedExt = '.pdf';
-  if (
-    file.mimetype === allowedMime ||
-    path.extname(file.originalname).toLowerCase() === allowedExt
-  ) {
+  const allowedMime = "application/pdf";
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  if (file.mimetype === allowedMime && ext === ".pdf") {
     cb(null, true);
   } else {
-    cb(new ApiError(404, 'Only upload pdf file!'), false);
+    cb(new ApiError(400, "Only PDF files are allowed"), false);
   }
 };
 
+// Multer instance
 const upload = multer({
   storage,
   fileFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB
+  },
 });
 
 export default upload;
+
+
+// curl.exe -X POST http://localhost:5000/api/v1/resumes/upload -F "resume=@C:\Project\Resume-Saathi\New Microsoft Word Document.pdf"
