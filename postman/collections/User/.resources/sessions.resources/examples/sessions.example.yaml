@@ -1,0 +1,54 @@
+$kind: http-example
+request:
+  url: "{{HOST_NAME}}users/sessions"
+  method: GET
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    content-security-policy: "default-src 'self';base-uri 'self';font-src 'self'
+      https: data:;form-action 'self';frame-ancestors 'self';img-src 'self'
+      data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src
+      'self' https: 'unsafe-inline';upgrade-insecure-requests"
+    cross-origin-opener-policy: same-origin
+    cross-origin-resource-policy: same-origin
+    origin-agent-cluster: ?1
+    referrer-policy: no-referrer
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-content-type-options: nosniff
+    x-dns-prefetch-control: off
+    x-download-options: noopen
+    x-frame-options: SAMEORIGIN
+    x-permitted-cross-domain-policies: none
+    x-xss-protection: "0"
+    vary: Origin
+    access-control-allow-credentials: "true"
+    content-type: application/json; charset=utf-8
+    content-length: "4865"
+    etag: W/"1301-H/0J8xjk5QlVZm5eWhPlMGlwOh0"
+    date: Thu, 05 Mar 2026 14:07:42 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+  body:
+    type: json
+    content: '{"success":true,"statusCode":200,"message":"Sessions retrieved
+      successfully","data":[{"_id":"69a989df5111dfc3e6e766cb","user_id":"69a846bceecabe0b429b800d","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTg0NmJjZWVjYWJlMGI0MjliODAwZCIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzI3MTg1NTgsImV4cCI6MTgwNDI3NjE1OH0.p9ojNx6tK9mkDu3ufMSh1onEeOzLd-IcMtv8gadhQRg","browser":"Unknown","os":"Unknown","location":"Unknown,
+      Unknown,
+      Unknown","ip_address":"::1","is_active":true,"expires_at":"2027-03-05T13:49:19.588Z","createdAt":"2026-03-05T13:49:19.589Z","updatedAt":"2026-03-05T13:49:19.589Z","__v":0},{"_id":"69a988e15111dfc3e6e766c6","user_id":"69a846bceecabe0b429b800d","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTg0NmJjZWVjYWJlMGI0MjliODAwZCIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzI3MTgzMDQsImV4cCI6MTgwNDI3NTkwNH0.UtDksyuRj6Tvt8YtwLnYEmZPTiezu3t6PpBNTEtU4Es","browser":"Unknown","os":"Unknown","location":"Unknown,
+      Unknown,
+      Unknown","ip_address":"::1","is_active":true,"expires_at":"2027-03-05T13:45:05.540Z","createdAt":"2026-03-05T13:45:05.540Z","updatedAt":"2026-03-05T13:45:05.540Z","__v":0},{"_id":"69a988c35111dfc3e6e766c2","user_id":"69a846bceecabe0b429b800d","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTg0NmJjZWVjYWJlMGI0MjliODAwZCIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzI3MTgyNzQsImV4cCI6MTgwNDI3NTg3NH0.-hbo-l9Da_5de2MpV4lFmmMsdOo3GFQ9oDjjNsuyyGE","browser":"Unknown","os":"Unknown","location":"Unknown,
+      Unknown,
+      Unknown","ip_address":"::1","is_active":true,"expires_at":"2027-03-05T13:44:35.460Z","createdAt":"2026-03-05T13:44:35.460Z","updatedAt":"2026-03-05T13:44:35.460Z","__v":0},{"_id":"69a9887e5111dfc3e6e766be","user_id":"69a846bceecabe0b429b800d","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTg0NmJjZWVjYWJlMGI0MjliODAwZCIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzI3MTgyMDUsImV4cCI6MTgwNDI3NTgwNX0.wBTjQv6pQspV56E_FwiBrxO5DGJDpG706dK58WGEHuY","browser":"Unknown","os":"Unknown","location":"Unknown,
+      Unknown,
+      Unknown","ip_address":"::1","is_active":true,"expires_at":"2027-03-05T13:43:26.326Z","createdAt":"2026-03-05T13:43:26.327Z","updatedAt":"2026-03-05T13:43:26.327Z","__v":0},{"_id":"69a988175111dfc3e6e766ba","user_id":"69a846bceecabe0b429b800d","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTg0NmJjZWVjYWJlMGI0MjliODAwZCIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzI3MTgxMDEsImV4cCI6MTgwNDI3NTcwMX0.np0jPxYgayTNBZA_oDM2LCzQUJML9SHSWZzoiig7hFY","browser":"Unknown","os":"Unknown","location":"Unknown,
+      Unknown,
+      Unknown","ip_address":"::1","is_active":true,"expires_at":"2027-03-05T13:41:43.057Z","createdAt":"2026-03-05T13:41:43.057Z","updatedAt":"2026-03-05T13:41:43.057Z","__v":0},{"_id":"69a84c7f4e7bde4666561669","user_id":"69a846bceecabe0b429b800d","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTg0NmJjZWVjYWJlMGI0MjliODAwZCIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzI2MzczMTAsImV4cCI6MTgwNDE5NDkxMH0.h15j6HKuGdkyceAE1gBQcYnkMbW77JkH3voJz4e_TgA","browser":"Unknown","os":"Unknown","location":"Unknown,
+      Unknown,
+      Unknown","ip_address":"::1","is_active":true,"expires_at":"2027-03-04T15:15:11.162Z","createdAt":"2026-03-04T15:15:11.179Z","updatedAt":"2026-03-04T15:15:11.179Z","__v":0},{"_id":"69a84c633aa6962c9a71c96c","user_id":"69a846bceecabe0b429b800d","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTg0NmJjZWVjYWJlMGI0MjliODAwZCIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzI2MzcyODIsImV4cCI6MTgwNDE5NDg4Mn0.zoGJhN8JF0zdt5ZWWXN06ClL1F6brS6_JjD9yILKlrM","browser":"Unknown","os":"Unknown","location":"Unknown,
+      Unknown,
+      Unknown","ip_address":"::1","is_active":true,"expires_at":"2027-03-04T15:14:43.342Z","createdAt":"2026-03-04T15:14:43.343Z","updatedAt":"2026-03-04T15:14:43.343Z","__v":0},{"_id":"69a84c3a3aa6962c9a71c969","user_id":"69a846bceecabe0b429b800d","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTg0NmJjZWVjYWJlMGI0MjliODAwZCIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzI2MzcyNDEsImV4cCI6MTgwNDE5NDg0MX0.kY8CZH_P7-YKH6iAH1jg75yyklw4rV4jrgVJhvy-BeQ","browser":"Unknown","os":"Unknown","location":"Unknown,
+      Unknown,
+      Unknown","ip_address":"::1","is_active":true,"expires_at":"2027-03-04T15:14:02.135Z","createdAt":"2026-03-04T15:14:02.161Z","updatedAt":"2026-03-04T15:14:02.161Z","__v":0},{"_id":"69a8485aeecabe0b429b8019","user_id":"69a846bceecabe0b429b800d","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTg0NmJjZWVjYWJlMGI0MjliODAwZCIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NzI2MzYyNDgsImV4cCI6MTgwNDE5Mzg0OH0.FZM6gB_k-dlnF6BMAIU1E7ztbMTBfNY5bdPiAZUWMvE","browser":"Unknown","os":"Unknown","location":"Unknown,
+      Unknown,
+      Unknown","ip_address":"::1","is_active":true,"expires_at":"2027-03-04T14:57:30.994Z","createdAt":"2026-03-04T14:57:30.998Z","updatedAt":"2026-03-04T14:57:30.998Z","__v":0}]}'
+order: 1772719675988

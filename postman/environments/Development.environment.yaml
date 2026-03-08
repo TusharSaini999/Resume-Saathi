@@ -1,0 +1,5 @@
+name: Development
+values:
+  - key: HOST_NAME
+    value: ''
+    enabled: true

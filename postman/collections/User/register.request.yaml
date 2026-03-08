@@ -1,0 +1,16 @@
+$kind: http-request
+name: register
+url: "{{HOST_NAME}}users/register"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"name\":\"Test 1\",\r
+
+    \    \"email\":\"testuser@example.com\",\r
+
+    \    \"password\":\"test@1234\"\r
+
+    }"
+order: 1000
