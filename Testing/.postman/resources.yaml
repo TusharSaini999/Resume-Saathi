@@ -1,0 +1,16 @@
+# Use this workspace to collaborate
+workspace:
+  id: 3d37311c-e4f6-4c56-ba77-bddc02616ba2
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+cloudResources:
+  collections:
+    ..\postman\collections\Resume Saathi API: 42530401-350ac26a-23da-46ba-9a78-e99c2421cda9
+  environments:
+    ..\postman\environments\Local Development.environment.yaml: a8ff4cab-dd6a-49f6-a013-79cbe8735420
+
+# All resources in the `postman/` folder are automatically registered in Local View.
+# Point to additional files outside the `postman/` folder to register them individually. Example:
+#localResources:
+#  collections:
+#    - ../tests/E2E Test Collection/

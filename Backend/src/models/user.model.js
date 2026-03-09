@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import ApiError from '../utils/apiError.js';
+import ApiError from '../utils/ApiError.js';
 
 const authProviderSchema = new mongoose.Schema(
   {
@@ -60,7 +60,7 @@ const userSchema = new mongoose.Schema(
 
     resume_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Resume',
+      ref: 'ResumesCollection',
       default: null,
     },
   },
@@ -72,10 +72,23 @@ const userSchema = new mongoose.Schema(
 // Hash password before saving
 userSchema.pre('save', async function () {
   try {
-    if (!this.isModified('password')) return next();
+    if (!this.isModified('password')) return ;
 
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
+  } catch (error) {
+    next(error);
+  }
+});
+
+userSchema.pre('findOneAndUpdate', async function () {
+  try {
+    const update = this.getUpdate();
+
+    if (!update.password) return ;
+
+    const salt = await bcrypt.genSalt(10);
+    update.password = await bcrypt.hash(update.password, salt);
   } catch (error) {
     next(error);
   }

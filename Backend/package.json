@@ -23,6 +23,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "groq-sdk": "^0.37.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.2",
@@ -31,7 +32,6 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-linkedin-oauth2": "^2.0.0",
-    "pdf-parse": "^2.4.5",
     "pdfjs-dist": "^5.4.624",
     "ua-parser-js": "^2.0.9"
   },

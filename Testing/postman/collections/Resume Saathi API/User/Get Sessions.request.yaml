@@ -1,0 +1,5 @@
+$kind: http-request
+url: "{{HOST_NAME}}/users/sessions"
+method: GET
+order: 7000
+examples: ./.resources\Get Sessions.resources\examples
