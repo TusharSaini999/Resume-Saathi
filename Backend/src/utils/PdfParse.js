@@ -47,22 +47,34 @@ class PdfParese {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
 
-        const itemsWithPositions = content.items.map((item) => ({
-          text: item.str,
-          x: item.transform[4], // x coordinate
-          y: item.transform[5], // y coordinate
-          fontHeight: item.height,
-          width: item.width,
-        }));
+        const itemsWithPositions = content.items
+          .map((item) => ({
+            text: item.str.trim(), // trim whitespace
+            x: item.transform[4], // x coordinate
+            y: item.transform[5], // y coordinate
+            fontHeight: item.height || 0, // fallback to 0
+            width: item.width || 0, // fallback to 0
+          }))
+          .filter(
+            (item) =>
+              item.text && // remove empty text
+              item.text.length > 0 && // remove blank strings
+              item.width > 0 && // remove zero-width items
+              item.fontHeight > 0 // remove items with zero height
+          );
 
-        allPages.push({
-          page: i,
-          items: itemsWithPositions,
-        });
+        // Only push pages that have meaningful content
+        if (itemsWithPositions.length > 0) {
+          allPages.push({
+            page: i,
+            items: itemsWithPositions,
+          });
+        }
       }
+
       return allPages;
     } catch (error) {
-      console.error('Error in getAllPagesWithPositions:', error);
+      console.error('Error in getAllPagesRawContent:', error);
       throw new ApiError(500, 'Failed to extract PDF content: ' + error.message);
     }
   }

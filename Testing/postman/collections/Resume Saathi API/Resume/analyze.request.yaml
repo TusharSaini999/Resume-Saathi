@@ -1,0 +1,12 @@
+$kind: http-request
+name: analyze
+url: "{{HOST_NAME}}/resumes/analyze"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"resumeId\":\"69ace35a99620f00bebf124a\"\r
+
+    }"
+order: 1772903761692
