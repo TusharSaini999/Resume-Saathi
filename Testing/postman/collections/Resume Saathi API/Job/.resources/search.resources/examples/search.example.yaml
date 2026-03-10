@@ -1,0 +1,123 @@
+$kind: http-example
+request:
+  url: "{{HOST_NAME}}/jobs/search?query=Full Stack Developer"
+  method: GET
+  queryParams:
+    query: Full Stack Developer
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    content-security-policy: "default-src 'self';base-uri 'self';font-src 'self'
+      https: data:;form-action 'self';frame-ancestors 'self';img-src 'self'
+      data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src
+      'self' https: 'unsafe-inline';upgrade-insecure-requests"
+    cross-origin-opener-policy: same-origin
+    cross-origin-resource-policy: same-origin
+    origin-agent-cluster: ?1
+    referrer-policy: no-referrer
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-content-type-options: nosniff
+    x-dns-prefetch-control: off
+    x-download-options: noopen
+    x-frame-options: SAMEORIGIN
+    x-permitted-cross-domain-policies: none
+    x-xss-protection: "0"
+    vary: Origin
+    access-control-allow-credentials: "true"
+    content-type: application/json; charset=utf-8
+    content-length: "6283"
+    etag: W/"188b-ms5MoOrJ6Yk0D8hGrS/0+1yTPKA"
+    date: Tue, 10 Mar 2026 08:36:07 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+  body:
+    type: json
+    content: '{"success":true,"statusCode":"Search results retrieved
+      successfully","message":[{"_id":"69afd31a243072a405803115","user_id":"69ac37a3767830d02e4d6213","resume_id":"69aedcc5369ab9bf543e0f86","title":"Full
+      Stack Developer","company_name":"Google","description":"Job Title: Full
+      Stack Developer\n\nLocation: Remote / Hybrid\nExperience Required: 2–4
+      Years\nEmployment Type: Full-Time\n\nJob Summary:\nWe are looking for a
+      skilled Full Stack Developer to join our development team. The candidate
+      will be responsible for building scalable web applications, developing
+      both frontend and backend components, and ensuring high performance and
+      responsiveness.\n\nKey Responsibilities:\n- Develop and maintain web
+      applications using modern frontend and backend technologies.\n- Build
+      responsive user interfaces using HTML, CSS, JavaScript, and React.js.\n-
+      Develop backend services and APIs using Node.js and Express.js.\n- Design
+      and manage databases using MongoDB or MySQL.\n- Implement RESTful APIs for
+      application integration.\n- Work with version control systems such as Git
+      and GitHub.\n- Collaborate with designers and other developers to deliver
+      high-quality software.\n- Debug and optimize applications for performance
+      and scalability.\n\nRequired Skills:\n- JavaScript, HTML5, CSS3\n-
+      React.js\n- Node.js, Express.js\n- MongoDB or other databases\n- REST API
+      development\n- Git version control\n- Software development
+      lifecycle\n\nPreferred Qualifications:\n- TypeScript\n- Docker and CI/CD
+      pipelines\n- Cloud platforms (AWS, Azure, or GCP)\n- Authentication and
+      security practices\n\nEducation:\nBachelor’s degree in Computer Science,
+      Software Engineering, or related field (or equivalent
+      experience).\n\nBenefits:\n- Competitive salary\n- Flexible working
+      hours\n- Learning and development opportunities\n- Collaborative work
+      environment","jd_analysis":{"skills":{"matched_skills":["JavaScript","HTML5","CSS3","React.js","Node.js","Express.js","MongoDB","REST
+      API development","Git version
+      control"],"missing_skills":["TypeScript","Docker and CI/CD
+      pipelines","Cloud platforms (AWS, Azure, or GCP)","Authentication and
+      security practices"],"extra_skills":["Java","Python","C","SQL
+      (MySQL)","Appwrite (BaaS)","Redis","OpenAI API","Gemini API","RAG-based
+      Chatbots","Lang Chain","Vector Search","FSSAI","Vector
+      DB","Firebase"]},"experience":{"required_experience":"2–4
+      Years","candidate_experience":"1 year
+      (internship)","experience_match":false},"education":{"required_education":"Bachelor’s
+      degree in Computer Science, Software Engineering, or related
+      field","candidate_education":"Bachelor of Technology in Computer Science
+      and Engineering (Expected –
+      2027)","education_match":true},"keyword_match":{"total_keywords":15,"matched_keywords":12,"percentage":80},"match_score":80,"suggestions":["Gain
+      more experience in the industry, specifically in full-stack
+      development.","Develop skills in TypeScript, Docker and CI/CD pipelines,
+      and cloud platforms.","Highlight experience with authentication and
+      security practices.","Quantify achievements in the internship and
+      projects."]},"createdAt":"2026-03-10T08:15:22.694Z","updatedAt":"2026-03-10T08:15:22.694Z","__v":0},{"_id":"69afd399243072a40580311a","user_id":"69ac37a3767830d02e4d6213","resume_id":"69aedcc5369ab9bf543e0f86","title":"Full
+      Stack Developer","company_name":"Google","description":"Job Title: Full
+      Stack Developer\n\nLocation: Remote / Hybrid\nExperience Required: 2–4
+      Years\nEmployment Type: Full-Time\n\nJob Summary:\nWe are looking for a
+      skilled Full Stack Developer to join our development team. The candidate
+      will be responsible for building scalable web applications, developing
+      both frontend and backend components, and ensuring high performance and
+      responsiveness.\n\nKey Responsibilities:\n- Develop and maintain web
+      applications using modern frontend and backend technologies.\n- Build
+      responsive user interfaces using HTML, CSS, JavaScript, and React.js.\n-
+      Develop backend services and APIs using Node.js and Express.js.\n- Design
+      and manage databases using MongoDB or MySQL.\n- Implement RESTful APIs for
+      application integration.\n- Work with version control systems such as Git
+      and GitHub.\n- Collaborate with designers and other developers to deliver
+      high-quality software.\n- Debug and optimize applications for performance
+      and scalability.\n\nRequired Skills:\n- JavaScript, HTML5, CSS3\n-
+      React.js\n- Node.js, Express.js\n- MongoDB or other databases\n- REST API
+      development\n- Git version control\n- Software development
+      lifecycle\n\nPreferred Qualifications:\n- TypeScript\n- Docker and CI/CD
+      pipelines\n- Cloud platforms (AWS, Azure, or GCP)\n- Authentication and
+      security practices\n\nEducation:\nBachelor’s degree in Computer Science,
+      Software Engineering, or related field (or equivalent
+      experience).\n\nBenefits:\n- Competitive salary\n- Flexible working
+      hours\n- Learning and development opportunities\n- Collaborative work
+      environment","jd_analysis":{"skills":{"matched_skills":["JavaScript","HTML5","CSS3","React.js","Node.js","Express.js","MongoDB","REST
+      API development","Git version
+      control"],"missing_skills":["TypeScript","Docker and CI/CD
+      pipelines","Cloud platforms (AWS, Azure, or GCP)","Authentication and
+      security practices"],"extra_skills":["Java","Python","C","SQL
+      (MySQL)","Appwrite (BaaS)","Redis","OpenAI API","Gemini API","RAG-based
+      Chatbots","Lang Chain","Vector Search","FSSAI","Vector
+      DB","Firebase"]},"experience":{"required_experience":"2–4
+      Years","candidate_experience":"1 year
+      (internship)","experience_match":false},"education":{"required_education":"Bachelor’s
+      degree in Computer Science, Software Engineering, or related
+      field","candidate_education":"Bachelor of Technology in Computer Science
+      and
+      Engineering","education_match":true},"keyword_match":{"total_keywords":15,"matched_keywords":12,"percentage":80},"match_score":80,"suggestions":["Gain
+      more experience in the industry to meet the 2-4 year requirement","Learn
+      and add skills in TypeScript, Docker and CI/CD pipelines, Cloud platforms,
+      and Authentication and security practices","Highlight projects and
+      experience in REST API development, software development lifecycle, and
+      database
+      management"]},"createdAt":"2026-03-10T08:17:29.516Z","updatedAt":"2026-03-10T08:17:29.516Z","__v":0}]}'
+order: 1773131772041

@@ -1,0 +1,38 @@
+$kind: http-request
+name: Check
+url: "{{HOST_NAME}}/jobs/check"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"company_name\": \"Google\",\r
+
+    \  \"description\": \"Job Title: Full Stack Developer\\n\\nLocation: Remote
+    / Hybrid\\nExperience Required: 2–4 Years\\nEmployment Type:
+    Full-Time\\n\\nJob Summary:\\nWe are looking for a skilled Full Stack
+    Developer to join our development team. The candidate will be responsible
+    for building scalable web applications, developing both frontend and backend
+    components, and ensuring high performance and responsiveness.\\n\\nKey
+    Responsibilities:\\n- Develop and maintain web applications using modern
+    frontend and backend technologies.\\n- Build responsive user interfaces
+    using HTML, CSS, JavaScript, and React.js.\\n- Develop backend services and
+    APIs using Node.js and Express.js.\\n- Design and manage databases using
+    MongoDB or MySQL.\\n- Implement RESTful APIs for application
+    integration.\\n- Work with version control systems such as Git and
+    GitHub.\\n- Collaborate with designers and other developers to deliver
+    high-quality software.\\n- Debug and optimize applications for performance
+    and scalability.\\n\\nRequired Skills:\\n- JavaScript, HTML5, CSS3\\n-
+    React.js\\n- Node.js, Express.js\\n- MongoDB or other databases\\n- REST API
+    development\\n- Git version control\\n- Software development
+    lifecycle\\n\\nPreferred Qualifications:\\n- TypeScript\\n- Docker and CI/CD
+    pipelines\\n- Cloud platforms (AWS, Azure, or GCP)\\n- Authentication and
+    security practices\\n\\nEducation:\\nBachelor’s degree in Computer Science,
+    Software Engineering, or related field (or equivalent
+    experience).\\n\\nBenefits:\\n- Competitive salary\\n- Flexible working
+    hours\\n- Learning and development opportunities\\n- Collaborative work
+    environment\"\r
+
+    }"
+order: 1773130157466
+examples: ./.resources\Check.resources\examples
