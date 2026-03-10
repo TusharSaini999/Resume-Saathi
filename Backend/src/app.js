@@ -50,9 +50,11 @@ app.set('trust proxy', true);
 import testRoute from './router/test.route.js';
 import userRouter from './router/user.router.js';
 import resumeRouter from './router/resume.router.js';
+import jobRouter from './router/job.router.js';
 
-app.use('/api/v1/users', userRouter);
 app.use('/api/v1', testRoute);
+app.use('/api/v1/jobs', jobRouter);
+app.use('/api/v1/users', userRouter);
 app.use('/api/v1/resumes', resumeRouter);
 
 export default app;

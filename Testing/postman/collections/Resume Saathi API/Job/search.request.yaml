@@ -1,0 +1,8 @@
+$kind: http-request
+name: search
+url: "{{HOST_NAME}}/jobs/search?query=Full Stack Developer"
+method: GET
+queryParams:
+  query: Full Stack Developer
+order: 2930877844065417
+examples: ./.resources\search.resources\examples

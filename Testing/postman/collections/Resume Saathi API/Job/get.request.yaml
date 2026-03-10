@@ -1,0 +1,6 @@
+$kind: http-request
+name: get
+url: "{{HOST_NAME}}/jobs/get"
+method: GET
+order: 1183259130705182
+examples: ./.resources\get.resources\examples
