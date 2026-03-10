@@ -8,7 +8,7 @@ import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import cloudinary from '../utils/cloudinary.js';
-import pdfAnalyzer from '../analyzer/pdf_analyzer.js';
+import Analyzer from '../analyzer/analyzer.js';
 
 const uploadResume = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -45,7 +45,7 @@ const uploadResume = asyncHandler(async (req, res) => {
     throw new ApiError(500, 'Failed to update user with resume ID');
   }
 
-  const PdfAnalysis = new pdfAnalyzer();
+  const PdfAnalysis = new Analyzer();
   const analysisResult = await PdfAnalysis.analyzePdf(resumeDoc.parsed_data);
 
   if (!analysisResult) {
@@ -106,7 +106,7 @@ const reUploadResume = asyncHandler(async (req, res) => {
     throw new ApiError(500, 'Failed to update user with resume ID');
   }
 
-  const PdfAnalysis = new pdfAnalyzer();
+  const PdfAnalysis = new Analyzer();
   const analysisResult = await PdfAnalysis.analyzePdf(resumeDoc.parsed_data);
 
   if (!analysisResult) {

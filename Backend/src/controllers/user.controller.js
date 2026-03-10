@@ -1,5 +1,7 @@
 import User from '../models/user.model.js';
 import Session from '../models/session.model.js';
+import JobDescription from '../models/jobDescription.model.js';
+import ResumeAnalysis from '../models/resume_analysis.model.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
@@ -41,6 +43,19 @@ const genrateSession = async (user, req) => {
   return token;
 };
 
+//get user and return resume/job details
+const getUserDetails = async (user) => {
+  const userId = user._id;
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new ApiError(400, 'Invalid User ID');
+  }
+  //get the JD
+  const jobResp = await JobDescription.find({ user_id: userId }).sort({ createdAt: -1 });
+  const resumeResp = await ResumeAnalysis.find({ user_id: userId, resume_id: user.resume_id }).sort(
+    { createdAt: -1 }
+  );
+  return { jobResp, resumeResp };
+};
 //send varification email
 const sendVerificationEmail = async (user) => {
   const existingToken = await Token.findOne({
@@ -171,7 +186,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
   await Token.deleteMany({ user_id: user._id, type: 'email_verification' });
 
   const accessToken = await genrateSession(user, req);
-
+  const userDetails = await getUserDetails(user);
   res
     .status(200)
     .cookie('token', accessToken, COOKIE_OPTIONS)
@@ -179,6 +194,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
       new ApiResponse(true, 200, 'Email verified successfully', {
         ...user._doc,
         token: accessToken,
+        ...userDetails,
       })
     );
 });
@@ -228,10 +244,13 @@ const loginUser = asyncHandler(async (req, res) => {
     );
   } else {
     const token = await genrateSession(user, req);
+    const userDetails = await getUserDetails(user);
     res
       .status(200)
       .cookie('token', token, COOKIE_OPTIONS)
-      .json(new ApiResponse(true, 200, 'Login successful', { ...user._doc, token }));
+      .json(
+        new ApiResponse(true, 200, 'Login successful', { ...user._doc, token, ...userDetails })
+      );
   }
 });
 

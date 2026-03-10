@@ -1,7 +1,7 @@
 import Groq from 'groq-sdk';
 import ApiError from '../utils/ApiError.js';
 
-class PdfAnalyzer {
+class Analyzer {
   constructor() {
     this.groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
   }
@@ -327,6 +327,219 @@ Resume text:
       throw new ApiError(500, 'Failed to analyze PDF');
     }
   }
+  async analyzeJDToResume(resumeText, jobDescriptionText) {
+    try {
+      const response = await this.groq.chat.completions.create({
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        temperature: 0,
+        max_completion_tokens: 8192,
+
+        messages: [
+          {
+            role: 'system',
+            content: `
+You are an expert AI recruiter and resume evaluator.
+
+Your task is to compare a candidate's RESUME with a JOB DESCRIPTION
+and return a structured JSON analysis.
+
+Evaluate the following:
+
+1. Job Title Extraction
+Extract the job title from the Job Description.
+
+Return:
+- title
+
+2. Overall Match Score (0–100)
+Evaluate how well the resume matches the job description.
+
+3. Skills Analysis
+Extract skills from the JD and compare with the resume.
+
+Return:
+- matched_skills
+- missing_skills
+- extra_skills
+
+4. Experience Comparison
+Compare required experience from the JD with candidate experience.
+
+Return:
+- required_experience
+- candidate_experience
+- experience_match (true/false)
+
+5. Education Comparison
+Compare education requirements with the candidate’s education.
+
+Return:
+- required_education
+- candidate_education
+- education_match (true/false)
+
+6. Keyword Match
+Extract important keywords from the JD and check their presence.
+
+Return:
+- total_keywords
+- matched_keywords
+- percentage
+
+7. Suggestions
+Provide practical improvements to help the candidate improve the resume for this job.
+
+Rules:
+- Return ONLY valid JSON
+- Follow the schema strictly
+- Do NOT add explanations outside JSON
+`,
+          },
+
+          {
+            role: 'user',
+            content: `
+Analyze the Resume against the Job Description.
+
+Return JSON strictly in this format:
+
+{
+  "title": "",
+  "match_score": 0,
+  "skills": {
+    "matched_skills": [],
+    "missing_skills": [],
+    "extra_skills": []
+  },
+  "experience": {
+    "required_experience": "",
+    "candidate_experience": "",
+    "experience_match": false
+  },
+  "education": {
+    "required_education": "",
+    "candidate_education": "",
+    "education_match": false
+  },
+  "keyword_match": {
+    "total_keywords": 0,
+    "matched_keywords": 0,
+    "percentage": 0
+  },
+  "suggestions": []
 }
 
-export default PdfAnalyzer;
+Job Description:
+"""${jobDescriptionText}"""
+
+Resume:
+"""${resumeText}"""
+`,
+          },
+        ],
+
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: 'jd_resume_analysis',
+            strict: true,
+
+            schema: {
+              type: 'object',
+
+              properties: {
+                title: {
+                  type: 'string',
+                },
+
+                match_score: {
+                  type: 'number',
+                },
+
+                skills: {
+                  type: 'object',
+                  properties: {
+                    matched_skills: {
+                      type: 'array',
+                      items: { type: 'string' },
+                    },
+                    missing_skills: {
+                      type: 'array',
+                      items: { type: 'string' },
+                    },
+                    extra_skills: {
+                      type: 'array',
+                      items: { type: 'string' },
+                    },
+                  },
+                  required: ['matched_skills', 'missing_skills', 'extra_skills'],
+                  additionalProperties: false,
+                },
+
+                experience: {
+                  type: 'object',
+                  properties: {
+                    required_experience: { type: 'string' },
+                    candidate_experience: { type: 'string' },
+                    experience_match: { type: 'boolean' },
+                  },
+                  required: ['required_experience', 'candidate_experience', 'experience_match'],
+                  additionalProperties: false,
+                },
+
+                education: {
+                  type: 'object',
+                  properties: {
+                    required_education: { type: 'string' },
+                    candidate_education: { type: 'string' },
+                    education_match: { type: 'boolean' },
+                  },
+                  required: ['required_education', 'candidate_education', 'education_match'],
+                  additionalProperties: false,
+                },
+
+                keyword_match: {
+                  type: 'object',
+                  properties: {
+                    total_keywords: { type: 'number' },
+                    matched_keywords: { type: 'number' },
+                    percentage: { type: 'number' },
+                  },
+                  required: ['total_keywords', 'matched_keywords', 'percentage'],
+                  additionalProperties: false,
+                },
+
+                suggestions: {
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                  },
+                },
+              },
+
+              required: [
+                'title',
+                'match_score',
+                'skills',
+                'experience',
+                'education',
+                'keyword_match',
+                'suggestions',
+              ],
+
+              additionalProperties: false,
+            },
+          },
+        },
+      });
+
+      const result = response.choices[0].message.content;
+      return JSON.parse(result);
+    } catch (error) {
+      console.error(error);
+      throw new ApiError(500, 'JD Resume analysis failed');
+    }
+  }
+}
+
+export default Analyzer;
