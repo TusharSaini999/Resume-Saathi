@@ -1,0 +1,15 @@
+$kind: http-request
+name: chat
+url: "{{HOST_NAME}}/chating/chat/:query"
+method: POST
+pathVariables:
+  query: Hii
+body:
+  type: json
+  content: "{\r
+
+    \    \"chatId\": \"69b0b4314777c5287b2b0aba\"\r
+
+    }"
+order: 1000
+examples: ./.resources\chat.resources\examples

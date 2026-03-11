@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const chatSessionSchema = new mongoose.Schema(
   {
     user_id: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: [true, "User ID is required"],
       index: true,
@@ -22,7 +22,7 @@ const chatSessionSchema = new mongoose.Schema(
 );
 
 /* -------------------- Indexes -------------------- */
-chatSessionSchema.index({ user_id: 1, created_at: -1 });
+chatSessionSchema.index({ user_id: 1, createdAt: 1 });
 
 /* -------------------- Model Export -------------------- */
 const ChatSession = mongoose.model("ChatSession", chatSessionSchema);

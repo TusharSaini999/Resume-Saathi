@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import ResumesCollection from '../models/resumes_collection.model.js';
 import ResumeAnalysis from '../models/resume_analysis.model.js';
-// import JobDescription from '../models/jobDescription.model.js';
 import User from '../models/user.model.js';
 import PdfParese from '../utils/PdfParse.js';
 import ApiError from '../utils/ApiError.js';
@@ -62,7 +61,7 @@ const uploadResume = asyncHandler(async (req, res) => {
   }
   res
     .status(201)
-    .json(new ApiResponse(true, 'Resume uploaded successfully', { resume: resumeDoc }));
+    .json(new ApiResponse(true, 200,'Resume uploaded successfully', { resume: resumeDoc }));
 });
 
 const reUploadResume = asyncHandler(async (req, res) => {
@@ -123,7 +122,7 @@ const reUploadResume = asyncHandler(async (req, res) => {
   }
   res
     .status(201)
-    .json(new ApiResponse(true, 'Resume Reuploaded successfully', { resume: resumeDoc }));
+    .json(new ApiResponse(true,200, 'Resume Reuploaded successfully', { resume: resumeDoc }));
 });
 
 // // curl.exe -X POST http://localhost:5000/api/v1/resumes/reupload -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YWMzN2EzNzY3ODMwZDAyZTRkNjIxMyIsImVtYWlsIjoidGVzdHVzZXJnbWFpbEBnbWFpbC5jb20iLCJpYXQiOjE3NzI5MzQwNTAsImV4cCI6MTgwNDQ5MTY1MH0.a-2Si_J5UeJUehnxYnvhnVr2VOSrX9iUNG71EjNmFl0" -F "resume=@C:\Users\tusha\Downloads\TusharSaini_SDE_Resume.pdf"

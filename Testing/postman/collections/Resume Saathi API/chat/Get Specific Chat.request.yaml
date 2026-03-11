@@ -1,0 +1,8 @@
+$kind: http-request
+name: Get Specific Chat
+url: "{{HOST_NAME}}/chating/chat/history/:id"
+method: GET
+pathVariables:
+  id: 69b0b8ae41d012679afe3bcc
+examples: ./.resources\Get Specific Chat.resources\examples
+order: 2957
