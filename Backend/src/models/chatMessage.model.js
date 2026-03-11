@@ -3,14 +3,14 @@ import mongoose from 'mongoose';
 const chatMessageSchema = new mongoose.Schema(
   {
     user_id: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'User ID is required'],
       index: true,
     },
 
     session_id: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'ChatSession',
       required: [true, 'Session ID is required'],
       index: true,
@@ -20,7 +20,7 @@ const chatMessageSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Sender is required'],
       enum: {
-        values: ['ai', 'user'],
+        values: ['assistant', 'user'],
         message: "Sender must be either 'ai' or 'user'",
       },
     },
@@ -39,7 +39,7 @@ const chatMessageSchema = new mongoose.Schema(
 /* -------------------- Indexes -------------------- */
 
 // For fetching session messages efficiently
-chatMessageSchema.index({ session_id: 1, created_at: 1 });
+chatMessageSchema.index({ session_id: 1, createdAt: 1 });
 
 // Optional: For user-level filtering
 chatMessageSchema.index({ user_id: 1, session_id: 1 });

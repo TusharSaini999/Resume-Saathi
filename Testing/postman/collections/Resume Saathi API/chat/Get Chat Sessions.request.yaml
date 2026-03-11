@@ -1,0 +1,6 @@
+$kind: http-request
+name: Get Chat Sessions
+url: "{{HOST_NAME}}/chating/chat/history"
+method: GET
+order: 3000
+examples: ./.resources\Get Chat Sessions.resources\examples

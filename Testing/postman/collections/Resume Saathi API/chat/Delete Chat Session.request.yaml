@@ -1,0 +1,8 @@
+$kind: http-request
+name: Delete Chat Session
+url: "{{HOST_NAME}}/chating/chat/history/:id"
+method: DELETE
+pathVariables:
+  id: 69b0b8ae41d012679afe3bcc
+order: 2683919136720059
+examples: ./.resources\Delete Chat Session.resources\examples

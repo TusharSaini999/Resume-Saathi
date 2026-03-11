@@ -41,7 +41,7 @@ const check = asyncHandler(async (req, res) => {
   if (!jobResp) {
     throw new ApiError(500, 'Failed to save job description analysis');
   }
-  res.status(200).json(new ApiResponse(true, 'Job description analyzed successfully', jobResp));
+  res.status(200).json(new ApiResponse(true,200, 'Job description analyzed successfully', jobResp));
 });
 
 const search = asyncHandler(async (req, res) => {
@@ -56,7 +56,7 @@ const search = asyncHandler(async (req, res) => {
   const jobs = await JobDescription.find({
     title: { $regex: query, $options: 'i' }, // 'i' = case-insensitive
   });
-  res.status(200).json(new ApiResponse(true, 'Search results retrieved successfully', jobs));
+  res.status(200).json(new ApiResponse(true,200, 'Search results retrieved successfully', jobs));
 });
 
 const get = asyncHandler(async (req, res) => {
@@ -65,7 +65,7 @@ const get = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Invalid User ID');
   }
   const jobs = await JobDescription.find({ user_id: userId }).sort({ createdAt: -1 });
-  res.status(200).json(new ApiResponse(true, 'Job descriptions retrieved successfully', jobs));
+  res.status(200).json(new ApiResponse(true,200, 'Job descriptions retrieved successfully', jobs));
 });
 
 export { check, search, get };
