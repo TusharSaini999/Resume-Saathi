@@ -1,0 +1,52 @@
+$kind: http-example
+request:
+  url: "{{HOST_NAME}}/chating/chat/history"
+  method: GET
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    content-security-policy: "default-src 'self';base-uri 'self';font-src 'self'
+      https: data:;form-action 'self';frame-ancestors 'self';img-src 'self'
+      data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src
+      'self' https: 'unsafe-inline';upgrade-insecure-requests"
+    cross-origin-opener-policy: same-origin
+    cross-origin-resource-policy: same-origin
+    origin-agent-cluster: ?1
+    referrer-policy: no-referrer
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-content-type-options: nosniff
+    x-dns-prefetch-control: off
+    x-download-options: noopen
+    x-frame-options: SAMEORIGIN
+    x-permitted-cross-domain-policies: none
+    x-xss-protection: "0"
+    vary: Origin
+    access-control-allow-credentials: "true"
+    content-type: application/json; charset=utf-8
+    content-length: "1641"
+    etag: W/"669-halOzan7T6Xe/5RW3vmqN/GisdI"
+    date: Wed, 11 Mar 2026 11:32:41 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+  body:
+    type: json
+    content: '{"success":true,"statusCode":200,"message":"Chat history
+      retrieved","data":[{"_id":"69b0b8ae41d012679afe3bcc","user_id":"69ac37a3767830d02e4d6213","session_title":"Hello
+      Test
+      User","createdAt":"2026-03-11T00:34:54.668Z","updatedAt":"2026-03-11T00:34:54.668Z","__v":0},{"_id":"69b0b4314777c5287b2b0aba","user_id":"69ac37a3767830d02e4d6213","session_title":"ATS
+      Score and Improvement
+      Suggestions","createdAt":"2026-03-11T00:15:45.915Z","updatedAt":"2026-03-11T00:15:45.915Z","__v":0},{"_id":"69b0b328ae362a2ec6e9144b","user_id":"69ac37a3767830d02e4d6213","session_title":"New
+      Chat
+      Session","createdAt":"2026-03-11T00:11:20.226Z","updatedAt":"2026-03-11T00:11:20.226Z","__v":0},{"_id":"69b0b2feae362a2ec6e91441","user_id":"69ac37a3767830d02e4d6213","session_title":"New
+      Chat
+      Session","createdAt":"2026-03-11T00:10:38.440Z","updatedAt":"2026-03-11T00:10:38.440Z","__v":0},{"_id":"69b0b2a6ae362a2ec6e91438","user_id":"69ac37a3767830d02e4d6213","session_title":"New
+      Chat
+      Session","createdAt":"2026-03-11T00:09:10.143Z","updatedAt":"2026-03-11T00:09:10.143Z","__v":0},{"_id":"69b0b25fae362a2ec6e9142f","user_id":"69ac37a3767830d02e4d6213","session_title":"New
+      Chat
+      Session","createdAt":"2026-03-11T00:07:59.576Z","updatedAt":"2026-03-11T00:07:59.576Z","__v":0},{"_id":"69b0b1a872ad4c109b3e3af2","user_id":"69ac37a3767830d02e4d6213","session_title":"New
+      Chat
+      Session","createdAt":"2026-03-11T00:04:56.577Z","updatedAt":"2026-03-11T00:04:56.577Z","__v":0},{"_id":"69b0b10c6a4528b7164641c6","user_id":"69ac37a3767830d02e4d6213","session_title":"New
+      Chat
+      Session","createdAt":"2026-03-11T00:02:20.688Z","updatedAt":"2026-03-11T00:02:20.688Z","__v":0}]}'
+order: 1773228789588

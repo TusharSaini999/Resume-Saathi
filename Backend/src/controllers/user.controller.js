@@ -2,6 +2,7 @@ import User from '../models/user.model.js';
 import Session from '../models/session.model.js';
 import JobDescription from '../models/jobDescription.model.js';
 import ResumeAnalysis from '../models/resume_analysis.model.js';
+import ChatSession from '../models/chatSession.model.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
@@ -54,7 +55,10 @@ const getUserDetails = async (user) => {
   const resumeResp = await ResumeAnalysis.find({ user_id: userId, resume_id: user.resume_id }).sort(
     { createdAt: -1 }
   );
-  return { jobResp, resumeResp };
+
+  //get the Current Chat session
+  const currentChatSession = await ChatSession.find({ user_id: userId }).sort({ createdAt: -1 });
+  return { jobResp, resumeResp, currentChatSession };
 };
 //send varification email
 const sendVerificationEmail = async (user) => {

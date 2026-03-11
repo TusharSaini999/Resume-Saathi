@@ -1,0 +1,46 @@
+$kind: http-example
+request:
+  url: "{{HOST_NAME}}/chating/chat/:query"
+  method: POST
+  pathVariables:
+    query: Hii
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    content-security-policy: "default-src 'self';base-uri 'self';font-src 'self'
+      https: data:;form-action 'self';frame-ancestors 'self';img-src 'self'
+      data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src
+      'self' https: 'unsafe-inline';upgrade-insecure-requests"
+    cross-origin-opener-policy: same-origin
+    cross-origin-resource-policy: same-origin
+    origin-agent-cluster: ?1
+    referrer-policy: no-referrer
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-content-type-options: nosniff
+    x-dns-prefetch-control: off
+    x-download-options: noopen
+    x-frame-options: SAMEORIGIN
+    x-permitted-cross-domain-policies: none
+    x-xss-protection: "0"
+    vary: Origin
+    access-control-allow-credentials: "true"
+    content-type: application/json; charset=utf-8
+    content-length: "637"
+    etag: W/"27d-pbo99WiAicaGQxsbpteo7LwqXHE"
+    date: Tue, 10 Mar 2026 17:44:10 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+  body:
+    type: json
+    content: "{\"success\":true,\"statusCode\":\"Chat response
+      generated\",\"message\":{\"title\":\"Resume Analysis and Career
+      Guidance\",\"answer\":\"I'd be happy to help you with your resume and
+      career goals. Based on your resume, you have a strong background in
+      computer science and engineering, with experience in programming languages
+      such as Java, JavaScript, and Python. You've also worked on various
+      projects, including a full-stack blogging platform and a food ordering
+      platform.\\n\\nTo better assist you, could you please tell me what
+      specific areas you'd like to focus on? Are you looking for interview
+      preparation, resume improvement, or career advice?\"}}"
+order: 1773164755742
