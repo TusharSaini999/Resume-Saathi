@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { PARAMETER_LIMIT, SIZE_LIMIT, URL_LIMIT } from './constants.js';
-
+import passport from './config/passport_config.js';
 const app = express();
 
 // Safe handling if CLIENT_URLS is not defined
@@ -47,16 +47,20 @@ app.use(cookieParser());
 
 app.set('trust proxy', true);
 
+app.use(passport.initialize());
+
 import testRoute from './router/test.route.js';
 import userRouter from './router/user.router.js';
 import resumeRouter from './router/resume.router.js';
 import jobRouter from './router/job.router.js';
 import chatRouter from './router/chat.router.js';
+import authRoutes from './router/auth.router.js';
 
 app.use('/api/v1', testRoute);
 app.use('/api/v1/jobs', jobRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/resumes', resumeRouter);
 app.use('/api/v1/chating', chatRouter);
+app.use("/api/v1/auth", authRoutes);
 
 export default app;

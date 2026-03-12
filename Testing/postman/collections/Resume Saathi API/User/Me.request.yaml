@@ -1,0 +1,6 @@
+$kind: http-request
+name: Me
+url: "{{HOST_NAME}}/users/me"
+method: GET
+order: 4470296369305232
+examples: ./.resources\Me.resources\examples
