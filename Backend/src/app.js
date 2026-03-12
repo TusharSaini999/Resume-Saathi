@@ -61,6 +61,6 @@ app.use('/api/v1/jobs', jobRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/resumes', resumeRouter);
 app.use('/api/v1/chating', chatRouter);
-app.use("/auth", authRoutes);
+app.use("/api/v1/auth", authRoutes);
 
 export default app;

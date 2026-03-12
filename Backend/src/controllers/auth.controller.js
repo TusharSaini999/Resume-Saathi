@@ -30,6 +30,7 @@ const authController = asyncHandler(async (req, res) => {
     );
 
     if (!existingProvider) {
+      user.email_verified = true;
       user.auth_service.push({
         auth_provider: userData.provider,
         provider_id: userData.providerId,

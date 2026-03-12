@@ -253,7 +253,11 @@ const loginUser = asyncHandler(async (req, res) => {
       .status(200)
       .cookie('token', token, COOKIE_OPTIONS)
       .json(
-        new ApiResponse(true, 200, 'Login successful', { ...user._doc, token, ...userDetails })
+        new ApiResponse(true, 200, 'Login Successful', {
+          ...user._doc,
+          token,
+          ...userDetails,
+        })
       );
   }
 });
@@ -273,7 +277,7 @@ const getUser = asyncHandler(async (req, res) => {
   res
     .status(200)
     .cookie('token', token, COOKIE_OPTIONS)
-    .json(new ApiResponse(true, 200, 'Login successful', { ...user._doc, token, ...userDetails }));
+    .json(new ApiResponse(true, 200, 'User Data fetch successfully', { ...user._doc, token, ...userDetails }));
 });
 //forgot password
 const forgotPassword = asyncHandler(async (req, res) => {
