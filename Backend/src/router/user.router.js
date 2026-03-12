@@ -12,6 +12,7 @@ import {
   forgotPassword,
   resetPassword,
   changePassword,
+  getUser,
 } from '../controllers/user.controller.js';
 
 const userRouter = router.Router();
@@ -25,6 +26,7 @@ userRouter.post('/forgot-password', forgotPassword);
 userRouter.post('/reset-password', resetPassword);
 
 // Protected
+userRouter.get('/me', verifyJwt, getUser);
 userRouter.post('/change-password', verifyJwt, changePassword);
 userRouter.get('/sessions', verifyJwt, listSessions);
 userRouter.delete('/sessions/:sessionId', verifyJwt, killSession);

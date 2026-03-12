@@ -258,6 +258,23 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
+//get user details
+const getUser = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new ApiError(400, 'Invalid User ID');
+  }
+  const user = await User.findById(userId).select('-password');
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+  const token = await genrateSession(user, req);
+  const userDetails = await getUserDetails(user);
+  res
+    .status(200)
+    .cookie('token', token, COOKIE_OPTIONS)
+    .json(new ApiResponse(true, 200, 'Login successful', { ...user._doc, token, ...userDetails }));
+});
 //forgot password
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
@@ -510,4 +527,6 @@ export {
   killSession,
   forgotPassword,
   resetPassword,
+  genrateSession,
+  getUser,
 };
