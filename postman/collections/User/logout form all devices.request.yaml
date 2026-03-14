@@ -1,6 +1,0 @@
-$kind: http-request
-name: logout form all devices
-url: "{{HOST_NAME}}users/logout-all"
-method: DELETE
-order: 4502556991875691
-examples: ./.resources\logout form all devices.resources\examples
