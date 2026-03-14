@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as LinkedInStrategy } from 'passport-linkedin-oauth2';
-    
+
 /* ---------- GOOGLE STRATEGY ---------- */
 
 passport.use(
@@ -9,7 +9,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      callbackURL: `${process.env.HOST_SERVER}/api/v1/auth/google/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -35,7 +35,7 @@ passport.use(
     {
       clientID: process.env.LINKEDIN_CLIENT_ID,
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
-      callbackURL: process.env.LINKEDIN_CALLBACK_URL,
+      callbackURL: `${process.env.HOST_SERVER}/api/v1/auth/linkedin/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -43,7 +43,7 @@ passport.use(
           provider: 'LINKEDIN',
           providerId: profile.id,
           name: profile.displayName,
-          email: profile.emails?.[0]?.value,
+          email: profile.email,
         };
 
         return done(null, userData);

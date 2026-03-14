@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
-import authController from '../controllers/auth.controller';
+import authController from '../controllers/auth.controller.js';
 const authRouter = Router();
 
 /* ---------- GOOGLE AUTH ---------- */
@@ -28,7 +28,7 @@ authRouter.get(
 authRouter.get(
   '/linkedin',
   passport.authenticate('linkedin', {
-    scope: ['r_liteprofile', 'r_emailaddress'],
+    scope: ['email', 'profile', 'openid'],
     session: false,
   })
 );

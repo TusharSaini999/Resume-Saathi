@@ -1,0 +1,58 @@
+🎨 ResumeSaathi UI Color System
+1️⃣ Brand Colors (Primary)
+
+These are your main identity colors.
+
+Name	Color	Usage
+Primary Pink	#FE3E91	buttons, active nav
+Primary Magenta	#CA25AF	gradients
+Primary Purple	#803AD1	gradients
+
+Primary Gradient
+
+#FE3E91 → #CA25AF → #803AD1
+2️⃣ Dark Mode Brand Colors
+Name	Color
+Light Pink	#FF5FA7
+Light Magenta	#D340BD
+Light Purple	#9D65D5
+
+Dark Gradient
+
+#FF5FA7 → #D340BD → #9D65D5
+3️⃣ Neutral Colors (Text & UI)
+Token	Color	Usage
+text-primary	#1E293B	headings
+text-secondary	#475569	paragraph
+text-muted	#64748B	icons
+border-light	#E5E7EB	borders
+background	#FFFFFF	page
+surface	#F9FAFB	cards
+4️⃣ Dark Mode Neutrals
+Token	Color
+dark-background	#111827
+dark-surface	#1F2937
+dark-border	#374151
+dark-text	#FFFFFF
+dark-muted	#94A3B8
+5️⃣ Accent Colors
+
+Used for hover states & highlights
+
+Name	Color
+accent-pink	#FF66A8
+accent-pink-dark	#FA7DB3
+6️⃣ Semantic Colors (Professional UI)
+
+These are important for alerts and status messages.
+
+Type	Color
+Success	#22C55E
+Warning	#F59E0B
+Error	#EF4444
+Info	#3B82F6
+7️⃣ Shadow Colors
+Usage	Color
+Pink Shadow	rgba(254, 62, 145, 0.25)
+Purple Shadow	rgba(128, 58, 209, 0.25)
+Dark Shadow	rgba(0,0,0,0.2)
