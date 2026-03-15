@@ -1,13 +1,77 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>resume_saathi</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+
+  <link rel="icon" type="image/png" href="/Logo/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/Logo/favicon.svg" />
+  <link rel="shortcut icon" href="/Logo/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/Logo/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Resume Saathi" />
+  <link rel="manifest" href="/Logo/site.webmanifest" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Resume Saathi</title>
+
+  <style>
+    html,
+    body,
+    #root {
+      min-height: 100%;
+    }
+
+    html,
+    body {
+      margin: 0;
+      background-color: #f8fafc;
+    }
+  </style>
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem("theme") || "system";
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+      let useDark = false;
+
+      if (savedTheme === "system") {
+        useDark = prefersDark;
+      } else if (savedTheme === "dark") {
+        useDark = true;
+      }
+
+      const initialBg = useDark ? "#030712" : "#f8fafc";
+      document.documentElement.style.backgroundColor = initialBg;
+      if (document.body) {
+        document.body.style.backgroundColor = initialBg;
+      }
+
+      if (savedTheme === "system") {
+        if (prefersDark) {
+          document.documentElement.classList.add("dark");
+          localStorage.setItem("isDark", true);
+        } else {
+          document.documentElement.classList.remove("dark");
+          localStorage.setItem("isDark", false);
+        }
+      }
+      else if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("isDark", true);
+      }
+      else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("isDark", false);
+      }
+    })();
+  </script>
+
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>

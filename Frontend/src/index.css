@@ -1,2 +1,47 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
+
+.how-card {
+	will-change: transform, box-shadow, border-color;
+	transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
+}
+
+.how-card-icon {
+	transition: transform 260ms ease, box-shadow 260ms ease, background-color 260ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.how-card:hover {
+		transform: translateY(-8px);
+		box-shadow: 0 18px 40px rgba(30, 41, 59, 0.14);
+		border-color: rgba(202, 37, 175, 0.38);
+	}
+
+	.how-card:hover .how-card-icon {
+		transform: translateY(-2px) scale(1.06);
+		box-shadow: 0 10px 24px rgba(202, 37, 175, 0.22);
+		background-color: rgba(254, 62, 145, 0.08);
+	}
+}
+
+.how-card:active {
+	transform: translateY(-2px) scale(0.995);
+}
+
+@media (hover: none), (pointer: coarse) {
+	.how-card {
+		transition-duration: 150ms;
+	}
+
+	.how-card:active {
+		transform: translateY(-1px) scale(0.995);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.how-card,
+	.how-card-icon {
+		transition: none !important;
+		transform: none !important;
+	}
+}
