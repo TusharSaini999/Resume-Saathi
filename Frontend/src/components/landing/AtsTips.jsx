@@ -1,4 +1,5 @@
 import { CheckCircle2 } from "lucide-react";
+import ScrollReveal from "../ScrollReveal";
 
 const tips = [
   "Run Resume ATS Analyzer first to identify formatting, keyword, and structure issues.",
@@ -26,14 +27,13 @@ const AtsTips = () => {
           </p>
 
           <ul className="mt-8 grid gap-4 md:grid-cols-2">
-            {tips.map((tip) => (
-              <li
-                key={tip}
-                className="flex items-start gap-3 rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-4"
-              >
-                <CheckCircle2 className="mt-0.5 h-5 w-5 text-[#FE3E91]" />
-                <span className="text-sm leading-6 text-[#475569] dark:text-[#CBD5E1]">{tip}</span>
-              </li>
+            {tips.map((tip, index) => (
+              <ScrollReveal key={tip} as="li" delay={index * 80}>
+                <div className="group flex items-start gap-3 rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-4 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#803AD1]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 text-[#FE3E91] transition-transform duration-300 group-hover:scale-110" />
+                  <span className="text-sm leading-6 text-[#475569] dark:text-[#CBD5E1]">{tip}</span>
+                </div>
+              </ScrollReveal>
             ))}
           </ul>
         </div>
