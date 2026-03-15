@@ -80,7 +80,7 @@ const Hero = () => {
           shadow-xl">
 
             <img
-              src="/resume-preview.png"
+              src="../Assets/1.png"
               alt="Resume Saathi ATS analysis preview"
               className="rounded-xl w-105"
             />

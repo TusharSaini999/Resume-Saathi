@@ -1,6 +1,7 @@
 import { X, Sun, Moon, Laptop } from "lucide-react";
-import { useEffect, useLayoutEffect, useState } from "react";
-
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setTheme } from "../../context/themeSlice";
 const navItems = [
   { label: "Overview", id: "overview" },
   { label: "How It Works", id: "how-it-works" },
@@ -10,37 +11,57 @@ const navItems = [
   { label: "Support", id: "support" },
 ];
 
+const ACTIVE_SECTION_STORAGE_KEY = "activeSection";
+const THEME_STORAGE_KEY = "theme";
+
+const getStoredActiveSection = () => {
+  const storedSection = localStorage.getItem(ACTIVE_SECTION_STORAGE_KEY);
+  const isValidSection = navItems.some((item) => item.label === storedSection);
+  return isValidSection ? storedSection : "Overview";
+};
+
 const Header = () => {
+  const dispatch = useDispatch();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [active, setActive] = useState("Overview");
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "system");
+  const [active, setActive] = useState(getStoredActiveSection);
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  const [btnTheme, setBtnTheme] = useState(localStorage.getItem(THEME_STORAGE_KEY) || "system");
+  const isDark = useSelector((state) => state.theme.isDark);
+  const isClickScrolling = useRef(false);
+  const clickScrollTimer = useRef(null);
 
   const scrollToSection = (label, sectionId) => {
     setActive(label);
     setMobileMenuOpen(false);
+
+    isClickScrolling.current = true;
+    if (clickScrollTimer.current) clearTimeout(clickScrollTimer.current);
+
     const section = document.getElementById(sectionId);
     if (section) {
       section.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+
+    clickScrollTimer.current = setTimeout(() => {
+      isClickScrolling.current = false;
+    }, 1000);
   };
-
   const applyTheme = () => {
-    if (theme === "system") {
+    if (btnTheme === "system") {
       const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      localStorage.setItem("theme", "system");
-
       if (systemPrefersDark) {
         document.documentElement.classList.add("dark");
+        dispatch(setTheme({ theme: btnTheme, isDark: true }));
       } else {
         document.documentElement.classList.remove("dark");
+        dispatch(setTheme({ theme: btnTheme, isDark: false }));
       }
-    } else if (theme === "light") {
+    } else if (btnTheme === "light") {
       document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    } else if (theme === "dark") {
+      dispatch(setTheme({ theme: btnTheme, isDark: false }));
+    } else if (btnTheme === "dark") {
+      dispatch(setTheme({ theme: btnTheme, isDark: true }));
       document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
     }
   };
 
@@ -50,7 +71,7 @@ const Header = () => {
     applyTheme();
 
     const handleChange = () => {
-      if (theme === "system") {
+      if (btnTheme === "system") {
         applyTheme();
       }
     };
@@ -60,10 +81,19 @@ const Header = () => {
     return () => {
       media.removeEventListener("change", handleChange);
     };
-  }, [theme]);
+  }, [btnTheme]);
+
+  useEffect(() => {
+    localStorage.setItem(THEME_STORAGE_KEY, btnTheme);
+  }, [btnTheme]);
+
+  useEffect(() => {
+    localStorage.setItem(ACTIVE_SECTION_STORAGE_KEY, active);
+  }, [active]);
 
   useEffect(() => {
     const updateActiveSection = () => {
+      if (isClickScrolling.current) return;
       const scrollMarker = window.scrollY + 160;
       let currentSection = navItems[0].label;
 
@@ -105,7 +135,7 @@ const Header = () => {
             {/* Logo */}
             <div className="flex items-center cursor-pointer group">
               <img
-                src="./Logo/Logo.png"
+                src={!isDark ? "./Logo/lightLogo.png" : "./Logo/darkLogo.png"}
                 alt="ResumeSaathi Logo"
                 className="w-10 h-10 mr-2 rounded-2xl border-2 border-[#fe3e91] shadow-lg shadow-pink-500/20
                            transition-transform duration-500 transform group-hover:rotate-12 group-hover:scale-110"
@@ -128,20 +158,20 @@ const Header = () => {
               {/* Theme Toggle */}
               <button
                 onClick={() => {
-                  if (theme === "system") {
-                    setTheme("light");
-                  } else if (theme === "light") {
-                    setTheme("dark");
-                  } else if (theme === "dark") {
-                    setTheme("system");
+                  if (btnTheme === "system") {
+                    setBtnTheme("light");
+                  } else if (btnTheme === "light") {
+                    setBtnTheme("dark");
+                  } else if (btnTheme === "dark") {
+                    setBtnTheme("system");
                   }
                 }}
                 className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition text-slate-600 dark:text-slate-400"
                 aria-label="Toggle Theme"
               >
-                {theme === "light" && <Sun size={20} />}
-                {theme === "dark" && <Moon size={20} className="text-white" />}
-                {theme === "system" && <Laptop size={20} />}
+                {btnTheme === "light" && <Sun size={20} className="text-gray-600 dark:text-white" />}
+                {btnTheme === "dark" && <Moon size={20} className="text-gray-600 dark:text-white" />}
+                {btnTheme === "system" && <Laptop size={20} className="text-gray-600 dark:text-white" />}
               </button>
 
               {/* Get Started Button */}
