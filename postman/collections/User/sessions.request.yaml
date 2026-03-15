@@ -1,6 +1,0 @@
-$kind: http-request
-name: sessions
-url: "{{HOST_NAME}}users/sessions"
-method: GET
-order: 4384835557552096
-examples: ./.resources\sessions.resources\examples
