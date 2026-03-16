@@ -2,18 +2,6 @@ import ScrollReveal from "../ScrollReveal";
 
 const Support = () => {
 
-  const handleScrollToOverview = (e) => {
-    e.preventDefault();
-    const section = document.getElementById("overview");
-
-    if (section) {
-      section.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  };
-
   return (
     <section
       id="support"
@@ -21,7 +9,7 @@ const Support = () => {
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="rounded-3xl border border-[#E5E7EB] dark:border-[#374151] bg-[#F8FAFC] dark:bg-[#1F2937] p-8 md:p-10 text-center">
-          
+
           <p className="text-sm font-bold uppercase tracking-widest text-[#FE3E91]">
             Support
           </p>
@@ -98,13 +86,6 @@ const Support = () => {
             >
               Email Support
             </a>
-
-            <button
-              onClick={handleScrollToOverview}
-              className="px-6 py-3 font-semibold rounded-xl border border-[#E5E7EB] dark:border-[#374151] text-[#1E293B] dark:text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-white dark:hover:bg-[#111827] hover:shadow-lg hover:shadow-[#111827]/10"
-            >
-              Back to Overview
-            </button>
 
           </div>
         </div>
