@@ -2,6 +2,7 @@ import { X, Sun, Moon, Laptop } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setTheme } from "../../context/themeSlice";
+
 const navItems = [
   { label: "Overview", id: "overview" },
   { label: "How It Works", id: "how-it-works" },
@@ -15,20 +16,22 @@ const ACTIVE_SECTION_STORAGE_KEY = "activeSection";
 const THEME_STORAGE_KEY = "theme";
 
 const getStoredActiveSection = () => {
-  const storedSection = localStorage.getItem(ACTIVE_SECTION_STORAGE_KEY);
-  const isValidSection = navItems.some((item) => item.label === storedSection);
-  return isValidSection ? storedSection : "Overview";
+  const stored = localStorage.getItem(ACTIVE_SECTION_STORAGE_KEY);
+  return navItems.some((item) => item.label === stored) ? stored : null;
 };
 
 const Header = () => {
   const dispatch = useDispatch();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [active, setActive] = useState(getStoredActiveSection);
+  const [active, setActive] = useState(() => getStoredActiveSection() || navItems[0].label);
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
-  const [btnTheme, setBtnTheme] = useState(localStorage.getItem(THEME_STORAGE_KEY) || "system");
+  const [btnTheme, setBtnTheme] = useState(
+    localStorage.getItem(THEME_STORAGE_KEY) || "system"
+  );
   const isDark = useSelector((state) => state.theme.isDark);
   const isClickScrolling = useRef(false);
   const clickScrollTimer = useRef(null);
+  const navRef = useRef(null);
 
   const scrollToSection = (label, sectionId) => {
     setActive(label);
@@ -92,8 +95,55 @@ const Header = () => {
   }, [active]);
 
   useEffect(() => {
+    const storedActiveSection = getStoredActiveSection();
+    if (!storedActiveSection || storedActiveSection === navItems[0].label) {
+      return;
+    }
+
+    const targetItem = navItems.find((item) => item.label === storedActiveSection);
+    if (!targetItem) {
+      return;
+    }
+
+    let retryTimer = null;
+
+    const scrollToStoredSection = (remainingAttempts = 10) => {
+      const section = document.getElementById(targetItem.id);
+
+      if (section) {
+        isClickScrolling.current = true;
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        if (clickScrollTimer.current) clearTimeout(clickScrollTimer.current);
+        clickScrollTimer.current = setTimeout(() => {
+          isClickScrolling.current = false;
+        }, 1000);
+
+        return;
+      }
+
+      if (remainingAttempts > 0) {
+        retryTimer = setTimeout(() => {
+          scrollToStoredSection(remainingAttempts - 1);
+        }, 120);
+      }
+    };
+
+    scrollToStoredSection();
+
+    return () => {
+      if (retryTimer) clearTimeout(retryTimer);
+    };
+  }, []);
+
+  useEffect(() => {
+    const hasStoredActiveSection = Boolean(getStoredActiveSection());
+
     const updateActiveSection = () => {
-      if (isClickScrolling.current) return;
+      if (isClickScrolling.current) {
+        return;
+      }
+
       const scrollMarker = window.scrollY + 160;
       let currentSection = navItems[0].label;
 
@@ -107,7 +157,10 @@ const Header = () => {
       setActive((previous) => (previous === currentSection ? previous : currentSection));
     };
 
-    updateActiveSection();
+    if (!hasStoredActiveSection) {
+      updateActiveSection();
+    }
+
     window.addEventListener("scroll", updateActiveSection, { passive: true });
     window.addEventListener("resize", updateActiveSection);
 
@@ -117,23 +170,48 @@ const Header = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [mobileMenuOpen]);
+
   const getNavItemClass = (item) =>
     `w-full lg:w-auto text-center text-sm font-bold uppercase tracking-wider relative
-     transition-colors duration-300 py-1 ${active === item
-      ? "text-[#fe3e91] dark:text-[#ff5fa7]"
-      : "text-[#475569] dark:text-[#ffffff] hover:text-[#ff66a8] hover:dark:text-[#fa7db3]"
-    }`;
+     transition-colors duration-300 py-1 ${
+       active === item
+         ? "text-[#fe3e91] dark:text-[#ff5fa7]"
+         : "text-[#475569] dark:text-[#ffffff] hover:text-[#ff66a8] hover:dark:text-[#fa7db3]"
+     }`;
 
   return (
     <>
       <header>
-        <nav className="fixed top-0 w-full z-20 bg-white/80 backdrop-blur-md border-b border-[#E5E7EB] px-4 lg:px-6 py-3
-                        dark:bg-[#111827] dark:border-[#374151] transition-colors duration-300">
-
+        <nav
+          ref={navRef}
+          className="fixed top-0 w-full z-20 border-b border-[#E5E7EB] bg-white/80 px-4 py-3 backdrop-blur-md
+                     transition-colors duration-300 dark:border-[#374151] dark:bg-[#111827] lg:px-6"
+        >
           <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center">
-
             {/* Logo */}
-            <div className="flex items-center cursor-pointer group">
+            <div
+              className="group flex cursor-pointer items-center"
+              onClick={() => scrollToSection("Overview", "overview")}
+            >
               <img
                 src={!isDark ? "./Logo/lightLogo.png" : "./Logo/darkLogo.png"}
                 alt="ResumeSaathi Logo"
@@ -154,7 +232,6 @@ const Header = () => {
 
             {/* Right Actions */}
             <div className="flex items-center lg:order-2 space-x-3">
-
               {/* Theme Toggle */}
               <button
                 onClick={() => {
@@ -175,10 +252,12 @@ const Header = () => {
               </button>
 
               {/* Get Started Button */}
-              <button className="hidden sm:inline-block relative px-6 py-2.5 font-bold text-white rounded-xl
+              <button
+                className="hidden sm:inline-block relative px-6 py-2.5 font-bold text-white rounded-xl
                                  bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1]
                                  dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5]
-                                 hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25 transition-all">
+                                 hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25 transition-all"
+              >
                 Get Started
               </button>
 
@@ -191,18 +270,23 @@ const Header = () => {
                   <X size={24} />
                 ) : (
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                      d="M4 6h16M4 12h16m-7 6h7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 6h16M4 12h16m-7 6h7"
+                    />
                   </svg>
                 )}
               </button>
-
             </div>
 
             {/* Navigation */}
-            <div className={`w-full lg:flex lg:w-auto lg:order-1 transition-all duration-300 ${mobileMenuOpen ? "block mt-4" : "hidden lg:block"
-              }`}>
-
+            <div
+              className={`w-full transition-all duration-300 lg:order-1 lg:flex lg:w-auto ${
+                mobileMenuOpen ? "block mt-4" : "hidden lg:block"
+              }`}
+            >
               <ul className="flex flex-col items-center lg:flex-row lg:space-x-8 space-y-2 lg:space-y-0">
                 {navItems.map(({ label, id }) => (
                   <li key={label} className="relative w-full lg:w-auto">
@@ -215,16 +299,16 @@ const Header = () => {
                         <span className={`absolute left-0 -bottom-1 w-full h-0.5 rounded-full
                         bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1]
                         dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5]
-                        transition-all duration-300 ${active === label ? "scale-x-100" : "scale-x-0"
-                          } origin-left`} />
+                        transition-all duration-300 ${
+                          active === label ? "scale-x-100" : "scale-x-0"
+                        } origin-left`}
+                        />
                       )}
                     </button>
                   </li>
                 ))}
-
               </ul>
             </div>
-
           </div>
         </nav>
       </header>

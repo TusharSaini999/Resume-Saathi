@@ -45,3 +45,21 @@
 		transform: none !important;
 	}
 }
+
+/* Chrome, Edge, Safari */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox */
+html,
+body {
+  scrollbar-width: none;
+}
+
+/* IE & Edge */
+html,
+body {
+  -ms-overflow-style: none;
+}
