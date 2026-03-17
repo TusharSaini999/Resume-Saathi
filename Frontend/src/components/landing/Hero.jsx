@@ -4,7 +4,7 @@ const Hero = () => {
   return (
     <section
       id="overview"
-      className="scroll-mt-28 relative overflow-hidden bg-white dark:bg-[#111827]"
+      className="scroll-mt-28 relative overflow-hidden bg-white dark:bg-[#111827] mt-4 sm:mt-2 md:mt-0"
     >
       {/* Gradient Background Glow */}
       <div className="absolute inset-0 opacity-20 blur-3xl">

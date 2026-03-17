@@ -87,27 +87,124 @@ const sendVerificationEmail = async (user) => {
     expires_at: expiresAt,
   });
 
-  const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+  const verificationLink = `${process.env.FRONTEND_URL}/auth/verify-email-update?token=${token}`;
 
-  const subject = 'Verify Your Email Address';
+const subject = 'Verify Your Email Address';
 
-  const text = `Hello ${user.name},
+// Plain text version (fallback for email clients)
+const text = `Hello ${user.name},
 
 Please verify your email address by clicking the link below:
 
 ${verificationLink}
 
+This link will expire in 15 minutes.
+
 If you did not create an account, please ignore this email.
 
-Thank you!`;
+Thank you!
+`;
 
-  const html = `
-    <p>Hello ${user.name},</p>
-    <p>Please verify your email address by clicking the link below:</p>
-    <a href="${verificationLink}">Verify Email</a>
-    <p>If you did not create an account, please ignore this email.</p>
-    <p>Thank you!</p>
-  `;
+// HTML version with ResumeSaathi theme colors
+const html = `
+<div style="
+  font-family: 'Inter', sans-serif;
+  background-color: #FFFFFF; 
+  color: #1E293B; 
+  padding: 30px; 
+  border-radius: 12px;
+  max-width: 600px;
+  margin: auto;
+  box-shadow: 0 8px 24px rgba(128, 58, 209, 0.15);
+">
+  <!-- Greeting -->
+  <p style="
+    font-size: 18px; 
+    font-weight: 600; 
+    margin-bottom: 16px;
+    color: #1E293B;
+  ">
+    Hello ${user.name},
+  </p>
+
+  <!-- Message -->
+  <p style="
+    font-size: 15px; 
+    color: #475569; 
+    margin-bottom: 24px;
+    line-height: 1.6;
+  ">
+    Please verify your email address by clicking the button below. This verification link is valid for <strong>15 minutes</strong>.
+  </p>
+
+  <!-- Verify Email Button -->
+  <p style="text-align: center; margin-bottom: 24px;">
+    <a href="${verificationLink}" style="
+      display: inline-block;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #FFFFFF;
+      text-decoration: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #FE3E91, #CA25AF, #803AD1);
+      box-shadow: 0 6px 18px rgba(128, 58, 209, 0.25);
+      transition: all 0.3s ease;
+    " onmouseover="this.style.background='linear-gradient(90deg, #FF5FA7, #D340BD, #9D65D5)';" 
+       onmouseout="this.style.background='linear-gradient(90deg, #FE3E91, #CA25AF, #803AD1)';">
+      Verify Email
+    </a>
+  </p>
+
+  <!-- Expiry Info -->
+  <p style="
+    font-size: 14px; 
+    color: #64748B; 
+    margin-bottom: 24px;
+  ">
+    ⚠️ This link will expire in 15 minutes. Please verify your email promptly.
+  </p>
+
+  <!-- Ignore Info -->
+  <p style="
+    font-size: 14px; 
+    color: #64748B; 
+    margin-bottom: 24px;
+  ">
+    If you did not create an account, please ignore this email.
+  </p>
+
+  <!-- Footer -->
+  <p style="
+    font-size: 14px; 
+    color: #475569;
+  ">
+    Thank you,<br/>
+    <span style="font-weight: 600; color: #803AD1;">ResumeSaathi Team</span>
+  </p>
+
+  <!-- Dark mode support -->
+  <style>
+    @media (prefers-color-scheme: dark) {
+      div {
+        background-color: #111827 !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2) !important;
+      }
+      p {
+        color: #FFFFFF !important;
+      }
+      p span {
+        color: #D340BD !important;
+      }
+      a {
+        background: linear-gradient(90deg, #FF5FA7, #D340BD, #9D65D5) !important;
+        box-shadow: 0 6px 18px rgba(128, 58, 209, 0.25) !important;
+      }
+    }
+  </style>
+</div>
+`;
 
   await sendEmail({
     to: user.email,
@@ -277,7 +374,13 @@ const getUser = asyncHandler(async (req, res) => {
   res
     .status(200)
     .cookie('token', token, COOKIE_OPTIONS)
-    .json(new ApiResponse(true, 200, 'User Data fetch successfully', { ...user._doc, token, ...userDetails }));
+    .json(
+      new ApiResponse(true, 200, 'User Data fetch successfully', {
+        ...user._doc,
+        token,
+        ...userDetails,
+      })
+    );
 });
 //forgot password
 const forgotPassword = asyncHandler(async (req, res) => {
@@ -338,10 +441,11 @@ const forgotPassword = asyncHandler(async (req, res) => {
   });
 
   //Create reset link (send RAW token)
-  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${rawToken}`;
+  const resetLink = `${process.env.FRONTEND_URL}/auth/reset-password?token=${rawToken}`;
 
   const subject = 'Password Reset Request';
 
+  // Plain text version (fallback for email clients)
   const text = `Hello ${user.name},
 
 We received a request to reset your password.
@@ -355,19 +459,106 @@ If you did not request this, please ignore this email.
 
 Thank you.`;
 
+  // HTML version with full ResumeSaathi theme styling
   const html = `
-    <p>Hello ${user.name},</p>
-    <p>We received a request to reset your password.</p>
-    <p>
-      <a href="${resetLink}" 
-         style="padding:10px 15px;background:#2563eb;color:white;text-decoration:none;border-radius:5px;">
-         Reset Password
+  <div style="
+    font-family: 'Inter', sans-serif;
+    background-color: #FFFFFF; 
+    color: #1E293B; 
+    padding: 30px; 
+    border-radius: 12px;
+    max-width: 600px;
+    margin: auto;
+    box-shadow: 0 8px 24px rgba(128, 58, 209, 0.15);
+  ">
+    <!-- Greeting -->
+    <p style="
+      font-size: 18px; 
+      font-weight: 600; 
+      margin-bottom: 16px;
+      color: #1E293B;
+    ">
+      Hello ${user.name},
+    </p>
+
+    <!-- Message -->
+    <p style="
+      font-size: 15px; 
+      color: #475569; 
+      margin-bottom: 24px;
+      line-height: 1.6;
+    ">
+      We received a request to reset your password. Click the button below to securely reset it.
+    </p>
+
+    <!-- Reset Password Button -->
+    <p style="text-align: center; margin-bottom: 24px;">
+      <a href="${resetLink}" style="
+        display: inline-block;
+        padding: 12px 24px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #FFFFFF;
+        text-decoration: none;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #FE3E91, #CA25AF, #803AD1);
+        box-shadow: 0 6px 18px rgba(128, 58, 209, 0.25);
+        transition: all 0.3s ease;
+      " onmouseover="this.style.background='linear-gradient(90deg, #FF5FA7, #D340BD, #9D65D5)';" 
+         onmouseout="this.style.background='linear-gradient(90deg, #FE3E91, #CA25AF, #803AD1)';">
+        Reset Password
       </a>
     </p>
-    <p>This link will expire in 10 minutes.</p>
-    <p>If you did not request this, please ignore this email.</p>
-    <p>Thank you.</p>
-  `;
+
+    <!-- Expiration info -->
+    <p style="
+      font-size: 14px; 
+      color: #64748B; 
+      margin-bottom: 12px;
+    ">
+      This link will expire in 10 minutes.
+    </p>
+
+    <!-- Ignore info -->
+    <p style="
+      font-size: 14px; 
+      color: #64748B; 
+      margin-bottom: 24px;
+    ">
+      If you did not request this, please ignore this email.
+    </p>
+
+    <!-- Footer -->
+    <p style="
+      font-size: 14px; 
+      color: #475569;
+    ">
+      Thank you,<br/>
+      <span style="font-weight: 600; color: #803AD1;">ResumeSaathi Team</span>
+    </p>
+
+    <!-- Dark mode support using media query -->
+    <style>
+      @media (prefers-color-scheme: dark) {
+        div {
+          background-color: #111827 !important;
+          color: #FFFFFF !important;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.2) !important;
+        }
+        p {
+          color: #FFFFFF !important;
+        }
+        p span {
+          color: #D340BD !important;
+        }
+        a {
+          background: linear-gradient(90deg, #FF5FA7, #D340BD, #9D65D5) !important;
+          box-shadow: 0 6px 18px rgba(128, 58, 209, 0.25) !important;
+        }
+      }
+    </style>
+  </div>
+`;
 
   await sendEmail({
     to: user.email,
