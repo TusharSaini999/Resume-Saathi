@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import PasswordRecoveryPanel from "../components/layout/PasswordRecoveryPanel";
 import FormFooter from "../components/layout/FormFooter";
 import AuthService from "../services/authService";
-import ErrorForm from "../layout/ErrorForm";
+import ErrorForm from "../components/layout/ErrorForm";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();

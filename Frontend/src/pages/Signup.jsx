@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import SignupSidePanel from "../components/layout/SignupSidePanel";
 import SocialLogin from "../components/layout/SocialLogin";
 import FormFooter from "../components/layout/FormFooter";
-import ErrorForm from "../layout/ErrorForm";
+import ErrorForm from "../components/layout/ErrorForm";
 import AuthService from "../services/authService";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../context/authSlice";
