@@ -7,7 +7,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import { UAParser } from 'ua-parser-js';
-import { COOKIE_OPTIONS, EMAIL_VERIFICATION_TTL, PASSWORD_RESET_TTL } from '../constants.js';
+import { COOKIE_OPTIONS, EMAIL_VERIFICATION_TTL, PASSWORD_RESET_TTL,JWT_EXPIRATION } from '../constants.js';
 import sendEmail from '../utils/sendMail.js';
 import Token from '../models/token.model.js';
 import crypto from 'crypto';
@@ -23,7 +23,9 @@ const genrateSession = async (user, req) => {
   const uaParser = new UAParser(req.headers['user-agent']);
   const userData = uaParser.getResult();
 
-  const response = await fetch(`https://ipapi.co/${ip}/json/`);
+  const response = await fetch(
+    `https://api.ipwho.org/ip/${ip}?apiKey=${process.env.IPWHO_API_KEY}`
+  );
   const data = await response.json();
 
   const sessionData = {
@@ -31,12 +33,13 @@ const genrateSession = async (user, req) => {
     token: token,
     browser: userData.browser.name || 'Unknown',
     os: userData.os.name || 'Unknown',
-    location: `${data.city || 'Unknown'}, ${data.region || 'Unknown'}, ${data.country_name || 'Unknown'}`,
+    location: `${data.data?.geoLocation?.city || 'Unknown'}, ${
+      data.data?.geoLocation?.region || 'Unknown'
+    }, ${data.data?.geoLocation?.country || 'Unknown'}`,
     ip_address: ip,
     is_active: true,
-    expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    expires_at: new Date(Date.now() + JWT_EXPIRATION),
   };
-
   const session = await Session.create(sessionData);
   if (!session) {
     throw new ApiError(500, 'Failed to create session');
@@ -60,6 +63,7 @@ const getUserDetails = async (user) => {
   const currentChatSession = await ChatSession.find({ user_id: userId }).sort({ createdAt: -1 });
   return { jobResp, resumeResp, currentChatSession };
 };
+
 //send varification email
 const sendVerificationEmail = async (user) => {
   const existingToken = await Token.findOne({
@@ -89,10 +93,10 @@ const sendVerificationEmail = async (user) => {
 
   const verificationLink = `${process.env.FRONTEND_URL}/auth/verify-email-update?token=${token}`;
 
-const subject = 'Verify Your Email Address';
+  const subject = 'Verify Your Email Address';
 
-// Plain text version (fallback for email clients)
-const text = `Hello ${user.name},
+  // Plain text version (fallback for email clients)
+  const text = `Hello ${user.name},
 
 Please verify your email address by clicking the link below:
 
@@ -105,8 +109,8 @@ If you did not create an account, please ignore this email.
 Thank you!
 `;
 
-// HTML version with ResumeSaathi theme colors
-const html = `
+  // HTML version with ResumeSaathi theme colors
+  const html = `
 <div style="
   font-family: 'Inter', sans-serif;
   background-color: #FFFFFF; 
@@ -327,6 +331,7 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findOne({ email }).select('+password');
+
   if (!user) {
     throw new ApiError(400, 'Invalid email or password');
   }
@@ -361,26 +366,17 @@ const loginUser = asyncHandler(async (req, res) => {
 
 //get user details
 const getUser = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    throw new ApiError(400, 'Invalid User ID');
-  }
-  const user = await User.findById(userId).select('-password');
-  if (!user) {
-    throw new ApiError(404, 'User not found');
-  }
-  const token = await genrateSession(user, req);
+  const user = req.user;
+  const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
+  // const token = await genrateSession(user, req);
   const userDetails = await getUserDetails(user);
-  res
-    .status(200)
-    .cookie('token', token, COOKIE_OPTIONS)
-    .json(
-      new ApiResponse(true, 200, 'User Data fetch successfully', {
-        ...user._doc,
-        token,
-        ...userDetails,
-      })
-    );
+  res.status(200).json(
+    new ApiResponse(true, 200, 'User Data fetch successfully', {
+      ...user._doc,
+      token: token,
+      ...userDetails,
+    })
+  );
 });
 //forgot password
 const forgotPassword = asyncHandler(async (req, res) => {

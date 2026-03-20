@@ -8,6 +8,9 @@ const SplashScreen = ({ show = true }) => {
     const [isEntered, setIsEntered] = useState(false);
 
     const isDark = localStorage.getItem("isDark") === "true";
+    const logoSrc = isDark
+        ? `${import.meta.env.BASE_URL}Logo/darkLogo.png`
+        : `${import.meta.env.BASE_URL}Logo/lightLogo.png`;
 
     useEffect(() => {
         const frame = window.requestAnimationFrame(() => {
@@ -77,7 +80,7 @@ const SplashScreen = ({ show = true }) => {
                     <div className="absolute h-20 w-20 rounded-full border border-pink-400/40 border-b-transparent animate-spin [animation-duration:1.2s] [animation-direction:reverse]" />
 
                     <img
-                        src={!isDark ? "./Logo/lightLogo.png" : "./Logo/darkLogo.png"}
+                        src={logoSrc}
                         alt="ResumeSaathi Logo"
                         className="relative z-10 h-16 w-16 rounded-2xl border-2 border-pink-500/70 shadow-[0_0_30px_rgba(236,72,153,0.45)] animate-[pulse_1.8s_ease-in-out_infinite]"
                     />
