@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 import { setLogin } from "./context/authSlice.js"
 import AuthService from "./services/authService.js";
 import { Suspense } from "react";
+import GlobalMessage from "./components/layout/GlobalMessage.jsx";
+import { setError,setSuccess } from "./context/messageSlice.js";
 
 function App({ children }) {
   const [showSplash, setShowSplash] = useState(true);
@@ -13,11 +15,15 @@ function App({ children }) {
       try {
         const response = await AuthService.getProfile();
         if (response.success) {
-          console.log("User profile fetched successfully:", response);
           dispatch(setLogin(response.data));
+          dispatch(setSuccess("Logged in successfully"));
+        }else{
+          dispatch(setLogin(null));
+          dispatch(setError(response.message || "Failed to fetch profile"));
         }
       } catch (error) {
-        console.log("Error fetching user profile:", error);
+        dispatch(setLogin(null));
+        dispatch(setError("Something went wrong while fetching"));
       } finally {
         setTimeout(() => {
           setShowSplash(false);
@@ -31,6 +37,7 @@ function App({ children }) {
   return (
     <>
       <SplashScreen show={showSplash} />
+      <GlobalMessage />
       <Suspense fallback={<SplashScreen show="true" />}>
         {children}
       </Suspense>

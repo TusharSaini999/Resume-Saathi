@@ -93,7 +93,7 @@ const sendVerificationEmail = async (user) => {
 
   const verificationLink = `${process.env.FRONTEND_URL}/auth/verify-email-update?token=${token}`;
 
-  const subject = 'Verify Your Email Address';
+const subject = 'Verify Your Email Address';
 
   // Plain text version (fallback for email clients)
   const text = `Hello ${user.name},
