@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useDispatch } from "react-redux";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
-import AuthService from "../services/authService";
+import AuthService from "../services/authService.js";
 import { setLogin } from "../context/authSlice";
 
 const verificationRequestCache = new Map();

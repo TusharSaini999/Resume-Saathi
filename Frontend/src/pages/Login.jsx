@@ -6,7 +6,7 @@ import LoginSidePanel from "../components/layout/LoginSidePanel";
 import SocialLogin from "../components/layout/SocialLogin";
 import FormFooter from "../components/layout/FormFooter";
 import AuthService from "../services/authService";
-import ErrorForm from "../layout/ErrorForm";
+import ErrorForm from "../components/layout/ErrorForm";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../context/authSlice";
 const Login = () => {

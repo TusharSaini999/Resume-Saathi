@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useSearchParams, useNavigate } from "react-router";
 import PasswordRecoveryPanel from "../components/layout/PasswordRecoveryPanel";
 import FormFooter from "../components/layout/FormFooter";
-import ErrorForm from "../layout/ErrorForm";
+import ErrorForm from "../components/layout/ErrorForm";
 import AuthService from "../services/authService";
 
 const VerifyToken = () => {
