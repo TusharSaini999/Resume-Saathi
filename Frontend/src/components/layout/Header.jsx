@@ -1,8 +1,9 @@
-import { X, Sun, Moon, Laptop } from "lucide-react";
+import { X, Sun, Moon, Laptop, LogOut } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setTheme } from "../../context/themeSlice";
-import { Link } from "react-router";
+import { setLogout } from "../../context/authSlice";
+import { Link, useLocation, useNavigate } from "react-router";
 
 const navItems = [
   { label: "Overview", id: "overview" },
@@ -11,6 +12,12 @@ const navItems = [
   { label: "ATS Tips", id: "ats-tips" },
   { label: "About", id: "about" },
   { label: "Support", id: "support" },
+];
+
+const dashboardNavItems = [
+  { label: "Resume", path: "/dashboard" },
+  { label: "Job Description", path: "/dashboard/job" },
+  { label: "Chat", path: "/dashboard/chat" },
 ];
 
 const ACTIVE_SECTION_STORAGE_KEY = "activeSection";
@@ -23,6 +30,18 @@ const getStoredActiveSection = () => {
 
 const Header = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const user = useSelector((state) => state.auth.user);
+  const isLoggedIn = !!user;
+  const isRootPage = location.pathname === "/";
+  const showDashboardNav = isLoggedIn && !isRootPage;
+
+  const handleLogout = () => {
+    dispatch(setLogout());
+    navigate("/");
+  };
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [active, setActive] = useState(() => getStoredActiveSection() || navItems[0].label);
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
@@ -252,9 +271,10 @@ const Header = () => {
               </button>
 
               {/* Get Started Button */}
-              <Link
-                to="/auth/login"
-                className="hidden sm:inline-block items-center justify-center
+              {!showDashboardNav && (
+                <Link
+                  to="/auth/login"
+                  className="hidden sm:inline-block items-center justify-center
   w-full sm:w-auto
   px-5 sm:px-6 py-2.5 sm:py-3
   text-sm sm:text-base font-bold text-white
@@ -264,9 +284,30 @@ const Header = () => {
   hover:scale-105 active:scale-95
   shadow-lg shadow-purple-500/25
   transition-all"
-              >
-                Get Started
-              </Link>
+                >
+                  Get Started
+                </Link>
+              )}
+
+              {/* Logout Button */}
+              {isLoggedIn && (
+                <button
+                  onClick={handleLogout}
+                  className="hidden sm:inline-block items-center justify-center
+  w-full sm:w-auto
+  px-5 sm:px-6 py-2.5 sm:py-3
+  text-sm sm:text-base font-bold text-white
+  rounded-xl
+  bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1]
+  dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5]
+  hover:scale-105 active:scale-95
+  shadow-lg shadow-purple-500/25
+  transition-all"
+                  title="Logout"
+                >
+                  Logout
+                </button>
+              )}
 
               {/* Mobile Menu Toggle */}
               <button
@@ -294,7 +335,8 @@ const Header = () => {
                 }`}
             >
               <ul className="flex flex-col items-center lg:flex-row lg:space-x-8 space-y-2 lg:space-y-0">
-                {navItems.map(({ label, id }) => (
+                {/* Show landing nav items if on root page or not logged in */}
+                {!showDashboardNav && navItems.map(({ label, id }) => (
                   <li key={label} className="relative w-full lg:w-auto">
                     <button
                       onClick={() => scrollToSection(label, id)}
@@ -312,8 +354,32 @@ const Header = () => {
                     </button>
                   </li>
                 ))}
+
+                {/* Show dashboard nav items if logged in and not on root page */}
+                {showDashboardNav && dashboardNavItems.map(({ label, path }) => (
+                  <li key={label} className="relative w-full lg:w-auto">
+                    <Link
+                      to={path}
+                      className={`block lg:inline-block w-full lg:w-auto text-center text-sm font-bold uppercase tracking-wider relative
+                       transition-colors duration-300 py-1 ${location.pathname === path
+                          ? "text-[#fe3e91] dark:text-[#ff5fa7]"
+                          : "text-[#475569] dark:text-[#ffffff] hover:text-[#ff66a8] hover:dark:text-[#fa7db3]"
+                        }`}
+                    >
+                      {label}
+                      {!mobileMenuOpen && (
+                        <span className={`absolute left-0 -bottom-1 w-full h-0.5 rounded-full
+                        bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1]
+                        dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5]
+                        transition-all duration-300 ${location.pathname === path ? "scale-x-100" : "scale-x-0"
+                          } origin-left`}
+                        />
+                      )}
+                    </Link>
+                  </li>
+                ))}
               </ul>
-              {mobileMenuOpen && (
+              {mobileMenuOpen && !showDashboardNav && (
                 <Link
                   to="/auth/login"
                   className="flex sm:hidden items-center justify-center
@@ -329,7 +395,28 @@ const Header = () => {
                 >
                   Get Started
                 </Link>
+
               )}
+              {isLoggedIn && mobileMenuOpen && showDashboardNav && (
+                <button
+                  onClick={handleLogout}
+                  className="flex sm:hidden items-center justify-center
+    w-full sm:w-auto
+    px-5 sm:px-6 py-2.5 sm:py-3
+    text-sm sm:text-base font-bold text-white
+    rounded-xl
+    bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1]
+    dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5]
+    hover:scale-105 active:scale-95
+    shadow-lg shadow-purple-500/25
+    transition-all"
+                  title="Logout"
+                >
+                  Logout
+                </button>
+              )}
+
+
 
             </div>
           </div>
