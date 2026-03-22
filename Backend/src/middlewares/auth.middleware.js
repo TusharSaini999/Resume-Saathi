@@ -4,7 +4,7 @@ import ApiError from '../utils/ApiError.js';
 import jwt from 'jsonwebtoken';
 import Session from '../models/session.model.js';
 
-const verifyJwt = asyncHandler(async (req, _, next) => {
+const verifyJwt = asyncHandler(async (req, res, next) => {
   try {
     // Extract access token from cookies or Authorization header
     const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
@@ -18,12 +18,14 @@ const verifyJwt = asyncHandler(async (req, _, next) => {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const session = await Session.findOne({ token, is_active: true });
     if (!session) {
+      res.clearCookie('token');
       throw new ApiError(401, 'Invalid access token');
     }
     // Fetch the user associated with the token
     const user = await User.findById(decodedToken.id);
     // If user does not exist, token is invalid
     if (!user) {
+      res.clearCookie('token');
       throw new ApiError(401, 'Invalid access token');
     }
 
@@ -34,11 +36,14 @@ const verifyJwt = asyncHandler(async (req, _, next) => {
     next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
+      res.clearCookie('token');
       throw new ApiError(401, 'Access token has expired');
     }
     if (error.name === 'JsonWebTokenError') {
+      res.clearCookie('token');
       throw new ApiError(401, 'Invalid access token');
     }
+    res.clearCookie('token');
     throw error;
   }
 });

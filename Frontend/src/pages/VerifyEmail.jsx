@@ -33,7 +33,7 @@ const VerifyEmail = () => {
 
     useEffect(() => {
         if (!userId) {
-            navigate("/auth/login");
+            navigate("/error");
         }
 
         if (user?.email_Send) {

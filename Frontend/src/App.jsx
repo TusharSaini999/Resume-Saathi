@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import SplashScreen from "./components/layout/SplashScreen";
 import { useDispatch } from "react-redux";
-import { setLogin } from "./context/authSlice.js"
+import { setLogin, setLogout } from "./context/authSlice.js"
 import AuthService from "./services/authService.js";
 import { Suspense } from "react";
 import GlobalMessage from "./components/layout/GlobalMessage.jsx";
-import { setError,setSuccess } from "./context/messageSlice.js";
+import { setError, setSuccess } from "./context/messageSlice.js";
 
 function App({ children }) {
   const [showSplash, setShowSplash] = useState(true);
@@ -17,12 +17,12 @@ function App({ children }) {
         if (response.success) {
           dispatch(setLogin(response.data));
           dispatch(setSuccess("Logged in successfully"));
-        }else{
-          dispatch(setLogin(null));
+        } else {
+          dispatch(setLogout());
           dispatch(setError(response.message || "Failed to fetch profile"));
         }
       } catch (error) {
-        dispatch(setLogin(null));
+        dispatch(setLogout());
         dispatch(setError("Something went wrong while fetching"));
       } finally {
         setTimeout(() => {
@@ -30,8 +30,13 @@ function App({ children }) {
         }, 2000);
       }
     };
-
-    fetchProfile();
+    if (localStorage.getItem("trueLogin")=="true") {
+      fetchProfile();
+    } else {
+      setTimeout(() => {
+        setShowSplash(false);
+      }, 1000);
+    }
   }, []);
 
   return (
