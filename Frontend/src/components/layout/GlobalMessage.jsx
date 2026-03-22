@@ -18,7 +18,6 @@ function GlobalMessage() {
 
   if (!message) return null;
 
-  // 🎨 Type-based styles (Light + Dark)
   const typeStyles = {
     error:
       "bg-[#EF4444] text-white dark:bg-red-500 dark:text-white",
@@ -29,11 +28,12 @@ function GlobalMessage() {
   };
 
   return (
-    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
+    <div className="fixed z-50 bottom-10 sm:bottom-15 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-auto max-w-md">
       <div
         className={`
-          px-4 py-2 rounded-xl shadow-lg text-sm font-medium
-          flex items-center gap-2
+          px-3 sm:px-4 py-2 rounded-xl shadow-lg text-xs sm:text-sm font-medium
+          flex items-center gap-2 w-full sm:w-auto
+          wrap-break-word
           backdrop-blur-md
           border border-white/20 dark:border-white/10
           ${typeStyles[type] || "bg-gray-800 text-white dark:bg-gray-700"}

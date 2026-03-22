@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Loader2 } from "lucide-react";
 import ResumeUpload from "../components/dashboard/ResumeUpload";
 import ResumeAnalysis from "../components/dashboard/ResumeAnalysis";
 import AnalysisError from "../components/dashboard/AnalysisError";
+import ResumeService from "../services/resumeService.js"
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const Resume = () => {
   const isDark = useSelector((state) => state.theme.isDark);
   const user = useSelector((state) => state.auth.user);
   const [analysisData, setAnalysisData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingStage, setLoadingStage] = useState("uploading");
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -27,39 +32,61 @@ const Resume = () => {
 
   const handleResumeUpload = async (file) => {
     setLoading(true);
+    setLoadingStage("uploading");
     setError(null);
 
+    const processingTimeout = setTimeout(() => {
+      setLoadingStage("processing");
+    }, 1000);
+
+    const finalizingTimeout = setTimeout(() => {
+      setLoadingStage("finalizing");
+    }, 3000);
+
     try {
-      const formData = new FormData();
-      formData.append("resume", file);
-
-      // Call your API endpoint here
-      const response = await fetch("/api/resume/analyze", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to analyze resume");
+      
+      const response = await ResumeService.uploadResume(file);
+      if(response.success){
+        setAnalysisData(response.data);
+        await wait(4000);
+      }else{
+        setError(response.message || "Failed to upload and analyze resume. Please try again.");
       }
-
-      const data = await response.json();
-      setAnalysisData(data);
+      
     } catch (err) {
       setError(err.message);
       setAnalysisData(null);
     } finally {
+      clearTimeout(processingTimeout);
+      clearTimeout(finalizingTimeout);
       setLoading(false);
     }
   };
-
-  const handleReupload = () => {
+  const handleReUpload = () => {
     setAnalysisData(null);
     setError(null);
-  };
+    setLoading(false);
+  } 
 
-  const currentView = analysisData ? "analysis" : error ? "error" : "upload";
+  const currentView = loading ? "loading" : analysisData ? "analysis" : error ? "error" : "upload";
+  const loadingTitle =
+    loadingStage === "processing"
+      ? "Processing your resume..."
+      : loadingStage === "finalizing"
+      ? "Finalizing your report..."
+      : "Uploading your resume...";
+  const loadingDescription =
+    loadingStage === "processing"
+      ? "We are analyzing sections, keywords, ATS compatibility, and formatting. Do not leave this page."
+      : loadingStage === "finalizing"
+      ? "Almost done. Preparing your final results for display. Do not leave this page."
+      : "Your PDF is being uploaded securely. This usually takes a few seconds. Do not leave this page.";
+  const loadingStepText =
+    loadingStage === "processing"
+      ? "Step 2 of 3: Processing"
+      : loadingStage === "finalizing"
+      ? "Step 3 of 3: Finalizing"
+      : "Step 1 of 3: Uploading";
 
   return (
     <div
@@ -92,12 +119,37 @@ const Resume = () => {
         </div>
 
         <section>
-          <div className="mx-auto mb-4 flex w-fit items-center gap-2 rounded-full border px-4 py-1 text-xs font-bold uppercase tracking-wider text-[#fe3e91] border-[#fe3e91]/40 bg-[#fe3e91]/10">
-            {currentView === "upload" ? "Step 1" : "Step 2"}
-            <span className={isDark ? "text-[#cbd5e1]" : "text-[#475569]"}>
-              {currentView === "upload" ? "Upload Resume" : "Review Analysis"}
-            </span>
-          </div>
+          {currentView === "loading" && (
+            <div className="w-full max-w-3xl mx-auto">
+              <div
+                className={`relative overflow-hidden rounded-3xl border p-8 md:p-10 shadow-2xl ${
+                  isDark
+                    ? "border-[#334155] bg-[#0f172a]"
+                    : "border-[#e2e8f0] bg-white"
+                }`}
+              >
+                <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-[#fe3e91]/10 blur-3xl" />
+                <div className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-[#803ad1]/10 blur-3xl" />
+
+                <div className="relative z-10 flex flex-col items-center text-center">
+                  <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-r from-[#fe3e91]/20 via-[#ca25af]/20 to-[#803ad1]/20">
+                    <Loader2 size={36} className="animate-spin text-[#fe3e91]" />
+                  </div>
+
+                  <h3 className={`text-2xl md:text-3xl font-black tracking-tight ${isDark ? "text-white" : "text-[#1E293B]"}`}>
+                    {loadingTitle}
+                  </h3>
+                  <p className={`mt-3 max-w-xl text-sm md:text-base ${isDark ? "text-[#cbd5e1]" : "text-[#64748b]"}`}>
+                    {loadingDescription}
+                  </p>
+
+                  <div className={`mt-6 rounded-full px-4 py-2 text-xs font-bold ${isDark ? "bg-[#1e293b] text-[#cbd5e1]" : "bg-[#f8fafc] text-[#475569]"}`}>
+                    {loadingStepText}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {currentView === "upload" && (
             <ResumeUpload
@@ -110,7 +162,7 @@ const Resume = () => {
           {currentView === "analysis" && (
             <ResumeAnalysis
               data={analysisData}
-              onReupload={handleReupload}
+              onReupload={handleReUpload}
               loading={loading}
             />
           )}
@@ -118,7 +170,7 @@ const Resume = () => {
           {currentView === "error" && (
             <AnalysisError
               error={error}
-              onReupload={handleReupload}
+              onReupload={handleReUpload}
             />
           )}
         </section>

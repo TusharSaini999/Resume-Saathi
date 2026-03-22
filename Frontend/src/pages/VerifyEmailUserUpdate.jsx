@@ -37,14 +37,11 @@ const VerifyEmailUserUpdate = () => {
 
                 if (response.success) {
                     console.log("Email verification successful, updating user data in store:", response);
-                    dispatch(setLogin(response.data));
                     setMessage(response.message || "Email verified successfully.");
                     setSuccess(true);
-
                     setTimeout(() => {
-                        navigator("/deshboard");
-                    }, 2000);
-
+                        dispatch(setLogin(response.data));
+                    }, 1500);
                 } else {
                     setSuccess(false);
                     setMessage(response?.message || "Email verification failed.");

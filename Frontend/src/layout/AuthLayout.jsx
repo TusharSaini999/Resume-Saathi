@@ -6,7 +6,7 @@ function AuthLayout() {
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
   useEffect(() => {
-    if (user) {
+    if (user && user.email_verified) {
       navigate("/dashboard");
     }
   }, [user]);

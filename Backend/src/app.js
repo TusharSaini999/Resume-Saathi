@@ -14,6 +14,14 @@ const allowedOrigins = process.env.CLIENT_URLS
 // Security headers
 app.use(helmet());
 
+
+// Route logger middleware
+app.use((req, res, next) => {
+  const time = new Date().toLocaleString();
+  console.log(`[${time}] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // CORS configuration
 app.use(
   cors({

@@ -10,6 +10,9 @@ const authSlice = createSlice({
   reducers: {
     setLogin: (state, action) => {
       console.log("Setting login with user data:", action.payload);
+      if(action.payload?.email_verified){
+        localStorage.setItem("trueLogin", true);
+      }
       state.user = action.payload;
     },
     updateExpiration: (state, action) => {
@@ -19,6 +22,7 @@ const authSlice = createSlice({
     },
     setLogout: (state) => {
       state.user = null;
+      localStorage.setItem("trueLogin", false);
     },
   },
 });
