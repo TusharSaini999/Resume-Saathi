@@ -241,7 +241,7 @@ const createUser = asyncHandler(async (req, res) => {
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new ApiError(400, 'Account already exist!');
+    throw new ApiError(400, 'Something went wrong');
   }
 
   if (!req.headers['user-agent']) {
