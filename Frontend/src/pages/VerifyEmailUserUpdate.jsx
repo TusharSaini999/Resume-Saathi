@@ -51,8 +51,9 @@ const VerifyEmailUserUpdate = () => {
                 setSuccess(false);
                 setMessage("Something went wrong while verifying email.");
             } finally {
-                if (!isActive) return;
-                setLoading(false);
+                if (isActive) {
+                    setLoading(false);
+                }
             }
         };
 
@@ -61,7 +62,7 @@ const VerifyEmailUserUpdate = () => {
         return () => {
             isActive = false;
         };
-    }, [token]);
+    }, [token, dispatch]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#FFFFFF] dark:bg-[#111827] px-4">

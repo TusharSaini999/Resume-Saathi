@@ -102,7 +102,7 @@ const spacingAnalysisSchema = new mongoose.Schema(
 
 const columnAnalysisSchema = new mongoose.Schema(
   {
-    multi_column_detected: { type: Number, required: true },
+    multi_column_detected: { type: Boolean, required: true },
     column_count: { type: Number, required: true },
   },
   { _id: false, strict: true }

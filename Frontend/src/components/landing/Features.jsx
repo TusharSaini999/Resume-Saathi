@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import { Gauge, FileSearch, Brain, MessagesSquare } from "lucide-react";
 import ScrollReveal from "../ScrollReveal";
 
@@ -63,7 +64,7 @@ const Features = () => {
                 
                 <div className="flex items-center gap-3">
                   <span className="inline-flex rounded-xl p-2.5 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] transition-colors duration-300 group-hover:bg-[#FFF1F8] dark:group-hover:bg-[#2A1F38]">
-                    <Icon className="w-5 h-5 text-[#FE3E91] transition-transform duration-300 group-hover:scale-110" />
+                    {createElement(Icon, { className: "w-5 h-5 text-[#FE3E91] transition-transform duration-300 group-hover:scale-110" })}
                   </span>
 
                   <h3 className="text-lg font-bold text-[#1E293B] dark:text-white">

@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import { FileUp, SearchCheck, BadgeCheck } from "lucide-react";
 import ScrollReveal from "../ScrollReveal";
 
@@ -47,7 +48,7 @@ const HowItWorks = () => {
             <ScrollReveal key={title} delay={index * 120}>
               <article className="how-card rounded-2xl border border-[#E5E7EB] dark:border-[#374151] p-6 bg-[#F8FAFC] dark:bg-[#1F2937] h-full">
                 <div className="how-card-icon inline-flex rounded-xl p-3 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151]">
-                  <Icon className="w-5 h-5 text-[#CA25AF]" />
+                  {createElement(Icon, { className: "w-5 h-5 text-[#CA25AF]" })}
                 </div>
                 <h3 className="mt-4 text-xl font-bold text-[#1E293B] dark:text-white">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-[#64748B] dark:text-[#94A3B8]">{description}</p>

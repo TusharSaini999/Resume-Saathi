@@ -602,7 +602,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'User not found');
   }
   await Token.deleteOne({ _id: tokenDoc._id });
-  res.status(200).json(new ApiResponse(true, 200, 'Password reset successful'));
+  res.status(200).json(new ApiResponse(true, 200, 'Password reset Successful'));
 });
 
 //chnage password (while logged in)
@@ -656,7 +656,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   res
     .status(200)
     .clearCookie('token', COOKIE_OPTIONS)
-    .json(new ApiResponse(true, 200, 'Logout successful'));
+    .json(new ApiResponse(true, 200, 'Logout Successfully'));
 });
 
 //logout all sessions

@@ -21,7 +21,7 @@ function Logout({style = ""}) {
             } else {
                 dispatch(setError("Failed to log out. Please try again."));
             }
-        } catch (error) {
+        } catch {
             dispatch(setError("An error occurred during logout. Please try again."));
         } finally {
             setIsLoading(false);
