@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
 
-const SPLASH_EXIT_DURATION_MS = 450;
-
 const SplashScreen = ({ show = true }) => {
-    const [shouldRenderSplash, setShouldRenderSplash] = useState(show);
-    const [isSplashExiting, setIsSplashExiting] = useState(false);
     const [isEntered, setIsEntered] = useState(false);
 
     const isDark = localStorage.getItem("isDark") === "true";
@@ -22,30 +18,12 @@ const SplashScreen = ({ show = true }) => {
         };
     }, []);
 
-    useEffect(() => {
-        if (show) {
-            setShouldRenderSplash(true);
-            setIsSplashExiting(false);
-            return;
-        }
-
-        setIsSplashExiting(true);
-
-        const unmountTimer = window.setTimeout(() => {
-            setShouldRenderSplash(false);
-        }, SPLASH_EXIT_DURATION_MS);
-
-        return () => {
-            window.clearTimeout(unmountTimer);
-        };
-    }, [show]);
-
-    if (!shouldRenderSplash) return null;
+    if (!show) return null;
 
     return (
         <section
             className={`fixed inset-0 z-100 flex items-center justify-center overflow-hidden transition-all duration-500 ease-out ${
-                isSplashExiting ? "opacity-0 pointer-events-none" : "opacity-100"
+                "opacity-100"
             } ${
                 isDark
                     ? "bg-[radial-gradient(circle_at_top,#1f2937_0%,#0b1120_55%,#030712_100%)]"
@@ -63,9 +41,7 @@ const SplashScreen = ({ show = true }) => {
 
             <div
                 className={`relative flex flex-col items-center gap-5 transition-all duration-500 ease-out ${
-                    isSplashExiting
-                        ? "translate-y-2 scale-110 opacity-0"
-                        : isEntered
+                    isEntered
                         ? "translate-y-0 scale-100 opacity-100"
                         : "translate-y-4 scale-90 opacity-0"
                 }`}

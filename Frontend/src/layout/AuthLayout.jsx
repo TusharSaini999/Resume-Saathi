@@ -9,7 +9,7 @@ function AuthLayout() {
     if (user && user.email_verified) {
       navigate("/dashboard");
     }
-  }, [user]);
+  }, [user, navigate]);
   return (
     <>
       <main>

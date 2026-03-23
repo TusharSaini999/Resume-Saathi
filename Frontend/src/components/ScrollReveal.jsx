@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
  *   as     — HTML tag to render as (default: "div")
  *   className — extra classes forwarded to the wrapper element
  */
-const ScrollReveal = ({ children, delay = 0, as: Tag = "div", className = "" }) => {
+const ScrollReveal = ({ children, delay = 0, as = "div", className = "" }) => {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
@@ -31,19 +31,21 @@ const ScrollReveal = ({ children, delay = 0, as: Tag = "div", className = "" }) 
     return () => observer.disconnect();
   }, []);
 
-  return (
-    <Tag
-      ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-700 ease-out ${
-        visible
-          ? "opacity-100 translate-y-0 scale-100"
-          : "opacity-0 translate-y-6 scale-95"
-      } ${className}`}
-    >
-      {children}
-    </Tag>
-  );
+  const commonProps = {
+    ref,
+    style: { transitionDelay: `${delay}ms` },
+    className: `transition-all duration-700 ease-out ${
+      visible
+        ? "opacity-100 translate-y-0 scale-100"
+        : "opacity-0 translate-y-6 scale-95"
+    } ${className}`,
+  };
+
+  if (as === "li") {
+    return <li {...commonProps}>{children}</li>;
+  }
+
+  return <div {...commonProps}>{children}</div>;
 };
 
 export default ScrollReveal;

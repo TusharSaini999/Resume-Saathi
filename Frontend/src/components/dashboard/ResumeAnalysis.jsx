@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import { createElement, memo, useCallback, useMemo, useState } from "react";
 import {
   ChevronDown,
   AlertCircle,
@@ -48,6 +48,46 @@ const formatScore = (score) => {
   return numeric <= 10 ? `${numeric}/10` : `${numeric}/100`;
 };
 
+const AnalysisSection = ({
+  title,
+  sectionKey,
+  children,
+  icon,
+  panel,
+  hoverBg,
+  heading,
+  muted,
+  borderColor,
+  expanded,
+  onToggle,
+}) => (
+  <div className={`rounded-2xl hover:rounded-2xl overflow-hidden border shadow-sm transition-all ${panel}`}>
+    <button
+      onClick={() => onToggle(sectionKey)}
+      className={`w-full px-5 md:px-6 py-4 md:py-5 flex items-center justify-between transition-all ${hoverBg}`}
+    >
+      <div className="flex items-center gap-3">
+        <div className="rounded-xl p-2 bg-linear-to-r from-[#fe3e91]/20 via-[#ca25af]/20 to-[#803ad1]/20">
+          {createElement(icon, { size: 18, className: "text-[#fe3e91]" })}
+        </div>
+        <span className={`font-extrabold tracking-wide text-sm md:text-base ${heading}`}>
+          {title}
+        </span>
+      </div>
+      <ChevronDown
+        size={20}
+        className={`transition-transform duration-300 ${expanded ? "rotate-180" : "rotate-0"} ${muted}`}
+      />
+    </button>
+
+    {expanded && (
+      <div className={`border-t px-5 md:px-6 py-5 md:py-6 ${borderColor}`}>
+        {children}
+      </div>
+    )}
+  </div>
+);
+
 const ResumeAnalysis = ({ data, onReupload, loading }) => {
   const isDark = useSelector((state) => state.theme.isDark);
   const [expandedSections, setExpandedSections] = useState(DEFAULT_EXPANDED_SECTIONS);
@@ -90,34 +130,6 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
   const atsRecommendations = useMemo(() => asArray(atsAnalysis?.recommendations), [atsAnalysis?.recommendations]);
   const formatIssues = useMemo(() => asArray(formatAnalysis?.format_issues), [formatAnalysis?.format_issues]);
   const keywordsFound = useMemo(() => asArray(keywordAnalysis?.keywords_found), [keywordAnalysis?.keywords_found]);
-
-  const AnalysisSection = ({ title, sectionKey, children, icon: Icon }) => (
-    <div className={`rounded-2xl hover:rounded-2xl overflow-hidden border shadow-sm transition-all ${panel}`}>
-      <button
-        onClick={() => toggleSection(sectionKey)}
-        className={`w-full px-5 md:px-6 py-4 md:py-5 flex items-center justify-between transition-all ${hoverBg}`}
-      >
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl p-2 bg-linear-to-r from-[#fe3e91]/20 via-[#ca25af]/20 to-[#803ad1]/20">
-            <Icon size={18} className="text-[#fe3e91]" />
-          </div>
-          <span className={`font-extrabold tracking-wide text-sm md:text-base ${heading}`}>
-            {title}
-          </span>
-        </div>
-        <ChevronDown
-          size={20}
-          className={`transition-transform duration-300 ${expandedSections[sectionKey] ? "rotate-180" : "rotate-0"} ${muted}`}
-        />
-      </button>
-
-      {expandedSections[sectionKey] && (
-        <div className={`border-t px-5 md:px-6 py-5 md:py-6 ${borderColor}`}>
-          {children}
-        </div>
-      )}
-    </div>
-  );
 
   return (
     <div className="space-y-6">
@@ -178,7 +190,18 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
       )}
 
       {atsAnalysis && (
-        <AnalysisSection title="ATS Analysis" sectionKey="ats" icon={BarChart3}>
+        <AnalysisSection
+          title="ATS Analysis"
+          sectionKey="ats"
+          icon={BarChart3}
+          panel={panel}
+          hoverBg={hoverBg}
+          heading={heading}
+          muted={muted}
+          borderColor={borderColor}
+          expanded={expandedSections.ats}
+          onToggle={toggleSection}
+        >
           <div className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className={`rounded-xl border p-4 ${tile}`}>
@@ -208,7 +231,18 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
       )}
 
       {experienceAnalysis.length > 0 && (
-        <AnalysisSection title="Experience Analysis" sectionKey="experience" icon={Briefcase}>
+        <AnalysisSection
+          title="Experience Analysis"
+          sectionKey="experience"
+          icon={Briefcase}
+          panel={panel}
+          hoverBg={hoverBg}
+          heading={heading}
+          muted={muted}
+          borderColor={borderColor}
+          expanded={expandedSections.experience}
+          onToggle={toggleSection}
+        >
           <div className="space-y-4">
             {experienceAnalysis.map((exp, idx) => (
               <div key={idx} className={`rounded-xl border p-5 ${tile}`}>
@@ -250,7 +284,18 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
       )}
 
       {(sectionsPresent.length > 0 || missingSections.length > 0) && (
-        <AnalysisSection title="Section Coverage" sectionKey="sectionCoverage" icon={FileText}>
+        <AnalysisSection
+          title="Section Coverage"
+          sectionKey="sectionCoverage"
+          icon={FileText}
+          panel={panel}
+          hoverBg={hoverBg}
+          heading={heading}
+          muted={muted}
+          borderColor={borderColor}
+          expanded={expandedSections.sectionCoverage}
+          onToggle={toggleSection}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className={`rounded-xl border p-4 ${tile}`}>
               <p className={`text-sm font-bold mb-2 ${heading}`}>Sections Present</p>
@@ -273,7 +318,18 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
       )}
 
       {formatAnalysis && (
-        <AnalysisSection title="Format Issues Analysis" sectionKey="baseFormat" icon={Type}>
+        <AnalysisSection
+          title="Format Issues Analysis"
+          sectionKey="baseFormat"
+          icon={Type}
+          panel={panel}
+          hoverBg={hoverBg}
+          heading={heading}
+          muted={muted}
+          borderColor={borderColor}
+          expanded={expandedSections.baseFormat}
+          onToggle={toggleSection}
+        >
           <div className="space-y-4">
             <div className={`rounded-xl border p-4 ${tile}`}>
               <p className={`text-xs font-bold uppercase ${muted}`}>Format Score</p>
@@ -297,7 +353,18 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
       )}
 
       {formatedAnalysis && (
-        <AnalysisSection title="Detailed Layout Analysis" sectionKey="format" icon={Type}>
+        <AnalysisSection
+          title="Detailed Layout Analysis"
+          sectionKey="format"
+          icon={Type}
+          panel={panel}
+          hoverBg={hoverBg}
+          heading={heading}
+          muted={muted}
+          borderColor={borderColor}
+          expanded={expandedSections.format}
+          onToggle={toggleSection}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className={`rounded-xl border p-4 ${tile}`}>
               <p className={`text-sm font-bold mb-2 ${heading}`}>Font Analysis</p>
@@ -325,7 +392,7 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
               <p className={`text-sm font-bold mb-2 ${heading}`}>Column Analysis</p>
               <div className={`space-y-1 text-sm ${muted}`}>
                 <p>Column count: {formatedAnalysis.column_analysis?.column_count}</p>
-                <p>Multi-column detected: {formatedAnalysis.column_analysis?.multi_column_detected}</p>
+                <p>Multi-column detected: {formatedAnalysis.column_analysis?.multi_column_detected?"Yes":"No"}</p>
               </div>
             </div>
 
@@ -375,7 +442,18 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
       )}
 
       {englishProblems.length > 0 && (
-        <AnalysisSection title="English Problems" sectionKey="englishProblems" icon={Languages}>
+        <AnalysisSection
+          title="English Problems"
+          sectionKey="englishProblems"
+          icon={Languages}
+          panel={panel}
+          hoverBg={hoverBg}
+          heading={heading}
+          muted={muted}
+          borderColor={borderColor}
+          expanded={expandedSections.englishProblems}
+          onToggle={toggleSection}
+        >
           <div className="space-y-4">
             {englishProblems.map((item, idx) => (
               <div key={idx} className={`rounded-xl border p-4 ${tile}`}>
@@ -390,7 +468,18 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
       )}
 
       {keywordAnalysis && (
-        <AnalysisSection title="Keywords Analysis" sectionKey="keywords" icon={KeyRound}>
+        <AnalysisSection
+          title="Keywords Analysis"
+          sectionKey="keywords"
+          icon={KeyRound}
+          panel={panel}
+          hoverBg={hoverBg}
+          heading={heading}
+          muted={muted}
+          borderColor={borderColor}
+          expanded={expandedSections.keywords}
+          onToggle={toggleSection}
+        >
           <div className={`rounded-xl border p-4 ${tile}`}>
             <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
               <p className={`text-sm font-bold ${heading}`}>Keyword Score</p>
@@ -413,7 +502,18 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
       )}
 
       {improvementSuggestions.length > 0 && (
-        <AnalysisSection title="Improvement Suggestions" sectionKey="suggestions" icon={Lightbulb}>
+        <AnalysisSection
+          title="Improvement Suggestions"
+          sectionKey="suggestions"
+          icon={Lightbulb}
+          panel={panel}
+          hoverBg={hoverBg}
+          heading={heading}
+          muted={muted}
+          borderColor={borderColor}
+          expanded={expandedSections.suggestions}
+          onToggle={toggleSection}
+        >
           <div className="space-y-4">
             {improvementSuggestions.map((suggestion, idx) => (
               <div

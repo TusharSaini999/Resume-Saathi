@@ -13,7 +13,7 @@ function DashboardLayout() {
     if (!user) {
       navigate("/auth/login");
     }
-  }, [user]);
+  }, [user, navigate]);
   return (
     <>
       <Header />
