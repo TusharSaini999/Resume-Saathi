@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { Mail, Send, ShieldCheck, RefreshCw, Loader2 } from "lucide-react";
-import { set, useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
+import { useForm } from "react-hook-form";
 import PasswordRecoveryPanel from "../components/layout/PasswordRecoveryPanel";
 import FormFooter from "../components/layout/FormFooter";
 import AuthService from "../services/authService";
 import ErrorForm from "../components/layout/ErrorForm";
 
 const ForgotPassword = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");

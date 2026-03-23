@@ -40,7 +40,7 @@ const VerifyEmail = () => {
             setCooldown(getRemainingSeconds(user?.email_ExpiresAt));
         }
 
-    }, [userId, user?.email_Send, user?.email_ExpiresAt, user]);
+    }, [userId, user?.email_Send, user?.email_ExpiresAt, user, navigate]);
 
     useEffect(() => {
         if (cooldown > 0) {
@@ -67,7 +67,6 @@ const VerifyEmail = () => {
             setError("Something went wrong. Please try again.");
         } finally {
             setLoading(false);
-            if (error) setTimeout(() => setError(null), 5000);
         }
     };
 

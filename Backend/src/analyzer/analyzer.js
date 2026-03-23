@@ -92,7 +92,7 @@ Output Rules:
   "formated_analysis": {
     "font_analysis": { "avg_font_size": 0, "min_font_size": 0, "max_font_size": 0, "font_variations": 0, "inconsistent_fonts": false },
     "spacing_analysis": { "avg_line_height": 0, "min_line_height": 0, "max_line_height": 0, "excessive_spacing_detected": false, "compressed_spacing_detected": false },
-    "column_analysis": { "multi_column_detected": 0, "column_count": 0 },
+    "column_analysis": { "multi_column_detected": false, "column_count": 0 },
     "margin_analysis": { "left_margin": 0, "right_margin": 0, "top_margin": 0, "bottom_margin": 0, "margin_issue_detected": false },
     "alignment_analysis": { "centered_text_detected": false, "inconsistent_alignment": false },
     "layout_score": 0,
@@ -250,7 +250,7 @@ Resume text:
                     column_analysis: {
                       type: 'object',
                       properties: {
-                        multi_column_detected: { type: 'number' },
+                        multi_column_detected: { type: 'boolean' },
                         column_count: { type: 'number' },
                       },
                       required: ['multi_column_detected', 'column_count'],

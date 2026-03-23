@@ -83,7 +83,9 @@ const uploadResume = asyncHandler(async (req, res) => {
   const pdfParser = new PdfParese();
   const pdfText = await pdfParser.getText(file.path);
   const formatResume = await pdfParser.getAllPagesRawContent(file.path);
-
+  if (!pdfText || !formatResume) {
+    throw new ApiError(500, 'Failed to parse resume PDF');
+  }
   const resUpload = await cloudinary.fileUpload(file);
 
   const resumeDoc = await ResumesCollection.create({
@@ -95,14 +97,6 @@ const uploadResume = asyncHandler(async (req, res) => {
 
   if (!resumeDoc) {
     throw new ApiError(500, 'Failed to save resume data');
-  }
-  const userRes = await User.findByIdAndUpdate(
-    userId,
-    { resume_id: resumeDoc._id },
-    { returnDocument: 'after' }
-  );
-  if (!userRes) {
-    throw new ApiError(500, 'Failed to update user with resume ID');
   }
 
   const PdfAnalysis = new Analyzer();
@@ -120,9 +114,23 @@ const uploadResume = asyncHandler(async (req, res) => {
   if (!savedAnalysis) {
     throw new ApiError(500, 'Failed to save resume analysis');
   }
+
+  const userRes = await User.findByIdAndUpdate(
+    userId,
+    { resume_id: resumeDoc._id },
+    { returnDocument: 'after' }
+  );
+  if (!userRes) {
+    throw new ApiError(500, 'Failed to update user with resume ID');
+  }
   res
     .status(201)
-    .json(new ApiResponse(true,200, 'Resume uploaded successfully', { resume: resumeDoc }));
+    .json(
+      new ApiResponse(true, 200, 'Resume uploaded successfully', {
+        resumeId: resumeDoc._id,
+        analysis: savedAnalysis,
+      })
+    );
 });
 
 // // curl.exe -X POST http://localhost:5000/api/v1/resumes/reupload -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YWMzN2EzNzY3ODMwZDAyZTRkNjIxMyIsImVtYWlsIjoidGVzdHVzZXJnbWFpbEBnbWFpbC5jb20iLCJpYXQiOjE3NzI5MzQwNTAsImV4cCI6MTgwNDQ5MTY1MH0.a-2Si_J5UeJUehnxYnvhnVr2VOSrX9iUNG71EjNmFl0" -F "resume=@C:\Users\tusha\Downloads\TusharSaini_SDE_Resume.pdf"

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, LogIn, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import LoginSidePanel from "../components/layout/LoginSidePanel";
 import SocialLogin from "../components/layout/SocialLogin";
 import FormFooter from "../components/layout/FormFooter";

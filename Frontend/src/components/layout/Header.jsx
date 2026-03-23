@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react
 import { useSelector, useDispatch } from "react-redux";
 import { setTheme } from "../../context/themeSlice";
 import Logout from "./Logout";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useLocation } from "react-router";
 
 const navItems = [
   { label: "Overview", id: "overview" },
@@ -34,7 +34,6 @@ const getStoredActiveSection = () => {
 
 const Header = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector((state) => state.auth.user);
   const isLoggedIn = !!user;

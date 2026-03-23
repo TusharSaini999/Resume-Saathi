@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User, UserPlus } from "lucide-react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import SignupSidePanel from "../components/layout/SignupSidePanel";
 import SocialLogin from "../components/layout/SocialLogin";
@@ -18,11 +18,9 @@ const Signup = () => {
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors },
     } = useForm();
     const dispatch = useDispatch();
-    const password = watch("password");
 
     const onSubmit = async (data) => {
         setLoading(true);
@@ -44,7 +42,7 @@ const Signup = () => {
             } else {
                 setError(response.message || "Failed to create account");
             }
-        } catch (err) {
+        } catch {
             setError("Something went wrong. Please try again.");
         } finally {
             setTimeout(() => {
