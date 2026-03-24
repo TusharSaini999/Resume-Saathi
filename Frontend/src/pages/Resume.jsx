@@ -40,14 +40,6 @@ const Resume = () => {
       setLoadingStage("finalizing");
     }, 3000);
 
-    const processingTimeout = setTimeout(() => {
-      setLoadingStage("processing");
-    }, 1000);
-
-    const finalizingTimeout = setTimeout(() => {
-      setLoadingStage("finalizing");
-    }, 3000);
-
     try {
       const response = await dispatch(submitResume(file)).unwrap();
       if(response && response.analysis) {
