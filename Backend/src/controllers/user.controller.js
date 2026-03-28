@@ -55,7 +55,7 @@ const getUserDetails = async (user) => {
   }
   //get the JD
   const jobResp = await JobDescription.find({ user_id: userId }).sort({ createdAt: -1 });
-  const resumeResp = await ResumeAnalysis.find({ user_id: userId, resume_id: user.resume_id }).sort(
+  const resumeResp = await ResumeAnalysis.findOne({ user_id: userId, resume_id: user.resume_id }).sort(
     { createdAt: -1 }
   );
 
