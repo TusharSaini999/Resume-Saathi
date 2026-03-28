@@ -11,6 +11,64 @@ class Chat {
     this.groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
   }
 
+  async generateStructuredResponse(messages, responseSchema) {
+    const basePayload = {
+      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      response_format: {
+        type: 'json_schema',
+        json_schema: responseSchema,
+      },
+    };
+
+    const strictReminder = {
+      role: 'system',
+      content:
+        'Return ONLY valid JSON with exactly two fields: "title" and "answer". The "answer" value must be a single markdown string. Do not return arrays or objects inside "answer".',
+    };
+
+    const attempts = [
+      { temperature: 0.6, withReminder: false },
+      { temperature: 0.2, withReminder: true },
+      { temperature: 0, withReminder: true },
+    ];
+
+    let lastError = null;
+
+    for (const attempt of attempts) {
+      const attemptMessages = attempt.withReminder ? [...messages, strictReminder] : messages;
+
+      try {
+        const response = await this.groq.chat.completions.create({
+          ...basePayload,
+          messages: attemptMessages,
+          temperature: attempt.temperature,
+        });
+
+        const content = response?.choices?.[0]?.message?.content;
+        if (!content) {
+          throw new Error('Missing response content');
+        }
+
+        const parsed = JSON.parse(content);
+        if (typeof parsed?.title !== 'string' || typeof parsed?.answer !== 'string') {
+          throw new Error('Invalid response shape returned by model');
+        }
+
+        return parsed;
+      } catch (error) {
+        lastError = error;
+        console.error('Structured response attempt failed:', {
+          temperature: attempt.temperature,
+          withReminder: attempt.withReminder,
+          error,
+        });
+      }
+    }
+
+    console.error('All structured response attempts failed:', lastError);
+    throw new ApiError(502, 'AI response generation failed');
+  }
+
   async chat(query = '', userId = '', userName = '', resumeId = '', resumeText = '', history = []) {
     try {
       // ---------------- VALIDATION ----------------
@@ -329,54 +387,12 @@ ${query}
         console.log('Messages after pushing tool call:', messages);
 
         // ---------------- SECOND CALL (STRUCTURED OUTPUT) ----------------
-        let finalResponse;
-
-        try {
-          finalResponse = await this.groq.chat.completions.create({
-            model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-            messages,
-            temperature: 0.6,
-            response_format: {
-              type: 'json_schema',
-              json_schema: responseSchema,
-            },
-          });
-        } catch (error) {
-          console.error('Groq Final Call Error:', error);
-          throw new ApiError(502, 'AI response generation failed');
-        }
-
-        try {
-          return JSON.parse(finalResponse.choices[0].message.content);
-        } catch (error) {
-          throw new ApiError(500, 'Failed to parse AI response');
-        }
+        return await this.generateStructuredResponse(messages, responseSchema);
       }
 
       // ---------------- NO TOOL CALLED → FORMAT RESPONSE ----------------
 
-      let formattedResponse;
-
-      try {
-        formattedResponse = await this.groq.chat.completions.create({
-          model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-          messages,
-          temperature: 0.6,
-          response_format: {
-            type: 'json_schema',
-            json_schema: responseSchema,
-          },
-        });
-      } catch (error) {
-        console.error('Groq Formatting Error:', error);
-        throw new ApiError(502, 'AI formatting failed');
-      }
-
-      try {
-        return JSON.parse(formattedResponse.choices[0].message.content);
-      } catch (error) {
-        throw new ApiError(500, 'Invalid JSON returned from AI');
-      }
+      return await this.generateStructuredResponse(messages, responseSchema);
     } catch (error) {
       if (error instanceof ApiError) {
         throw error;

@@ -9,7 +9,7 @@ import Chat from '../chat/chat.js';
 
 const chat = asyncHandler(async (req, res) => {
   const user = req.user;
-  const query = req.params.query;
+  const query = req.body.query;
   const chatId = req.body?.chatId;
   if (!query) {
     throw new ApiError(400, 'Query is required');
