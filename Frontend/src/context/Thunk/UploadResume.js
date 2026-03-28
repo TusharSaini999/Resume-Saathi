@@ -1,38 +1,31 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { setError } from "../messageSlice.js";
 import ResumeService from "../../services/resumeService.js";
+import {
+  setLoadingStage,
+} from "../resumeSlice.js";
 
-export const submitResume = createAsyncThunk(
-  "auth/submitResume",
+const submitResume = createAsyncThunk(
+  "resume/submitResume",
   async (file, { dispatch, rejectWithValue }) => {
     try {
+      setTimeout(() => {
+        dispatch(setLoadingStage("processing"));
+      }, 2000);
+      setTimeout(() => {
+        dispatch(setLoadingStage("finalizing"));
+      }, 6000);
       const response = await ResumeService.uploadResume(file);
       if (response.success) {
         return response.data;
       } else {
-        dispatch(
-          setError(
-            response.message ||
-              "Failed to upload and analyze resume. Please try again.",
-          ),
-        );
-        return rejectWithValue(
-          response.message ||
-            "Failed to upload and analyze resume. Please try again.",
-        );
+        return rejectWithValue(response.message || "Failed to upload resume.");
       }
     } catch (error) {
-      dispatch(
-        setError(
-          error.message ||
-            "An error occurred while uploading the resume. Please try again.",
-        ),
-      );
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
-          "An error occurred while uploading the resume. Please try again.",
+        error.message || "An error occurred while uploading the resume.",
       );
     }
   },
 );
+
+export { submitResume };

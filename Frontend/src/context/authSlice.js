@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { submitResume } from "./Thunk/UploadResume.js";
 const initialUser = null;
 
 const authSlice = createSlice({
@@ -51,8 +50,11 @@ const authSlice = createSlice({
   },
 });
 
-export const { setLogin, setLogout, updateExpiration, setErrorClear } =
-  authSlice.actions;
+export const {
+  setLogin,
+  setLogout,
+  updateExpiration
+} = authSlice.actions;
 export default authSlice.reducer;
 
 // const theme = useSelector((state) => state.theme.value);
