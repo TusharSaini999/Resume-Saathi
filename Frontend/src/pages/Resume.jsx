@@ -1,62 +1,55 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Loader2 } from "lucide-react";
 import ResumeUpload from "../components/dashboard/ResumeUpload";
 import ResumeAnalysis from "../components/dashboard/ResumeAnalysis";
 import AnalysisError from "../components/dashboard/AnalysisError";
-import { submitResume } from "../context/Thunk/UploadResume.js";
-import { setErrorClear } from "../context/authSlice.js";
+import { submitResumeWithStages } from "../context/Thunk/UploadResume.js";
+import { setErrorClear, setLoadingStage } from "../context/authSlice.js";
 
 
 const Resume = () => {
   const isDark = useSelector((state) => state.theme.isDark);
   const user = useSelector((state) => state.auth.user);
-  const [analysisData, setAnalysisData] = useState(null);
+  const analysisData= useSelector((state)=>state.auth.user?.resumeResp);
   const loading = useSelector((state) => state.auth.loading || false);
-  const [loadingStage, setLoadingStage] = useState("uploading");
+  const loadingStage = useSelector((state) => state.auth.loadingStage || "uploading");
+  const [flag,setFlag] = useState(false);
   const error = useSelector((state) => state.auth.error || null);
   const dispatch = useDispatch();
-  useEffect(() => {
-    if (!user?.resume_id || !Array.isArray(user?.resumeResp) || user.resumeResp.length === 0) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (!user?.resume_id || !Array.isArray(user?.resumeResp) || user.resumeResp.length === 0) {
+  //     return;
+  //   }
 
-    const matchedResumeAnalysis =
-      user.resumeResp.find((item) => item.resume_id === user.resume_id) || user.resumeResp[0];
+  //   const matchedResumeAnalysis =
+  //     user.resumeResp.find((item) => item.resume_id === user.resume_id) || user.resumeResp[0];
 
-    if (matchedResumeAnalysis) {
-      setAnalysisData((previous) => previous || matchedResumeAnalysis);
-    }
-  }, [user]);
+  //   if (matchedResumeAnalysis) {
+  //     setAnalysisData((previous) => previous || matchedResumeAnalysis);
+  //   }
+  //   console.log("User data or resume response changed, updated analysis data:", matchedResumeAnalysis);
+  // }, [user]);
 
   const handleResumeUpload = async (file) => {
-    setLoadingStage("uploading");
-
-    const processingTimeout = setTimeout(() => {
-      setLoadingStage("processing");
-    }, 1000);
-
-    const finalizingTimeout = setTimeout(() => {
-      setLoadingStage("finalizing");
-    }, 3000);
-
     try {
-      const response = await dispatch(submitResume(file)).unwrap();
-      if(response && response.analysis) {
-        setAnalysisData(response.analysis);
-      }
+      const response = await dispatch(submitResumeWithStages(file));
+      // if(response && response.analysis) {
+      //   setAnalysisData(response.analysis);
+      // }
     } catch {
       // Error is handled by authSlice
-    } finally {
-      clearTimeout(processingTimeout);
-      clearTimeout(finalizingTimeout);
     }
   };
+  useEffect(() => {
+    console.log(analysisData);
+  }, [analysisData]);
 
   const handleReUpload = () => {
-    setAnalysisData(null);
+    // setAnalysisData(null);
+    setFlag(true);
     dispatch(setErrorClear());
-    setLoadingStage("uploading");
+    dispatch(setLoadingStage("uploading"));
   };
 
   const currentView = loading ? "loading" : analysisData ? "analysis" : error ? "error" : "upload";
@@ -138,7 +131,7 @@ const Resume = () => {
             </div>
           )}
 
-          {currentView === "upload" && (
+          {currentView === "upload" || flag && (
             <ResumeUpload
               onUpload={handleResumeUpload}
               loading={loading}
@@ -146,7 +139,7 @@ const Resume = () => {
             />
           )}
 
-          {currentView === "analysis" && (
+          {currentView === "analysis" && !flag && (
             <ResumeAnalysis
               data={analysisData}
               onReupload={handleReUpload}

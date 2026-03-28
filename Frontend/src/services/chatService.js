@@ -1,6 +1,6 @@
 import API from "./api";
 
-class chatService extends API {
+class ChatService extends API {
   async sendMessage(query, chatId) {
     try {
       const payload = chatId ? { query, chatId } : { query };
@@ -41,4 +41,4 @@ class chatService extends API {
   }
 }
 
-export default new chatService();
+export default new ChatService();
