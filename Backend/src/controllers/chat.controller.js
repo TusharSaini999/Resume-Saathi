@@ -60,8 +60,9 @@ const chat = asyncHandler(async (req, res) => {
     }
     return res.status(200).json(
       new ApiResponse(true, 200, 'Chat response generated', {
-        ...response,
-        chatId: chatSession._id,
+        message:response,
+        chatSession: chatSession,
+        newChat:false
       })
     );
   } else {
@@ -101,8 +102,9 @@ const chat = asyncHandler(async (req, res) => {
     }
     return res.status(200).json(
       new ApiResponse(true, 200, 'Chat response generated', {
-        ...response,
-        chatId: newChatSession._id,
+        message:response,
+        chatSession: newChatSession,
+        newChat:true
       })
     );
   }
