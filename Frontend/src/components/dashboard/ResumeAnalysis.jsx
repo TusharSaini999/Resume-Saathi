@@ -12,7 +12,6 @@ import {
   KeyRound,
   Lightbulb,
 } from "lucide-react";
-import { useSelector } from "react-redux";
 
 const DEFAULT_EXPANDED_SECTIONS = {
   ats: true,
@@ -89,7 +88,6 @@ const AnalysisSection = ({
 );
 
 const ResumeAnalysis = ({ data, onReupload, loading }) => {
-  const isDark = useSelector((state) => state.theme.isDark);
   const [expandedSections, setExpandedSections] = useState(DEFAULT_EXPANDED_SECTIONS);
 
   const toggleSection = useCallback((section) => {
@@ -99,21 +97,12 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
     }));
   }, []);
 
-  const { panel, tile, muted, heading, hoverBg, borderColor } = useMemo(
-    () => ({
-      panel: isDark
-        ? "border-[#334155] bg-[#111827]/80"
-        : "border-[#e2e8f0] bg-white",
-      tile: isDark
-        ? "border-[#334155] bg-[#0f172a]"
-        : "border-[#e2e8f0] bg-[#f8fafc]",
-      muted: isDark ? "text-[#cbd5e1]" : "text-[#64748b]",
-      heading: isDark ? "text-white" : "text-[#1E293B]",
-      hoverBg: isDark ? "hover:bg-[#0b1220]" : "hover:bg-[#f8fafc]",
-      borderColor: isDark ? "border-[#334155]" : "border-[#e2e8f0]",
-    }),
-    [isDark],
-  );
+  const panel = "border-[#e2e8f0] bg-white dark:border-[#334155] dark:bg-[#111827]/80";
+  const tile = "border-[#e2e8f0] bg-[#f8fafc] dark:border-[#334155] dark:bg-[#0f172a]";
+  const muted = "text-[#64748b] dark:text-[#cbd5e1]";
+  const heading = "text-[#1E293B] dark:text-white";
+  const hoverBg = "hover:bg-[#f8fafc] dark:hover:bg-[#0b1220]";
+  const borderColor = "border-[#e2e8f0] dark:border-[#334155]";
 
   const summary = data?.summary;
   const atsAnalysis = data?.ats_analysis;
@@ -552,7 +541,7 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
         className={`w-full py-3.5 font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
           loading
             ? "bg-[#fe3e91]/50 text-white cursor-not-allowed"
-            : "bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] text-white hover:scale-[1.01] active:scale-95"
+            : "bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5] text-white hover:scale-[1.01] active:scale-95 shadow-lg shadow-purple-500/25"
         }`}
       >
         <RotateCcw size={18} />

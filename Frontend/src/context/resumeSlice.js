@@ -6,6 +6,7 @@ const initialState = {
   error: null,
 };
 import { submitResume } from "./Thunk/UploadResume";
+
 const resumeSlice = createSlice({
   name: "resume",
   initialState,
@@ -46,7 +47,7 @@ const resumeSlice = createSlice({
       .addCase(submitResume.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.resume = action.payload;
+        state.resume = action.payload.analysis;
         state.loadingStage = "uploading";
       })
       .addCase(submitResume.rejected, (state, action) => {
@@ -57,6 +58,6 @@ const resumeSlice = createSlice({
   },
 });
 
-export const { setResume, setLoading, setError, setLoadingStage, clearError } =
+export const { setResume, setLoading, setError, setLoadingStage, clearError,setLogout } =
   resumeSlice.actions;
 export default resumeSlice.reducer;

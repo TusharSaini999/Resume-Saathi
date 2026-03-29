@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { chat, history } from "./Thunk/Chat.js";
-import { set } from "mongoose";
+
 const initialState = {
   chatSession: [],
   currentChat: [],
@@ -78,6 +78,6 @@ const chatSlice = createSlice({
   },
 });
 
-export const { setChatSession, setLoading, setError, clearError } =
+export const { setChatSession, setLoading, setError, clearError,setLogout } =
   chatSlice.actions;
 export default chatSlice.reducer;

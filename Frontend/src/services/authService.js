@@ -105,6 +105,24 @@ class AuthService extends API {
       return error.response.data;
     }
   }
+  async loginWithGoogle() {
+    try {
+      // Redirect to Google OAuth endpoint
+      const apiBaseUrl = this.api.defaults.baseURL || window.location.origin;
+      window.location.href = `${apiBaseUrl}/auth/google`;
+    } catch (error) {
+      return error.response?.data || { success: false, message: "Failed to initiate Google login" };
+    }
+  }
+  async loginWithLinkedin() {
+    try {
+      // Redirect to LinkedIn OAuth endpoint
+      const apiBaseUrl = this.api.defaults.baseURL || window.location.origin;
+      window.location.href = `${apiBaseUrl}/auth/linkedin`;
+    } catch (error) {
+      return error.response?.data || { success: false, message: "Failed to initiate LinkedIn login" };
+    }
+  }
 }
 
 export default new AuthService();
