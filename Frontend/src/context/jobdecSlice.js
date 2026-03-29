@@ -12,6 +12,7 @@ const jobDecSlice = createSlice({
   initialState,
   reducers: {
     setJobDecSetUp: (state, action) => {
+      console.log("Setting jobDec with data:", action.payload);
       state.jobDec = action.payload;
       state.loading = false;
       state.error = null;
