@@ -14,6 +14,7 @@ import VerifyToken from "./pages/VerifyToken";
 import VerifyEmail from "./pages/VerifyEmail";
 import VerifyEmailUserUpdate from "./pages/VerifyEmailUserUpdate";
 import Resume from "./pages/Resume";
+import JobDescription from "./pages/JobDescription";
 import { Provider } from "react-redux";
 import store from "./store/store.js";
 import GlobalError from "./pages/Error.jsx";
@@ -71,7 +72,7 @@ const router = createBrowserRouter([
       },
       {
         path:"/dashboard/job",
-        element:<>Job Description Check</>
+        element:<JobDescription/>
       },
       {
         path:"/dashboard/chat",
