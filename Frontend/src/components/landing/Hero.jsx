@@ -49,7 +49,8 @@ const Hero = () => {
             <button
               className="flex items-center gap-2 px-6 py-3 text-white font-semibold rounded-xl
               bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1]
-              hover:scale-105 transition shadow-lg"
+              dark:from-[#FF5FA7] dark:via-[#D340BD] dark:to-[#9D65D5]
+              hover:scale-105 active:scale-95 transition shadow-lg shadow-purple-500/25"
               style={{ boxShadow: "0 10px 25px rgba(254,62,145,0.25)" }}
             >
               Analyze Resume

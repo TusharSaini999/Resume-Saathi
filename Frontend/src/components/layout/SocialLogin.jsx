@@ -1,4 +1,5 @@
 import { Linkedin } from "lucide-react";
+import AuthService from "../../services/authService.js";
 
 const GoogleIcon = ({ className }) => (
     <svg viewBox="0 0 48 48" className={className}>
@@ -22,6 +23,10 @@ const SocialLogin = () => {
 
                 {/* Google */}
                 <button
+                    onClick={() => {
+                      AuthService.loginWithGoogle();
+                      localStorage.setItem("trueLogin", "true");
+                    }}
                     className="group flex items-center justify-center gap-2 py-3 rounded-lg
         border border-[#E5E7EB] dark:border-[#374151]
         bg-[#FFFFFF] dark:bg-[#1F2937]
@@ -38,6 +43,10 @@ const SocialLogin = () => {
 
                 {/* LinkedIn */}
                 <button
+                    onClick={() => {
+                      AuthService.loginWithLinkedin();
+                      localStorage.setItem("trueLogin", "true");
+                    }}
                     className="group flex items-center justify-center gap-2 py-3 rounded-lg
         border border-[#E5E7EB] dark:border-[#374151]
         bg-[#FFFFFF] dark:bg-[#1F2937]

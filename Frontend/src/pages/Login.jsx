@@ -8,7 +8,7 @@ import FormFooter from "../components/layout/FormFooter";
 import AuthService from "../services/authService";
 import ErrorForm from "../components/layout/ErrorForm";
 import { useDispatch } from "react-redux";
-import { setLogin } from "../context/authSlice";
+import { Login as LoginThunk } from "../context/Thunk/Auth.js";
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ const Login = () => {
             const response = await AuthService.login(data);
             if (response.success) {
                 console.log("Login successfull", response);
-                dispatch(setLogin(response.data));
+                dispatch(LoginThunk(response.data));
                 if (response.statusCode == 200 && response?.data?.email_verified) {
                     navigate("/dashboard");
                 } else {
@@ -186,7 +186,8 @@ const Login = () => {
                                 disabled={loading}
                                 className="w-full py-2.5 rounded-lg text-white font-semibold 
                                 bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1]
-                                hover:scale-[1.02] active:scale-95 transition-all disabled:cursor-not-allowed disabled:opacity-70"
+                                dark:from-[#FF5FA7] dark:via-[#D340BD] dark:to-[#9D65D5]
+                                hover:scale-[1.02] active:scale-95 transition-all disabled:cursor-not-allowed disabled:opacity-70 shadow-lg shadow-purple-500/25"
                             >
                                 {loading ? (
                                     <>

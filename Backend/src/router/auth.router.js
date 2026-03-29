@@ -17,7 +17,7 @@ authRouter.get(
 authRouter.get(
   '/google/callback',
   passport.authenticate('google', {
-    failureRedirect: `${process.env.FRONTEND_URL}/login`,
+    failureRedirect: `${process.env.FRONTEND_URL}/auth/login`,
     session: false,
   }),
   authController
@@ -37,7 +37,7 @@ authRouter.get(
 authRouter.get(
   '/linkedin/callback',
   passport.authenticate('linkedin', {
-    failureRedirect: `${process.env.FRONTEND_URL}/login`,
+    failureRedirect: `${process.env.FRONTEND_URL}/auth/login`,
     session: false,
   }),
   authController
