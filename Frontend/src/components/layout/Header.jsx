@@ -217,7 +217,7 @@ const Header = () => {
             onClick={() => scrollToSection("Overview", "overview")}
           >
             <img
-              src={!isDark ? "./Logo/lightLogo.png" : "./Logo/darkLogo.png"}
+              src={!isDark ? "/Logo/lightLogo.png" : "/Logo/darkLogo.png"}
               alt="ResumeSaathi Logo"
               className="w-10 h-10 mr-2 rounded-2xl border-2 border-[#fe3e91] shadow-lg shadow-pink-500/20
                          transition-transform duration-500 transform group-hover:rotate-12 group-hover:scale-110"

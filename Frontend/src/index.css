@@ -63,3 +63,16 @@ html,
 body {
   -ms-overflow-style: none;
 }
+
+button:hover {
+	cursor: pointer;
+}
+
+.history-scroll-hidden {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.history-scroll-hidden::-webkit-scrollbar {
+	display: none;
+}

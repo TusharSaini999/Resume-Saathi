@@ -5,6 +5,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: initialUser,
+    isAuthResolved: false,
   },
   reducers: {
     setLogin: (state, action) => {
@@ -13,6 +14,10 @@ const authSlice = createSlice({
         localStorage.setItem("trueLogin", true);
       }
       state.user = action.payload;
+      state.isAuthResolved = true;
+    },
+    setAuthResolved: (state, action) => {
+      state.isAuthResolved = action.payload;
     },
     updateExpiration: (state, action) => {
       if (state.user) {
@@ -22,6 +27,7 @@ const authSlice = createSlice({
     setLogout: (state) => {
       state.user = null;
       localStorage.setItem("trueLogin", false);
+      state.isAuthResolved = true;
     }
   },
 });
@@ -29,6 +35,7 @@ const authSlice = createSlice({
 export const {
   setLogin,
   setLogout,
+  setAuthResolved,
   updateExpiration
 } = authSlice.actions;
 export default authSlice.reducer;

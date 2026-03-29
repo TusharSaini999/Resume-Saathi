@@ -8,10 +8,10 @@ const submitJD = createAsyncThunk(
     try {
       setTimeout(() => {
         dispatch(setLoadingStage("processing"));
-      }, 2000);
+      }, 500);
       setTimeout(() => {
         dispatch(setLoadingStage("finalizing"));
-      }, 6000);
+      }, 1000);
       const response = await JobService.checkJobDec(payload);
       if (response.success) {
         return response.data;

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, LogIn, Loader2 } from "lucide-react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import LoginSidePanel from "../components/layout/LoginSidePanel";
 import SocialLogin from "../components/layout/SocialLogin";
@@ -14,6 +14,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const location = useLocation();
     const dispatch = useDispatch();
     const {
         register,
@@ -30,7 +31,8 @@ const Login = () => {
                 console.log("Login successfull", response);
                 dispatch(LoginThunk(response.data));
                 if (response.statusCode == 200 && response?.data?.email_verified) {
-                    navigate("/dashboard");
+                    const redirectPath = location.state?.from?.pathname || "/dashboard";
+                    navigate(redirectPath, { replace: true });
                 } else {
                     navigate("/auth/verify-email");
                 }
