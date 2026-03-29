@@ -63,5 +63,6 @@ export const {
   setError,
   setLoadingStage,
   clearError,
+  setLogout,
 } = jobDecSlice.actions;
 export default jobDecSlice.reducer;

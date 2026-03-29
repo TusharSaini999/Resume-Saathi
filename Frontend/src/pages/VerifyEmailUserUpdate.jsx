@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import AuthService from "../services/authService.js";
 import { setLogin } from "../context/authSlice";
+import { Login } from "../context/Thunk/Auth.js";
 
 const verificationRequestCache = new Map();
 
@@ -40,7 +41,7 @@ const VerifyEmailUserUpdate = () => {
                     setMessage(response.message || "Email verified successfully.");
                     setSuccess(true);
                     setTimeout(() => {
-                        dispatch(setLogin(response.data));
+                        dispatch(Login(response.data));
                     }, 1500);
                 } else {
                     setSuccess(false);

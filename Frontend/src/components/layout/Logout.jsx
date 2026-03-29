@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
-import { setLogout } from "../../context/authSlice";
 import AuthService from "../../services/authService.js";
 import { setError, setSuccess } from "../../context/messageSlice.js";
+import { Logout as LogoutThunk } from "../../context/Thunk/Auth.js";
 function Logout({style = ""}) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -16,8 +16,10 @@ function Logout({style = ""}) {
             const res = await AuthService.logout();
             if (res.success) {
                 dispatch(setSuccess(res.message || "Logged out successfully."));
-                dispatch(setLogout());
-                navigate("/auth/login");
+                dispatch(LogoutThunk());
+                setTimeout(() => {
+                    navigate("/auth/login");
+                }, 1500);
             } else {
                 dispatch(setError("Failed to log out. Please try again."));
             }
