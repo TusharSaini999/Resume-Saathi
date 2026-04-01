@@ -15,9 +15,11 @@ import VerifyEmail from "./pages/VerifyEmail";
 import VerifyEmailUserUpdate from "./pages/VerifyEmailUserUpdate";
 import Resume from "./pages/Resume";
 import JobDescription from "./pages/JobDescription";
+import Settings from "./pages/Settings";
 import { Provider } from "react-redux";
 import store from "./store/store.js";
 import GlobalError from "./pages/Error.jsx";
+import ResumeSaathiChatLayout from "./pages/Chat.jsx"
 const router = createBrowserRouter([
   {
     path: "/",
@@ -76,7 +78,11 @@ const router = createBrowserRouter([
       },
       {
         path:"/dashboard/chat",
-        element:<>Chat</>
+       element:<ResumeSaathiChatLayout/>
+      },
+      {
+        path:"/dashboard/settings",
+        element:<Settings/>
       }
     ]
   }

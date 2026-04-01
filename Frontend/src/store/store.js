@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import themeSlice from "../context/themeSlice";
-import authSlice from "../context/authSlice";
+import authSlice from "../context/authSlice.js";
 import messageSlice from "../context/messageSlice";
 import resumeSlice from "../context/resumeSlice";
 import chatSlice from "../context/chatSlice";
