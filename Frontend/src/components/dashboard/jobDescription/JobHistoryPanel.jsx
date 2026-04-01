@@ -98,7 +98,7 @@ function JobHistoryPanel({
         <div className="relative lg:min-h-0 lg:flex-1">
           <div
             ref={listRef}
-            className="history-scroll-hidden max-h-[60vh] space-y-3 overflow-y-auto overscroll-y-contain pr-1 lg:min-h-0 lg:max-h-none lg:h-full"
+            className="history-scroll-hidden max-h-[60vh] space-y-3 overflow-y-auto pr-1 lg:min-h-0 lg:max-h-none lg:h-full"
           >
             {history.map((item) => {
               const active = item?._id === selectedId;

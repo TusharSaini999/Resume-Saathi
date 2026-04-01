@@ -9,6 +9,7 @@ const chat = createAsyncThunk(
         payload.query,
         payload.chatId,
       );
+      console.log("Response from ChatService.sendMessage:", response);
       if (response.success) {
         return response.data;
       } else {
@@ -41,4 +42,24 @@ const history = createAsyncThunk(
     }
   },
 );
-export { chat, history };
+
+const deleteChat = createAsyncThunk(
+  "chat/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await ChatService.deleteChat(id);
+      if (response.success) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          response.message || "Failed to delete chat.",
+        );
+      }
+    } catch (error) {
+      rejectWithValue(
+        error.message || "An error occurred while deleting the chat.",
+      );
+    }
+  },
+);
+export { chat, history, deleteChat };

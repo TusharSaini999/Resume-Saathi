@@ -12,7 +12,7 @@ function DashboardLayout() {
   const isAuthResolved = useSelector((state) => state.auth.isAuthResolved);
   const navigate = useNavigate();
   const location = useLocation();
-
+  const currentPath = location.pathname;
   useEffect(() => {
     if (!isAuthResolved) {
       return;
@@ -33,8 +33,9 @@ function DashboardLayout() {
       <main>
         <Outlet />
       </main>
-
-      <Footer />
+      {
+        currentPath !== "/dashboard/chat" && <Footer />
+      }
     </>
   );
 }

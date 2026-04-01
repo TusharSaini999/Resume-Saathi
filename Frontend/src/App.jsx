@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import GlobalMessage from "./components/layout/GlobalMessage.jsx";
 import { setError, setSuccess } from "./context/messageSlice.js";
 import { Login ,Logout} from "./context/Thunk/Auth.js";
-import { setAuthResolved } from "./context/AuthSlice.js";
+import { setAuthResolved } from "./context/authSlice.js";
 
 function App({ children }) {
   const [showSplash, setShowSplash] = useState(true);
@@ -23,8 +23,7 @@ function App({ children }) {
           dispatch(Logout());
           dispatch(setError(response.message || "Failed to fetch profile"));
         }
-      } catch {
-        dispatch(Logout());
+      } catch (error) {
         dispatch(setError("Something went wrong while fetching"));
       } finally {
         dispatch(setAuthResolved(true));
