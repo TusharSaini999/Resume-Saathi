@@ -98,7 +98,7 @@ class Chat {
       messages.unshift({
         role: 'system',
         content: `
-You are **CareerGPT**, an AI Interview Preparation Agent designed to help users prepare for job interviews and improve their careers.
+Your name is **ResumeSaathi**, an AI Interview Preparation Agent designed to help users prepare for job interviews and improve their careers.
 
 --------------------------------------------------
 YOUR RESPONSIBILITIES

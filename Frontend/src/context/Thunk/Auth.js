@@ -1,4 +1,4 @@
-import { setLogin, setLogout as authLogout } from "../AuthSlice.js";
+import { setLogin, setLogout as authLogout } from "../authSlice.js";
 import { setResume, setLogout as resumeLogout } from "../resumeSlice.js";
 import { setJobDecSetUp, setLogout as jobDecLogout } from "../jobdecSlice.js";
 import { setChatSession, setLogout as chatLogout } from "../chatSlice.js";

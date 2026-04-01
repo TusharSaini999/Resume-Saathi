@@ -18,6 +18,7 @@ const dashboardNavItems = [
   { label: "Resume", path: "/dashboard" },
   { label: "Job Description", path: "/dashboard/job" },
   { label: "Chat", path: "/dashboard/chat" },
+  { label: "Settings", path: "/dashboard/settings" },
 ];
 
 // Constants - extracted to reduce string duplication
@@ -196,6 +197,10 @@ const Header = () => {
     };
   }, [mobileMenuOpen]);
 
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
   const getNavItemClass = useCallback((isActive) =>
     `w-full lg:w-auto text-center text-sm font-bold uppercase tracking-wider relative transition-colors duration-300 py-1 ${
       isActive
@@ -318,6 +323,7 @@ const Header = () => {
                 <li key={label} className="relative w-full lg:w-auto">
                   <Link
                     to={path}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={getNavItemClass(location.pathname === path)}
                   >
                     {label}

@@ -60,9 +60,9 @@ const chat = asyncHandler(async (req, res) => {
     }
     return res.status(200).json(
       new ApiResponse(true, 200, 'Chat response generated', {
-        message:response,
+        message: aiChatMessage,
         chatSession: chatSession,
-        newChat:false
+        newChat: false,
       })
     );
   } else {
@@ -83,6 +83,7 @@ const chat = asyncHandler(async (req, res) => {
       user_id: user._id,
       session_title: response.title || 'New Chat Session',
     });
+    let aiChatMessage = null;
     if (newChatSession) {
       const newChatMessage = await ChatMessage.create({
         user_id: user._id,
@@ -90,7 +91,7 @@ const chat = asyncHandler(async (req, res) => {
         sender: 'user',
         message: query,
       });
-      const aiChatMessage = await ChatMessage.create({
+      aiChatMessage = await ChatMessage.create({
         user_id: user._id,
         session_id: newChatSession._id,
         sender: 'assistant',
@@ -102,9 +103,9 @@ const chat = asyncHandler(async (req, res) => {
     }
     return res.status(200).json(
       new ApiResponse(true, 200, 'Chat response generated', {
-        message:response,
+        message: aiChatMessage,
         chatSession: newChatSession,
-        newChat:true
+        newChat: true,
       })
     );
   }
@@ -146,7 +147,7 @@ const clearHistory = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Chat history not found');
   }
   await ChatMessage.deleteMany({ session_id: historyId });
-  return res.status(200).json(new ApiResponse(true, 200, 'Chat history cleared'));
+  return res.status(200).json(new ApiResponse(true, 200, 'Chat history cleared',historyId));
 });
 
 export { chat, history, clearHistory };
