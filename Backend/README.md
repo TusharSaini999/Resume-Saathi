@@ -1,8 +1,8 @@
-# Backend README
+# Backend README 🛠️
 
 This service powers Resume Saathi APIs for authentication, resume analysis, job matching, and chat.
 
-## Technology
+## Technology ⚙️
 
 - Node.js
 - Express.js
@@ -10,19 +10,19 @@ This service powers Resume Saathi APIs for authentication, resume analysis, job 
 - Passport (Google and LinkedIn OAuth)
 - Multer and Cloudinary
 
-## Prerequisites
+## Prerequisites ✅
 
 - Node.js 20 or later
 - npm 10 or later
 - MongoDB instance
 
-## Installation
+## Installation 📦
 
 ```bash
 npm install
 ```
 
-## Environment Configuration
+## Environment Configuration 🔧
 
 Create a local environment file from the sample:
 
@@ -54,24 +54,24 @@ Important variables:
 - CLOUDINARY_API_SECRET
 - IPWHO_API_KEY
 
-## Run the Server
+## Run the Server 🚀
 
 ```bash
 npm start
 ```
 
-Default local URL: http://localhost:5000
+Default local URL: http://localhost:5000 🌐
 
-## Available Scripts
+## Available Scripts 📜
 
 - npm start
 - npm run format
 
-## API Base Path
+## API Base Path 🧭
 
 - /api/v1
 
-## Production Notes
+## Production Notes 🔒
 
 - Do not commit the .env file.
 - Use strong secrets for JWT and third-party credentials.

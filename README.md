@@ -1,8 +1,8 @@
-# Resume Saathi
+# Resume Saathi 🚀
 
 Resume Saathi is an AI-powered ATS resume analysis platform. It helps users upload resumes, receive structured feedback, compare resumes against job descriptions, and improve quality with AI-driven suggestions.
 
-## Technology Stack
+## Technology Stack ⚙️
 
 - Frontend: React, Vite, Redux Toolkit, Tailwind CSS
 - Backend: Node.js, Express, MongoDB (Mongoose)
@@ -10,7 +10,7 @@ Resume Saathi is an AI-powered ATS resume analysis platform. It helps users uplo
 - Authentication: JWT, Google OAuth, LinkedIn OAuth
 - File services: Multer, Cloudinary
 
-## Repository Structure
+## Repository Structure 🗂️
 
 ```
 Resume-Saathi/
@@ -31,13 +31,13 @@ Resume-Saathi/
 └── CHANGELOG.md
 ```
 
-## Prerequisites
+## Prerequisites ✅
 
 - Node.js 20 or later
 - npm 10 or later
 - MongoDB (local or cloud)
 
-## Quick Start
+## Quick Start 🚀
 
 ### 1. Start the backend
 
@@ -48,7 +48,7 @@ copy .env.sample .env
 npm start
 ```
 
-Backend default URL: http://localhost:5000
+Backend default URL: http://localhost:5000 🌐
 
 ### 2. Start the frontend
 
@@ -66,9 +66,9 @@ npm install
 npm run dev
 ```
 
-Frontend default URL: http://localhost:5173
+Frontend default URL: http://localhost:5173 🌐
 
-## Project Documentation
+## Project Documentation 📚
 
 - Backend guide: Backend/README.md
 - Frontend guide: Frontend/README.md
@@ -78,12 +78,12 @@ Frontend default URL: http://localhost:5173
 - Support: SUPPORT.md
 - Changelog: CHANGELOG.md
 
-## GitHub Templates
+## GitHub Templates 🧩
 
 - Bug report: .github/ISSUE_TEMPLATE/bug_report.md
 - Feature request: .github/ISSUE_TEMPLATE/feature_request.md
 - Pull request: .github/pull_request_template.md
 
-## License
+## License 📄
 
 This project is licensed under the MIT License. See LICENSE for details.
