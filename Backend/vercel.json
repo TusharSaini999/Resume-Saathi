@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "functions": {
+    "src/index.js": {
+      "includeFiles": "node_modules/@napi-rs/**/*"
+    }
+  },
   "builds": [
     {
       "src": "src/index.js",
