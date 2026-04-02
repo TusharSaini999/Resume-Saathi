@@ -1,6 +1,6 @@
 // @ts-nocheck
 import nodemailer from "nodemailer";
-import ApiError from "./apiError.js";
+import ApiError from "./ApiError.js";
 
 const sendMail = async ({ to, subject, text, html }) => {
   try {
