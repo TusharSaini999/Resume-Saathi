@@ -1,3 +1,15 @@
+// Fallback: get server public IP location for local/private clients
+const getLocationFromIpApi = async () => {
+  try {
+    const response = await fetch('https://ipapi.co/json/');
+    if (!response.ok) return '';
+    const data = await response.json();
+    const parts = [data?.city, data?.region, data?.country_name].filter(Boolean);
+    return parts.length ? parts.join(', ') : '';
+  } catch {
+    return '';
+  }
+};
 import User from '../models/user.model.js';
 import Session from '../models/session.model.js';
 import JobDescription from '../models/jobDescription.model.js';
@@ -13,29 +25,98 @@ import Token from '../models/token.model.js';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 
+const LOCAL_NETWORK_LABEL = 'Local Network';
+
+const getClientIp = (req) => {
+  const forwardedIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim();
+  const rawIp = forwardedIp || req.socket?.remoteAddress || '0.0.0.0';
+
+  if (!rawIp) {
+    return '0.0.0.0';
+  }
+
+  // Convert IPv6-mapped IPv4 (::ffff:192.168.1.1) into plain IPv4.
+  return rawIp.replace(/^::ffff:/, '');
+};
+
+const getClientPublicIpHeader = (req) => {
+  const headerIp = req.headers['x-client-public-ip'];
+  if (!headerIp) {
+    return '';
+  }
+
+  const normalized = Array.isArray(headerIp) ? headerIp[0] : headerIp;
+  return normalized.split(',')[0]?.trim()?.replace(/^::ffff:/, '') || '';
+};
+
+const isPrivateOrLocalIp = (ip) => {
+  if (!ip) {
+    return true;
+  }
+
+  if (ip === '127.0.0.1' || ip === '::1' || ip.toLowerCase() === 'localhost') {
+    return true;
+  }
+
+  if (ip.startsWith('10.') || ip.startsWith('192.168.')) {
+    return true;
+  }
+
+  const secondOctet = Number(ip.split('.')[1]);
+  if (ip.startsWith('172.') && secondOctet >= 16 && secondOctet <= 31) {
+    return true;
+  }
+
+  return false;
+};
+
+const getLocationFromGeo = (geoLocation) => {
+  const city = geoLocation?.city;
+  const region = geoLocation?.region;
+  const country = geoLocation?.country;
+
+  const parts = [city, region, country].filter(Boolean);
+  return parts.length ? parts.join(', ') : 'Unknown location';
+};
+
+const resolveLocation = async (ip) => {
+  if (isPrivateOrLocalIp(ip)) {
+    const fallbackLocation = await getLocationFromIpApi();
+    return fallbackLocation || LOCAL_NETWORK_LABEL;
+  }
+
+  try {
+    const response = await fetch(`https://api.ipwho.org/ip/${ip}?apiKey=${process.env.IPWHO_API_KEY}`);
+    if (!response.ok) {
+      return 'Unknown location';
+    }
+
+    const data = await response.json();
+    return getLocationFromGeo(data?.data?.geoLocation);
+  } catch {
+    return 'Unknown location';
+  }
+};
+
 //generate session
 const genrateSession = async (user, req) => {
   const token = user.generateToken();
 
-  const ip =
-    req.headers['x-forwarded-for']?.split(',')[0] || req.socket?.remoteAddress || '0.0.0.0';
+  const ip = getClientIp(req);
+  const publicIpFromClient = getClientPublicIpHeader(req);
+  const locationLookupIp =
+    publicIpFromClient && !isPrivateOrLocalIp(publicIpFromClient) ? publicIpFromClient : ip;
 
   const uaParser = new UAParser(req.headers['user-agent']);
   const userData = uaParser.getResult();
-
-  const response = await fetch(
-    `https://api.ipwho.org/ip/${ip}?apiKey=${process.env.IPWHO_API_KEY}`
-  );
-  const data = await response.json();
+  const location = await resolveLocation(locationLookupIp);
 
   const sessionData = {
     user_id: user._id,
     token: token,
     browser: userData.browser.name || 'Unknown',
     os: userData.os.name || 'Unknown',
-    location: `${data.data?.geoLocation?.city || 'Unknown'}, ${
-      data.data?.geoLocation?.region || 'Unknown'
-    }, ${data.data?.geoLocation?.country || 'Unknown'}`,
+    location,
     ip_address: ip,
     is_active: true,
     expires_at: new Date(Date.now() + JWT_EXPIRATION),

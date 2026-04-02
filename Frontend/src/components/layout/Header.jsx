@@ -18,6 +18,7 @@ const dashboardNavItems = [
   { label: "Resume", path: "/dashboard" },
   { label: "Job Description", path: "/dashboard/job" },
   { label: "Chat", path: "/dashboard/chat" },
+  { label: "Settings", path: "/dashboard/settings" },
 ];
 
 // Constants - extracted to reduce string duplication
@@ -196,6 +197,10 @@ const Header = () => {
     };
   }, [mobileMenuOpen]);
 
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
   const getNavItemClass = useCallback((isActive) =>
     `w-full lg:w-auto text-center text-sm font-bold uppercase tracking-wider relative transition-colors duration-300 py-1 ${
       isActive
@@ -217,7 +222,7 @@ const Header = () => {
             onClick={() => scrollToSection("Overview", "overview")}
           >
             <img
-              src={!isDark ? "./Logo/lightLogo.png" : "./Logo/darkLogo.png"}
+              src={!isDark ? "/Logo/lightLogo.png" : "/Logo/darkLogo.png"}
               alt="ResumeSaathi Logo"
               className="w-10 h-10 mr-2 rounded-2xl border-2 border-[#fe3e91] shadow-lg shadow-pink-500/20
                          transition-transform duration-500 transform group-hover:rotate-12 group-hover:scale-110"
@@ -318,6 +323,7 @@ const Header = () => {
                 <li key={label} className="relative w-full lg:w-auto">
                   <Link
                     to={path}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={getNavItemClass(location.pathname === path)}
                   >
                     {label}

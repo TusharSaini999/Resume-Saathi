@@ -1,3 +1,38 @@
+/* Sidebar open/close animation */
+.sidebar-animated {
+	transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s, box-shadow 0.3s;
+	will-change: width, background, box-shadow;
+	overflow: hidden;
+}
+.sidebar-animated.sidebar-open {
+	width: 260px !important;
+	opacity: 1;
+	box-shadow: 0 8px 32px rgba(30,41,59,0.10);
+}
+.sidebar-animated.sidebar-closed {
+	width: 72px !important;
+	opacity: 0.98;
+	box-shadow: none;
+}
+/* Chat bubble animation */
+.chat-bubble-animate {
+	animation: chat-bubble-fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes chat-bubble-fade-in {
+	0% {
+		opacity: 0;
+		transform: translateY(24px) scale(0.98);
+	}
+	80% {
+		opacity: 1;
+		transform: translateY(-2px) scale(1.01);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -62,4 +97,17 @@ body {
 html,
 body {
   -ms-overflow-style: none;
+}
+
+button:hover {
+	cursor: pointer;
+}
+
+.history-scroll-hidden {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.history-scroll-hidden::-webkit-scrollbar {
+	display: none;
 }

@@ -5,8 +5,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: initialUser,
-    loading: false,
-    error: null,
+    isAuthResolved: false,
   },
   reducers: {
     setLogin: (state, action) => {
@@ -15,6 +14,10 @@ const authSlice = createSlice({
         localStorage.setItem("trueLogin", true);
       }
       state.user = action.payload;
+      state.isAuthResolved = true;
+    },
+    setAuthResolved: (state, action) => {
+      state.isAuthResolved = action.payload;
     },
     updateExpiration: (state, action) => {
       if (state.user) {
@@ -24,35 +27,15 @@ const authSlice = createSlice({
     setLogout: (state) => {
       state.user = null;
       localStorage.setItem("trueLogin", false);
-    },
-    setErrorClear: (state) => {
-      state.error = null;
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(submitResume.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(submitResume.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = null;
-        state.user.resume_id = action.payload.resumeId;
-        state.user.resumeResp = action.payload.analysis;
-      })
-      .addCase(submitResume.rejected, (state, action) => {
-        state.loading = false;
-        state.error =
-          action.payload.message ||
-          "Failed to upload and analyze resume. Please try again.";
-      });
+      state.isAuthResolved = true;
+    }
   },
 });
 
 export const {
   setLogin,
   setLogout,
+  setAuthResolved,
   updateExpiration
 } = authSlice.actions;
 export default authSlice.reducer;

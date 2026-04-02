@@ -32,14 +32,12 @@ const jdAnalysisSchema = new Schema(
         type: String,
         trim: true,
         default: '',
-        maxlength: [100, 'Required experience cannot exceed 100 characters'],
       },
 
       candidate_experience: {
         type: String,
         trim: true,
         default: '',
-        maxlength: [100, 'Candidate experience cannot exceed 100 characters'],
       },
 
       experience_match: {
@@ -53,14 +51,12 @@ const jdAnalysisSchema = new Schema(
         type: String,
         trim: true,
         default: '',
-        maxlength: [150, 'Required education cannot exceed 150 characters'],
       },
 
       candidate_education: {
         type: String,
         trim: true,
         default: '',
-        maxlength: [150, 'Candidate education cannot exceed 150 characters'],
       },
 
       education_match: {
@@ -93,12 +89,6 @@ const jdAnalysisSchema = new Schema(
     suggestions: {
       type: [String],
       default: [],
-      validate: {
-        validator: function (arr) {
-          return arr.every((item) => item.length <= 300);
-        },
-        message: 'Each suggestion must be less than 300 characters',
-      },
     },
   },
   { _id: false }
@@ -121,21 +111,17 @@ const jobDescriptionSchema = new Schema(
     title: {
       type: String,
       trim: true,
-      maxlength: [150, 'Job title cannot exceed 150 characters'],
     },
 
     company_name: {
       type: String,
       trim: true,
-      maxlength: [150, 'Company name cannot exceed 150 characters'],
     },
 
     description: {
       type: String,
       required: [true, 'Job description is required'],
       trim: true,
-      minlength: [20, 'Job description must be at least 20 characters long'],
-      maxlength: [10000, 'Job description cannot exceed 10000 characters'],
     },
 
     /* -------- JD Analysis Result -------- */

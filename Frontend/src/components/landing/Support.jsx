@@ -82,7 +82,7 @@ const Support = () => {
 
             <a
               href="mailto:support@resumesaathi.com"
-              className="px-6 py-3 font-semibold rounded-xl text-white bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-lg hover:shadow-[#CA25AF]/30"
+              className="px-6 py-3 font-semibold rounded-xl text-white bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] dark:from-[#FF5FA7] dark:via-[#D340BD] dark:to-[#9D65D5] transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25"
             >
               Email Support
             </a>
