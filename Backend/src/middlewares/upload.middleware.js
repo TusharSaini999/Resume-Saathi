@@ -1,10 +1,13 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import os from "os";
 import ApiError from "../utils/ApiError.js";
 
 // Upload directory
-const uploadDir = path.resolve("uploads");
+const uploadDir = process.env.VERCEL
+  ? path.join(os.tmpdir(), "uploads")
+  : path.resolve("uploads");
 
 // Ensure uploads folder exists
 if (!fs.existsSync(uploadDir)) {
