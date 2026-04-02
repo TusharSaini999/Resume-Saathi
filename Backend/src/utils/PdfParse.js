@@ -1,5 +1,5 @@
 import fs from 'fs';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs'; ///export * from "pdfjs-dist";
 import ApiError from './ApiError.js';
 class PdfParese {
   async getText(filePath) {
