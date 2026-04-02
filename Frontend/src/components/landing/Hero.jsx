@@ -88,7 +88,7 @@ const Hero = () => {
             shadow-xl w-full max-w-lg"
           >
             <img
-              src="/Assets/1.png"
+              src="https://res.cloudinary.com/cloud451752/image/upload/v1775133213/1_r5prct.webp"
               alt="Resume Saathi ATS analysis preview"
               className="rounded-xl w-full h-auto object-contain"
             />
