@@ -15,12 +15,8 @@ Resume Saathi is an AI-powered ATS resume analysis platform. It helps users uplo
 ```
 Resume-Saathi/
 ├── .github/
-│   ├── ISSUE_TEMPLATE/
-│   └── pull_request_template.md
 ├── Backend/
-│   └── README.md
 ├── Frontend/
-│   └── README.md
 ├── Databases/
 ├── Testing/
 ├── README.md
