@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 
 const SplashScreen = ({ show = true }) => {
     const [isEntered, setIsEntered] = useState(false);
+    const publicBaseUrl = import.meta.env.BASE_URL;
 
     const isDark = localStorage.getItem("isDark") === "true";
     const logoSrc = isDark
-        ? `${import.meta.env.BASE_URL}Logo/darkLogo.png`
-        : `${import.meta.env.BASE_URL}Logo/lightLogo.png`;
+        ? `${publicBaseUrl}Logo/darkLogo.png`
+        : `${publicBaseUrl}Logo/lightLogo.png`;
 
     useEffect(() => {
         const frame = window.requestAnimationFrame(() => {

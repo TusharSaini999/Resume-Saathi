@@ -21,6 +21,8 @@ const dashboardNavItems = [
   { label: "Settings", path: "/dashboard/settings" },
 ];
 
+const publicBaseUrl = import.meta.env.BASE_URL;
+
 // Constants - extracted to reduce string duplication
 const ACTIVE_SECTION_STORAGE_KEY = "activeSection";
 const THEME_STORAGE_KEY = "theme";
@@ -222,8 +224,10 @@ const Header = () => {
             onClick={() => scrollToSection("Overview", "overview")}
           >
             <img
-              src={!isDark ? "/Logo/lightLogo.png" : "/Logo/darkLogo.png"}
+              src={!isDark ? `${publicBaseUrl}Logo/lightLogo.png` : `${publicBaseUrl}Logo/darkLogo.png`}
               alt="ResumeSaathi Logo"
+              loading="eager"
+              fetchPriority="high"
               className="w-10 h-10 mr-2 rounded-2xl border-2 border-[#fe3e91] shadow-lg shadow-pink-500/20
                          transition-transform duration-500 transform group-hover:rotate-12 group-hover:scale-110"
             />
