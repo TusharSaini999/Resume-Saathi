@@ -6,9 +6,9 @@ export const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-  maxAge: 365 * 24 * 60 * 60 * 1000, //1 year
+  maxAge: 7 * 24 * 60 * 60 * 1000, //7 days
 };
 export const EMAIL_VERIFICATION_TTL = 15 * 60 * 1000; //15 minutes
 export const PASSWORD_RESET_TTL = 10 * 60 * 1000; //10 minutes
-export const JWT_EXPIRATION = 365 * 24 * 60 * 60 * 1000; //1 year
+export const JWT_EXPIRATION = 7 * 24 * 60 * 60 * 1000; //7 days
 

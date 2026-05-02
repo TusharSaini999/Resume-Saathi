@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import ApiError from '../utils/ApiError.js';
+import { JWT_EXPIRATION } from '../constants.js';
 
 const authProviderSchema = new mongoose.Schema(
   {
@@ -119,7 +120,7 @@ userSchema.methods.generateToken = function () {
         email: this.email,
       },
       process.env.JWT_SECRET_KEY,
-      { expiresIn: '1y' }
+      { expiresIn: Math.floor(JWT_EXPIRATION / 1000) }
     );
   } catch (error) {
     throw new Error('Token generation failed');
