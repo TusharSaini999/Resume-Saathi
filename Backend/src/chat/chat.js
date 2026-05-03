@@ -312,13 +312,11 @@ ${query}
         },
       };
 
-      console.log(responseSchema);
 
       // ---------------- FIRST LLM CALL (TOOLS ENABLED) ----------------
       let completion;
 
       try {
-        console.log('Sending messages to Groq API:', messages);
         completion = await this.groq.chat.completions.create({
           model: 'meta-llama/llama-4-scout-17b-16e-instruct',
           messages,
@@ -349,7 +347,6 @@ ${query}
       }
 
       const message = completion?.choices?.[0]?.message;
-      console.log('Groq API Response Message for Tool:', message);
       if (!message) {
         throw new ApiError(500, 'Invalid AI response received');
       }
@@ -384,7 +381,6 @@ ${query}
           tool_call_id: toolCall.id,
           content: JSON.stringify(toolResult),
         });
-        console.log('Messages after pushing tool call:', messages);
 
         // ---------------- SECOND CALL (STRUCTURED OUTPUT) ----------------
         return await this.generateStructuredResponse(messages, responseSchema);

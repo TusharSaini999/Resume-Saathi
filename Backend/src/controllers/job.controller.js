@@ -27,7 +27,6 @@ const check = asyncHandler(async (req, res) => {
   if (!analysisResult) {
     throw new ApiError(500, 'Failed to analyze job description');
   }
-  console.log(analysisResult);
 
   const jobResp = await JobDescription.create({
     user_id: userId,

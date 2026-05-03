@@ -9,7 +9,6 @@ const authSlice = createSlice({
   },
   reducers: {
     setLogin: (state, action) => {
-      console.log("Setting login with user data:", action.payload);
       if (action.payload?.email_verified) {
         localStorage.setItem("trueLogin", true);
       }

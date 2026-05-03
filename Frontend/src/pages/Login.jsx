@@ -28,7 +28,6 @@ const Login = () => {
         try {
             const response = await AuthService.login(data);
             if (response.success) {
-                console.log("Login successfull", response);
                 dispatch(LoginThunk(response.data));
                 if (response.statusCode == 200 && response?.data?.email_verified) {
                     const redirectPath = location.state?.from?.pathname || "/dashboard";
