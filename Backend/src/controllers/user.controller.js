@@ -690,7 +690,6 @@ const resetPassword = asyncHandler(async (req, res) => {
 const changePassword = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { currentPassword, newPassword } = req.body;
-  console.log('Change Password Request:', { userId, currentPassword, newPassword });
   if (!currentPassword || !newPassword) {
     throw new ApiError(400, 'Current and new password are required');
   }
@@ -698,7 +697,6 @@ const changePassword = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'New password must be at least 8 characters');
   }
   const user = await User.findById(userId).select('+password');
-  console.log('User found for password change:', user);
   if (!user) {
     throw new ApiError(404, 'User not found');
   }
@@ -712,7 +710,6 @@ const changePassword = asyncHandler(async (req, res) => {
   }
 
   const isMatch = await user.comparePassword(currentPassword);
-  console.log('Current password match:', isMatch);
   if (!isMatch) {
     throw new ApiError(400, 'Current password is incorrect');
   }

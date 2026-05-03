@@ -13,7 +13,6 @@ class Cloudinary {
 
   async fileUpload(file, folderName = 'resume_saathi') {
     try {
-      console.log('Uploading file to Cloudinary:', file);
       if (!file) {
         throw new Error('No file provided');
       }

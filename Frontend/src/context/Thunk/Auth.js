@@ -16,7 +16,6 @@ const Logout = () => (dispatch) => {
   dispatch(jobDecLogout());
   dispatch(chatLogout());
 
-  console.log("Logout thunk executed, all states cleared.");
 };
 
 export { Login, Logout };

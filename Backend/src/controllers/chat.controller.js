@@ -31,7 +31,6 @@ const chat = asyncHandler(async (req, res) => {
       sender: msg.sender,
       message: msg.message,
     }));
-    console.log('Formatted Messages:', formattedMessages);
     const chatInstance = new Chat();
     const response = await chatInstance.chat(
       query,
@@ -42,7 +41,6 @@ const chat = asyncHandler(async (req, res) => {
       formattedMessages
     );
     delete response.title;
-    console.log('Chat Response:', response);
     const newChatMessage = await ChatMessage.create({
       user_id: user._id,
       session_id: chatSession._id,
@@ -75,7 +73,6 @@ const chat = asyncHandler(async (req, res) => {
       resume.parsed_data,
       []
     );
-    console.log('Chat Response:', response);
     if (!response) {
       throw new ApiError(502, 'AI response generation failed');
     }

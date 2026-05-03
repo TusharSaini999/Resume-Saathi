@@ -9,7 +9,6 @@ const chat = createAsyncThunk(
         payload.query,
         payload.chatId,
       );
-      console.log("Response from ChatService.sendMessage:", response);
       if (response.success) {
         return response.data;
       } else {

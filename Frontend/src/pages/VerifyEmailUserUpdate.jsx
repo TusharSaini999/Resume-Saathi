@@ -37,7 +37,6 @@ const VerifyEmailUserUpdate = () => {
                 if (!isActive) return;
 
                 if (response.success) {
-                    console.log("Email verification successful, updating user data in store:", response);
                     setMessage(response.message || "Email verified successfully.");
                     setSuccess(true);
                     setTimeout(() => {

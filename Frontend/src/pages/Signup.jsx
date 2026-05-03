@@ -38,7 +38,6 @@ const Signup = () => {
                 } else {
                     navigate("/auth/verify-email");
                 }
-                console.log("Signup successful:", response);
             } else {
                 setError(response.message || "Failed to create account");
             }
