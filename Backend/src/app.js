@@ -6,10 +6,10 @@ import { PARAMETER_LIMIT, SIZE_LIMIT, URL_LIMIT } from './constants.js';
 import passport from './config/passport_config.js';
 const app = express();
 
-// Safe handling if CLIENT_URLS is not defined
-const allowedOrigins = process.env.CLIENT_URLS
-  ? process.env.CLIENT_URLS.split(',').map((origin) => origin.trim())
-  : [];
+// // Safe handling if CLIENT_URLS is not defined
+// const allowedOrigins = process.env.CLIENT_URLS
+//   ? process.env.CLIENT_URLS.split(',').map((origin) => origin.trim())
+//   : [];
 
 // Security headers
 app.use(helmet());
@@ -25,14 +25,8 @@ app.use((req, res, next) => {
 // CORS configuration
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS blocked for origin: ${origin}`));
-      }
-    },
-    credentials: true,
+    origin: process.env.CLIENT_URLS,
+    optionsSuccessStatus: 200,
   })
 );
 
