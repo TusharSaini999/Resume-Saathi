@@ -22,13 +22,20 @@ app.use((req, res, next) => {
   next();
 });
 
-// CORS configuration
+const CLIENT_URL = process.env.CLIENT_URLS;
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URLS,
-    optionsSuccessStatus: 200,
+    origin: CLIENT_URL,
+    credentials: true,
   })
 );
+
+// THIS is the key fix for your issue
+app.options('*', cors({
+  origin: CLIENT_URL,
+  credentials: true,
+}));
 
 // Body parsers
 app.use(express.json({ limit: SIZE_LIMIT }));
