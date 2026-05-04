@@ -31,11 +31,6 @@ app.use(
   })
 );
 
-// THIS is the key fix for your issue
-app.options('*', cors({
-  origin: CLIENT_URL,
-  credentials: true,
-}));
 
 // Body parsers
 app.use(express.json({ limit: SIZE_LIMIT }));
