@@ -214,7 +214,7 @@ const Header = () => {
     <header>
       <nav
         ref={navRef}
-        className="fixed top-0 w-full z-20 border-b border-[#E5E7EB] bg-white/80 px-4 py-3 backdrop-blur-md
+        className="fixed top-0 w-full z-25 border-b border-[#E5E7EB] bg-white/80 px-4 py-3 backdrop-blur-md
                    transition-colors duration-300 dark:border-[#374151] dark:bg-[#111827] lg:px-6"
       >
         <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center">
