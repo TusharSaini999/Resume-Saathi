@@ -1,0 +1,37 @@
+services:
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+
+    image: tusharsaini999/resume-saathi-backend
+
+    container_name: resume-backend-container
+
+    ports:
+      - "5000:5000"
+
+    env_file:
+      - ./Backend/.env
+
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+
+    image: tusharsaini999/resume-saathi-frontend
+
+    container_name: resume-frontend-container
+
+    ports:
+      - "3000:80"
+
+    env_file:
+      - ./Frontend/.env
+
+    depends_on:
+      - backend
+
+    restart: unless-stopped
