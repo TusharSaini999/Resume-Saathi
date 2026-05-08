@@ -20,13 +20,15 @@ services:
     build:
       context: ./Frontend
       dockerfile: Dockerfile
+      args:
+        VITE_SERVER_URL: ${VITE_SERVER_URL:-http://localhost:5000/api/v1}
 
     image: tusharsaini999/resume-saathi-frontend
 
     container_name: resume-frontend-container
 
     ports:
-      - "3000:80"
+      - "5173:80"
 
     env_file:
       - ./Frontend/.env

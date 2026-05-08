@@ -17,7 +17,6 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.97",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.9.0",
     "cookie-parser": "^1.4.7",

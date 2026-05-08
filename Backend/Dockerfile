@@ -1,21 +1,18 @@
-FROM node:22-alpine
+FROM node:24-alpine
 
-WORKDIR /app/backend
+WORKDIR /app
 
-# Copy package files
+# Copy package files first
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --omit=dev
+# Install only production dependencies
+RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy source code
 COPY . .
 
-# Production mode
 ENV NODE_ENV=production
 
-# Backend port
 EXPOSE 5000
 
-# Start server
-CMD ["node", "./src/index.js"]
+CMD ["node", "src/index.js"]

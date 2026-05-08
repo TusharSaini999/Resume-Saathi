@@ -1,4 +1,6 @@
-FROM node:22-alpine AS build
+FROM node:24 AS build
+
+ARG VITE_SERVER_URL
 
 WORKDIR /app/frontend
 
@@ -10,6 +12,9 @@ RUN npm ci
 
 # Copy source code
 COPY . .
+
+# If a build-time VITE_SERVER_URL is provided, write it into a .env file
+RUN if [ -n "$VITE_SERVER_URL" ]; then printf "VITE_SERVER_URL=%s\n" "$VITE_SERVER_URL" > .env; fi
 
 # Build frontend
 RUN npm run build
