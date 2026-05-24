@@ -1,0 +1,1010 @@
+{
+  "collections": {
+    "ResumeSaathiDB.chatmessages": {
+      "ns": "ResumeSaathiDB.chatmessages",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "__v",
+          "createdAt",
+          "message",
+          "sender",
+          "session_id",
+          "updatedAt",
+          "user_id"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "__v": {
+            "bsonType": "int"
+          },
+          "createdAt": {
+            "bsonType": "date"
+          },
+          "message": {
+            "bsonType": "string"
+          },
+          "sender": {
+            "bsonType": "string"
+          },
+          "session_id": {
+            "bsonType": "objectId"
+          },
+          "updatedAt": {
+            "bsonType": "date"
+          },
+          "user_id": {
+            "bsonType": "objectId"
+          }
+        }
+      }
+    },
+    "ResumeSaathiDB.chatsessions": {
+      "ns": "ResumeSaathiDB.chatsessions",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "__v",
+          "createdAt",
+          "session_title",
+          "updatedAt",
+          "user_id"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "__v": {
+            "bsonType": "int"
+          },
+          "createdAt": {
+            "bsonType": "date"
+          },
+          "session_title": {
+            "bsonType": "string"
+          },
+          "updatedAt": {
+            "bsonType": "date"
+          },
+          "user_id": {
+            "bsonType": "objectId"
+          }
+        }
+      }
+    },
+    "ResumeSaathiDB.jobdescriptions": {
+      "ns": "ResumeSaathiDB.jobdescriptions",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "__v",
+          "company_name",
+          "createdAt",
+          "description",
+          "jd_analysis",
+          "resume_id",
+          "title",
+          "updatedAt",
+          "user_id"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "__v": {
+            "bsonType": "int"
+          },
+          "company_name": {
+            "bsonType": "string"
+          },
+          "createdAt": {
+            "bsonType": "date"
+          },
+          "description": {
+            "bsonType": "string"
+          },
+          "jd_analysis": {
+            "bsonType": "object",
+            "properties": {
+              "education": {
+                "bsonType": "object",
+                "properties": {
+                  "candidate_education": {
+                    "bsonType": "string"
+                  },
+                  "education_match": {
+                    "bsonType": "bool"
+                  },
+                  "required_education": {
+                    "bsonType": "string"
+                  }
+                },
+                "required": [
+                  "candidate_education",
+                  "education_match",
+                  "required_education"
+                ]
+              },
+              "experience": {
+                "bsonType": "object",
+                "properties": {
+                  "candidate_experience": {
+                    "bsonType": "string"
+                  },
+                  "experience_match": {
+                    "bsonType": "bool"
+                  },
+                  "required_experience": {
+                    "bsonType": "string"
+                  }
+                },
+                "required": [
+                  "candidate_experience",
+                  "experience_match",
+                  "required_experience"
+                ]
+              },
+              "keyword_match": {
+                "bsonType": "object",
+                "properties": {
+                  "matched_keywords": {
+                    "bsonType": "int"
+                  },
+                  "percentage": {
+                    "bsonType": "int"
+                  },
+                  "total_keywords": {
+                    "bsonType": "int"
+                  }
+                },
+                "required": [
+                  "matched_keywords",
+                  "percentage",
+                  "total_keywords"
+                ]
+              },
+              "match_score": {
+                "bsonType": "int"
+              },
+              "skills": {
+                "bsonType": "object",
+                "properties": {
+                  "extra_skills": {
+                    "bsonType": "array"
+                  },
+                  "matched_skills": {
+                    "bsonType": "array"
+                  },
+                  "missing_skills": {
+                    "bsonType": "array"
+                  }
+                },
+                "required": [
+                  "extra_skills",
+                  "matched_skills",
+                  "missing_skills"
+                ]
+              },
+              "suggestions": {
+                "bsonType": "array",
+                "items": {
+                  "bsonType": "string"
+                }
+              }
+            },
+            "required": [
+              "education",
+              "experience",
+              "keyword_match",
+              "match_score",
+              "skills",
+              "suggestions"
+            ]
+          },
+          "resume_id": {
+            "bsonType": "objectId"
+          },
+          "title": {
+            "bsonType": "string"
+          },
+          "updatedAt": {
+            "bsonType": "date"
+          },
+          "user_id": {
+            "bsonType": "objectId"
+          }
+        }
+      }
+    },
+    "ResumeSaathiDB.resumeanalyses": {
+      "ns": "ResumeSaathiDB.resumeanalyses",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "__v",
+          "ats_analysis",
+          "createdAt",
+          "english_problem",
+          "experience_analysis",
+          "format_analysis",
+          "formated_analysis",
+          "keyword_analysis",
+          "missing_sections",
+          "resume_id",
+          "sections_present",
+          "suggestions",
+          "summary",
+          "updatedAt",
+          "user_id"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "__v": {
+            "bsonType": "int"
+          },
+          "ats_analysis": {
+            "bsonType": "object",
+            "properties": {
+              "ats_score": {
+                "bsonType": "double"
+              },
+              "compatibility": {
+                "bsonType": "string"
+              },
+              "recommendations": {
+                "bsonType": "array",
+                "items": {
+                  "bsonType": "string"
+                }
+              }
+            },
+            "required": [
+              "ats_score",
+              "compatibility",
+              "recommendations"
+            ]
+          },
+          "createdAt": {
+            "bsonType": "date"
+          },
+          "english_problem": {
+            "bsonType": "array",
+            "items": {
+              "bsonType": "object",
+              "properties": {
+                "issue_description": {
+                  "bsonType": "string"
+                },
+                "problem_type": {
+                  "bsonType": "string"
+                },
+                "sentence": {
+                  "bsonType": "string"
+                },
+                "suggested_fix": {
+                  "bsonType": "string"
+                }
+              },
+              "required": [
+                "issue_description",
+                "problem_type",
+                "sentence",
+                "suggested_fix"
+              ]
+            }
+          },
+          "experience_analysis": {
+            "bsonType": "array",
+            "items": {
+              "bsonType": "object",
+              "properties": {
+                "achievements": {
+                  "bsonType": "array",
+                  "items": {
+                    "bsonType": "string"
+                  }
+                },
+                "company": {
+                  "bsonType": "string"
+                },
+                "depth_score": {
+                  "bsonType": "int"
+                },
+                "duration": {
+                  "bsonType": "string"
+                },
+                "recommendations": {
+                  "bsonType": "array",
+                  "items": {
+                    "bsonType": "string"
+                  }
+                },
+                "role": {
+                  "bsonType": "string"
+                }
+              },
+              "required": [
+                "achievements",
+                "company",
+                "depth_score",
+                "duration",
+                "recommendations",
+                "role"
+              ]
+            }
+          },
+          "format_analysis": {
+            "bsonType": "object",
+            "properties": {
+              "format_issues": {
+                "bsonType": "array",
+                "items": {
+                  "bsonType": "string"
+                }
+              },
+              "format_score": {
+                "bsonType": "int"
+              }
+            },
+            "required": [
+              "format_issues",
+              "format_score"
+            ]
+          },
+          "formated_analysis": {
+            "bsonType": "object",
+            "properties": {
+              "alignment_analysis": {
+                "bsonType": "object",
+                "properties": {
+                  "centered_text_detected": {
+                    "bsonType": "bool"
+                  },
+                  "inconsistent_alignment": {
+                    "bsonType": "bool"
+                  }
+                },
+                "required": [
+                  "centered_text_detected",
+                  "inconsistent_alignment"
+                ]
+              },
+              "ats_risk_level": {
+                "bsonType": "string"
+              },
+              "column_analysis": {
+                "bsonType": "object",
+                "properties": {
+                  "column_count": {
+                    "bsonType": "int"
+                  },
+                  "multi_column_detected": {
+                    "bsonType": "bool"
+                  }
+                },
+                "required": [
+                  "column_count",
+                  "multi_column_detected"
+                ]
+              },
+              "font_analysis": {
+                "bsonType": "object",
+                "properties": {
+                  "avg_font_size": {
+                    "bsonType": "int"
+                  },
+                  "font_variations": {
+                    "bsonType": "int"
+                  },
+                  "inconsistent_fonts": {
+                    "bsonType": "bool"
+                  },
+                  "max_font_size": {
+                    "bsonType": "int"
+                  },
+                  "min_font_size": {
+                    "bsonType": "int"
+                  }
+                },
+                "required": [
+                  "avg_font_size",
+                  "font_variations",
+                  "inconsistent_fonts",
+                  "max_font_size",
+                  "min_font_size"
+                ]
+              },
+              "layout_score": {
+                "bsonType": "int"
+              },
+              "margin_analysis": {
+                "bsonType": "object",
+                "properties": {
+                  "bottom_margin": {
+                    "bsonType": "int"
+                  },
+                  "left_margin": {
+                    "bsonType": "int"
+                  },
+                  "margin_issue_detected": {
+                    "bsonType": "bool"
+                  },
+                  "right_margin": {
+                    "bsonType": "int"
+                  },
+                  "top_margin": {
+                    "bsonType": "int"
+                  }
+                },
+                "required": [
+                  "bottom_margin",
+                  "left_margin",
+                  "margin_issue_detected",
+                  "right_margin",
+                  "top_margin"
+                ]
+              },
+              "spacing_analysis": {
+                "bsonType": "object",
+                "properties": {
+                  "avg_line_height": {
+                    "bsonType": "double"
+                  },
+                  "compressed_spacing_detected": {
+                    "bsonType": "bool"
+                  },
+                  "excessive_spacing_detected": {
+                    "bsonType": "bool"
+                  },
+                  "max_line_height": {
+                    "bsonType": "double"
+                  },
+                  "min_line_height": {
+                    "bsonType": "int"
+                  }
+                },
+                "required": [
+                  "avg_line_height",
+                  "compressed_spacing_detected",
+                  "excessive_spacing_detected",
+                  "max_line_height",
+                  "min_line_height"
+                ]
+              },
+              "suggestions": {
+                "bsonType": "string"
+              }
+            },
+            "required": [
+              "alignment_analysis",
+              "ats_risk_level",
+              "column_analysis",
+              "font_analysis",
+              "layout_score",
+              "margin_analysis",
+              "spacing_analysis",
+              "suggestions"
+            ]
+          },
+          "keyword_analysis": {
+            "bsonType": "object",
+            "properties": {
+              "keyword_score": {
+                "bsonType": "int"
+              },
+              "keywords_found": {
+                "bsonType": "array",
+                "items": {
+                  "bsonType": "string"
+                }
+              }
+            },
+            "required": [
+              "keyword_score",
+              "keywords_found"
+            ]
+          },
+          "missing_sections": {
+            "bsonType": "array",
+            "items": {
+              "bsonType": "string"
+            }
+          },
+          "resume_id": {
+            "bsonType": "objectId"
+          },
+          "sections_present": {
+            "bsonType": "array",
+            "items": {
+              "bsonType": "string"
+            }
+          },
+          "suggestions": {
+            "bsonType": "array",
+            "items": {
+              "bsonType": "object",
+              "properties": {
+                "issue": {
+                  "bsonType": "string"
+                },
+                "priority": {
+                  "bsonType": "string"
+                },
+                "recommendation": {
+                  "bsonType": "string"
+                },
+                "section": {
+                  "bsonType": "string"
+                }
+              },
+              "required": [
+                "issue",
+                "priority",
+                "recommendation",
+                "section"
+              ]
+            }
+          },
+          "summary": {
+            "bsonType": "object",
+            "properties": {
+              "ats_compatibility": {
+                "bsonType": "string"
+              },
+              "overall_rating": {
+                "bsonType": "double"
+              },
+              "strengths": {
+                "bsonType": "array",
+                "items": {
+                  "bsonType": "string"
+                }
+              },
+              "weaknesses": {
+                "bsonType": "array",
+                "items": {
+                  "bsonType": "string"
+                }
+              }
+            },
+            "required": [
+              "ats_compatibility",
+              "overall_rating",
+              "strengths",
+              "weaknesses"
+            ]
+          },
+          "updatedAt": {
+            "bsonType": "date"
+          },
+          "user_id": {
+            "bsonType": "objectId"
+          }
+        }
+      }
+    },
+    "ResumeSaathiDB.resumescollections": {
+      "ns": "ResumeSaathiDB.resumescollections",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "__v",
+          "createdAt",
+          "parsed_data",
+          "raw_pdf_response",
+          "resume_url",
+          "updatedAt",
+          "user_id"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "__v": {
+            "bsonType": "int"
+          },
+          "createdAt": {
+            "bsonType": "date"
+          },
+          "parsed_data": {
+            "bsonType": "string"
+          },
+          "raw_pdf_response": {
+            "bsonType": "string"
+          },
+          "resume_url": {
+            "bsonType": "string"
+          },
+          "updatedAt": {
+            "bsonType": "date"
+          },
+          "user_id": {
+            "bsonType": "objectId"
+          }
+        }
+      }
+    },
+    "ResumeSaathiDB.sessions": {
+      "ns": "ResumeSaathiDB.sessions",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "__v",
+          "browser",
+          "createdAt",
+          "expires_at",
+          "ip_address",
+          "is_active",
+          "location",
+          "os",
+          "token",
+          "updatedAt",
+          "user_id"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "__v": {
+            "bsonType": "int"
+          },
+          "browser": {
+            "bsonType": "string"
+          },
+          "createdAt": {
+            "bsonType": "date"
+          },
+          "expires_at": {
+            "bsonType": "date"
+          },
+          "ip_address": {
+            "bsonType": "string"
+          },
+          "is_active": {
+            "bsonType": "bool"
+          },
+          "location": {
+            "bsonType": "string"
+          },
+          "os": {
+            "bsonType": "string"
+          },
+          "token": {
+            "bsonType": "string"
+          },
+          "updatedAt": {
+            "bsonType": "date"
+          },
+          "user_id": {
+            "bsonType": "objectId"
+          }
+        }
+      }
+    },
+    "ResumeSaathiDB.tokens": {
+      "ns": "ResumeSaathiDB.tokens",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "__v",
+          "createdAt",
+          "expires_at",
+          "token",
+          "type",
+          "updatedAt",
+          "user_id"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "__v": {
+            "bsonType": "int"
+          },
+          "createdAt": {
+            "bsonType": "date"
+          },
+          "expires_at": {
+            "bsonType": "date"
+          },
+          "token": {
+            "bsonType": "string"
+          },
+          "type": {
+            "bsonType": "string"
+          },
+          "updatedAt": {
+            "bsonType": "date"
+          },
+          "user_id": {
+            "bsonType": "objectId"
+          }
+        }
+      }
+    },
+    "ResumeSaathiDB.users": {
+      "ns": "ResumeSaathiDB.users",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "__v",
+          "auth_service",
+          "createdAt",
+          "email",
+          "email_verified",
+          "name",
+          "resume_id",
+          "updatedAt"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "__v": {
+            "bsonType": "int"
+          },
+          "auth_service": {
+            "bsonType": "array",
+            "items": {
+              "bsonType": "object",
+              "properties": {
+                "auth_provider": {
+                  "bsonType": "string"
+                },
+                "linked_at": {
+                  "bsonType": "date"
+                },
+                "provider_id": {
+                  "bsonType": "string"
+                }
+              },
+              "required": [
+                "auth_provider",
+                "linked_at",
+                "provider_id"
+              ]
+            }
+          },
+          "createdAt": {
+            "bsonType": "date"
+          },
+          "email": {
+            "bsonType": "string"
+          },
+          "email_verified": {
+            "bsonType": "bool"
+          },
+          "name": {
+            "bsonType": "string"
+          },
+          "password": {
+            "bsonType": "string"
+          },
+          "resume_id": {
+            "bsonType": [
+              "null",
+              "objectId"
+            ]
+          },
+          "updatedAt": {
+            "bsonType": "date"
+          }
+        }
+      }
+    }
+  },
+  "relationships": [
+    {
+      "id": "8529c56b-b725-4323-bddc-905dc55da70d",
+      "relationship": [
+        {
+          "ns": "ResumeSaathiDB.chatmessages",
+          "fields": [
+            "session_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "ResumeSaathiDB.chatsessions",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "d3e3477b-464e-47ed-bc54-569e589fc8e8",
+      "relationship": [
+        {
+          "ns": "ResumeSaathiDB.resumeanalyses",
+          "fields": [
+            "resume_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "ResumeSaathiDB.resumescollections",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "a742ae77-a176-4ee4-9a21-182f581bec3b",
+      "relationship": [
+        {
+          "ns": "ResumeSaathiDB.users",
+          "fields": [
+            "resume_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "ResumeSaathiDB.resumescollections",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "eaff6323-df9c-4d47-9dc3-54e661f49972",
+      "relationship": [
+        {
+          "ns": "ResumeSaathiDB.chatmessages",
+          "fields": [
+            "user_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "ResumeSaathiDB.users",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "6e6715fd-05c1-4697-8594-b0a7a14a053c",
+      "relationship": [
+        {
+          "ns": "ResumeSaathiDB.chatsessions",
+          "fields": [
+            "user_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "ResumeSaathiDB.users",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "1617844b-a040-4c9f-b94b-9f126eff7a5a",
+      "relationship": [
+        {
+          "ns": "ResumeSaathiDB.jobdescriptions",
+          "fields": [
+            "user_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "ResumeSaathiDB.users",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "f22fb783-8a84-4b72-b4fe-3af322d927b4",
+      "relationship": [
+        {
+          "ns": "ResumeSaathiDB.resumeanalyses",
+          "fields": [
+            "user_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "ResumeSaathiDB.users",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "19f56d42-2ad0-4f9b-90bc-d7de5f658f68",
+      "relationship": [
+        {
+          "ns": "ResumeSaathiDB.resumescollections",
+          "fields": [
+            "user_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "ResumeSaathiDB.users",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "3b397fa6-2207-4a2a-a086-f939cf8193e1",
+      "relationship": [
+        {
+          "ns": "ResumeSaathiDB.sessions",
+          "fields": [
+            "user_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "ResumeSaathiDB.users",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "15890629-90db-4fdd-80c3-c4fbcfe71645",
+      "relationship": [
+        {
+          "ns": "ResumeSaathiDB.tokens",
+          "fields": [
+            "user_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "ResumeSaathiDB.users",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    }
+  ]
+}
