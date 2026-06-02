@@ -59,9 +59,11 @@ VITE_SERVER_URL=http://localhost:5000/api/v1
 Then run:
 
 ```bash
+
 cd Frontend
 npm install
 npm run dev
+
 ```
 
 Frontend default URL: http://localhost:5173 🌐
