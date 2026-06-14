@@ -76,10 +76,14 @@ const uploadResume = asyncHandler(async (req, res) => {
   //Delete old resume from DB and Cloudinary
   const resumeExit = await ResumesCollection.findOne({ user_id: userId });
   if (resumeExit) {
-    // Delete from Cloudinary using the public_id from the URL
-    if (resumeExit.resume_url) {
-      const publicId = resumeExit.resume_url.split('/').pop().split('.')[0];
-      await cloudinary.uploader.destroy(`resume_saathi/${publicId}`);
+    // Delete from Cloudinary using stored public_id
+    if (resumeExit.cloudinary_public_id) {
+      try {
+        await cloudinary.deleteFile(resumeExit.cloudinary_public_id);
+      } catch (error) {
+        console.error('Failed to delete old resume from Cloudinary:', error.message);
+        // Continue with DB deletion even if Cloudinary delete fails
+      }
     }
     await ResumesCollection.findByIdAndDelete(resumeExit._id);
     await ResumeAnalysis.findOneAndDelete({ user_id: userId, resume_id: resumeExit._id });
@@ -96,6 +100,7 @@ const uploadResume = asyncHandler(async (req, res) => {
   const resumeDoc = await ResumesCollection.create({
     user_id: userId,
     resume_url: resUpload.secure_url,
+    cloudinary_public_id: resUpload.public_id,
     parsed_data: pdfText,
     raw_pdf_response: JSON.stringify(formatResume),
   });
