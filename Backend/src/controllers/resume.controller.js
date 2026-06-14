@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import ResumesCollection from '../models/resumes_collection.model.js';
 import ResumeAnalysis from '../models/resume_analysis.model.js';
 import User from '../models/user.model.js';
-import PdfParese from '../utils/PdfParse.js';
+import PdfParse from '../utils/PdfParse.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import asyncHandler from '../utils/asyncHandler.js';
@@ -76,11 +76,16 @@ const uploadResume = asyncHandler(async (req, res) => {
   //Delete old resume from DB and Cloudinary
   const resumeExit = await ResumesCollection.findOne({ user_id: userId });
   if (resumeExit) {
+    // Delete from Cloudinary using the public_id from the URL
+    if (resumeExit.resume_url) {
+      const publicId = resumeExit.resume_url.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(`resume_saathi/${publicId}`);
+    }
     await ResumesCollection.findByIdAndDelete(resumeExit._id);
     await ResumeAnalysis.findOneAndDelete({ user_id: userId, resume_id: resumeExit._id });
   }
 
-  const pdfParser = new PdfParese();
+  const pdfParser = new PdfParse();
   const pdfText = await pdfParser.getText(file.path);
   const formatResume = await pdfParser.getAllPagesRawContent(file.path);
   if (!pdfText || !formatResume) {
@@ -106,15 +111,7 @@ const uploadResume = asyncHandler(async (req, res) => {
     throw new ApiError(500, 'Failed to analyze resume');
   }
 
-  const savedAnalysis = await ResumeAnalysis.findOneAndUpdate(
-    { user_id: userId, resume_id: resumeDoc._id },
-    { ...analysisResult, user_id: userId, resume_id: resumeDoc._id },
-    { upsert: true, returnDocument: 'after', runValidators: true }
-  );
-  if (!savedAnalysis) {
-    throw new ApiError(500, 'Failed to save resume analysis');
-  }
-
+  // Update user with resume ID first
   const userRes = await User.findByIdAndUpdate(
     userId,
     { resume_id: resumeDoc._id },
@@ -122,6 +119,15 @@ const uploadResume = asyncHandler(async (req, res) => {
   );
   if (!userRes) {
     throw new ApiError(500, 'Failed to update user with resume ID');
+  }
+
+  const savedAnalysis = await ResumeAnalysis.findOneAndUpdate(
+    { user_id: userId, resume_id: resumeDoc._id },
+    { ...analysisResult, user_id: userId, resume_id: resumeDoc._id },
+    { upsert: true, returnDocument: 'after', runValidators: true }
+  );
+  if (!savedAnalysis) {
+    throw new ApiError(500, 'Failed to save resume analysis');
   }
   res
     .status(201)
