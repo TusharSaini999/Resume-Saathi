@@ -6,10 +6,10 @@ import { PARAMETER_LIMIT, SIZE_LIMIT, URL_LIMIT } from './constants.js';
 import passport from './config/passport_config.js';
 const app = express();
 
-// // Safe handling if CLIENT_URLS is not defined
-// const allowedOrigins = process.env.CLIENT_URLS
-//   ? process.env.CLIENT_URLS.split(',').map((origin) => origin.trim())
-//   : [];
+// Safe handling if CLIENT_URLS is not defined
+const allowedOrigins = process.env.CLIENT_URLS
+  ? process.env.CLIENT_URLS.split(',').map((origin) => origin.trim())
+  : [];
 
 // Security headers
 app.use(helmet());
@@ -22,11 +22,9 @@ app.use((req, res, next) => {
   next();
 });
 
-const CLIENT_URL = process.env.CLIENT_URLS;
-
 app.use(
   cors({
-    origin: CLIENT_URL,
+    origin: allowedOrigins,
     credentials: true,
   })
 );

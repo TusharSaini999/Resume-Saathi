@@ -1,7 +1,7 @@
 import fs from 'fs';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs'; ///export * from "pdfjs-dist";
 import ApiError from './ApiError.js';
-class PdfParese {
+class PdfParse {
   async getText(filePath) {
     try {
       const data = new Uint8Array(fs.readFileSync(filePath));
@@ -80,4 +80,4 @@ class PdfParese {
   }
 }
 
-export default PdfParese;
+export default PdfParse;
