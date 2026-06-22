@@ -37,6 +37,21 @@ class Cloudinary {
       throw new ApiError(500, 'File upload failed', [], error.stack);
     }
   }
+
+  async deleteFile(publicId) {
+    try {
+      if (!publicId) {
+        console.warn('No public_id provided for deletion');
+        return { success: false, message: 'No public_id provided' };
+      }
+
+      const result = await cloudinary.uploader.destroy(publicId);
+      return result;
+    } catch (error) {
+      console.error('Cloudinary delete failed:', error);
+      throw new ApiError(500, 'File deletion failed', [], error.stack);
+    }
+  }
 }
 
 export default new Cloudinary();
