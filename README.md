@@ -6,7 +6,7 @@ Resume Saathi is an AI-powered ATS resume analysis platform. It helps users uplo
 
 - Frontend: React, Vite, Redux Toolkit, Tailwind CSS
 - Backend: Node.js, Express, MongoDB (Mongoose)
-- AI integration: Groq SDK
+- AI integration: Google GenAI SDK (Gemini API)
 - Authentication: JWT, Google OAuth, LinkedIn OAuth
 - File services: Multer, Cloudinary
 

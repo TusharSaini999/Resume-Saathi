@@ -1,55 +1,60 @@
-import Groq from 'groq-sdk';
+import { GoogleGenAI, Type } from '@google/genai';
 import ApiError from '../utils/ApiError.js';
 import ResumeAnalysis from '../models/resume_analysis.model.js';
 
 class Chat {
   constructor() {
-    if (!process.env.GROQ_API_KEY) {
-      throw new Error('GROQ_API_KEY is missing in environment variables');
+    const keysStr = process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY;
+    if (!keysStr) {
+      throw new Error('GEMINI_API_KEYS or GEMINI_API_KEY is missing in environment variables');
     }
 
-    this.groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    this.apiKeys = keysStr.split(',').map(key => key.trim()).filter(Boolean);
+    if (this.apiKeys.length === 0) {
+      throw new Error('No valid Gemini API keys found');
+    }
+
+    this.clients = this.apiKeys.map(apiKey => new GoogleGenAI({ apiKey }));
+    this.keyIndex = 0;
   }
 
-  async generateStructuredResponse(messages, responseSchema) {
-    const basePayload = {
-      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-      response_format: {
-        type: 'json_schema',
-        json_schema: responseSchema,
-      },
-    };
+  getClient() {
+    const client = this.clients[this.keyIndex];
+    this.keyIndex = (this.keyIndex + 1) % this.clients.length;
+    return client;
+  }
 
-    const strictReminder = {
-      role: 'system',
-      content:
-        'Return ONLY valid JSON with exactly two fields: "title" and "answer". The "answer" value must be a single markdown string. Do not return arrays or objects inside "answer".',
-    };
+  async generateStructuredResponse(contents, responseSchema, systemInstruction) {
+    const model = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
 
     const attempts = [
-      { temperature: 0.6, withReminder: false },
-      { temperature: 0.2, withReminder: true },
-      { temperature: 0, withReminder: true },
+      { temperature: 0.2 },
+      { temperature: 0.0 },
     ];
 
     let lastError = null;
 
     for (const attempt of attempts) {
-      const attemptMessages = attempt.withReminder ? [...messages, strictReminder] : messages;
-
       try {
-        const response = await this.groq.chat.completions.create({
-          ...basePayload,
-          messages: attemptMessages,
-          temperature: attempt.temperature,
+        const client = this.getClient();
+
+        const response = await client.models.generateContent({
+          model,
+          contents,
+          config: {
+            systemInstruction,
+            temperature: attempt.temperature,
+            responseMimeType: 'application/json',
+            responseSchema,
+          }
         });
 
-        const content = response?.choices?.[0]?.message?.content;
-        if (!content) {
+        const text = response.text;
+        if (!text) {
           throw new Error('Missing response content');
         }
 
-        const parsed = JSON.parse(content);
+        const parsed = JSON.parse(text);
         if (typeof parsed?.title !== 'string' || typeof parsed?.answer !== 'string') {
           throw new Error('Invalid response shape returned by model');
         }
@@ -59,7 +64,6 @@ class Chat {
         lastError = error;
         console.error('Structured response attempt failed:', {
           temperature: attempt.temperature,
-          withReminder: attempt.withReminder,
           error,
         });
       }
@@ -80,24 +84,20 @@ class Chat {
         throw new ApiError(400, 'History must be an array');
       }
 
-      const messages = [];
+      const contents = [];
 
       // ---------------- HISTORY ----------------
       history.forEach((h) => {
         if (h.sender && h.message) {
-          messages.push({
-            role: h.sender,
-            content: h.message,
+          contents.push({
+            role: h.sender === 'assistant' ? 'model' : 'user',
+            parts: [{ text: h.message }],
           });
         }
       });
 
-      const isFirstMessage = history.length === 0;
-
       // ---------------- SYSTEM PROMPT ----------------
-      messages.unshift({
-        role: 'system',
-        content: `
+      const systemInstruction = `
 Your name is **ResumeSaathi**, an AI Interview Preparation Agent designed to help users prepare for job interviews and improve their careers.
 
 --------------------------------------------------
@@ -264,12 +264,13 @@ Interview Flow:
 4. Problem-solving question
 5. Behavioral question
 6. Closing
-`,
-      });
+`;
+
       // ---------------- USER MESSAGE ----------------
-      messages.push({
+      contents.push({
         role: 'user',
-        content: `
+        parts: [{
+          text: `
 User ID: ${userId}
 Resume ID: ${resumeId}
 Do not disclose userId or resumeId in your response. Use them only for tool calls when necessary.
@@ -281,114 +282,100 @@ ${resumeText}
 
 USER QUERY:
 ${query}
-`,
+`
+        }],
       });
 
       // ---------------- RESPONSE SCHEMA ----------------
       const responseSchema = {
-        name: 'first_response',
-        schema: {
-          type: 'object',
-          additionalProperties: false,
-          properties: {
-            title: {
-              type: 'string',
-              minLength: 5,
-              maxLength: 80,
-              description:
-                "Short descriptive title summarizing the user's question or topic. Plain text only without markdown.",
-              pattern: '^[^{}\\[\\]]*$',
-            },
-            answer: {
-              type: 'string',
-              minLength: 120,
-              maxLength: 5000,
-              description:
-                'A detailed response written using Markdown formatting. The answer should include headings, bullet points, and clear sections when helpful. It must explain concepts clearly, provide reasoning, and include examples if appropriate. Do NOT include JSON, objects, arrays, or escaped JSON.',
-              pattern: '^[^{}]*$',
-            },
+        type: Type.OBJECT,
+        properties: {
+          title: {
+            type: Type.STRING,
+            description: "Short descriptive title summarizing the user's question or topic. Plain text only without markdown.",
           },
-          required: ['title', 'answer'],
+          answer: {
+            type: Type.STRING,
+            description: "A detailed response written using Markdown formatting. The answer should include headings, bullet points, and clear sections when helpful. It must explain concepts clearly, provide reasoning, and include examples if appropriate. Do NOT include JSON, objects, arrays, or escaped JSON.",
+          },
         },
+        required: ['title', 'answer'],
       };
-
 
       // ---------------- FIRST LLM CALL (TOOLS ENABLED) ----------------
       let completion;
+      const client = this.getClient();
+
+      const analyzeResumeTool = {
+        functionDeclarations: [
+          {
+            name: 'analyze_resume',
+            description: 'Fetch detailed resume analysis including strengths, weaknesses, ATS compatibility, and interview insights.',
+            parameters: {
+              type: Type.OBJECT,
+              properties: {
+                userId: { type: Type.STRING },
+                resumeId: { type: Type.STRING },
+              },
+              required: ['userId', 'resumeId'],
+            },
+          }
+        ]
+      };
 
       try {
-        completion = await this.groq.chat.completions.create({
-          model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-          messages,
-          temperature: 0.6,
-          tools: [
-            {
-              type: 'function',
-              function: {
-                name: 'analyze_resume',
-                description:
-                  'Fetch detailed resume analysis including strengths, weaknesses, ATS compatibility, and interview insights.',
-                parameters: {
-                  type: 'object',
-                  properties: {
-                    userId: { type: 'string' },
-                    resumeId: { type: 'string' },
-                  },
-                  required: ['userId', 'resumeId'],
-                },
-              },
-            },
-          ],
-          tool_choice: 'auto',
+        completion = await client.models.generateContent({
+          model: process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite',
+          contents,
+          config: {
+            systemInstruction,
+            temperature: 0.6,
+            tools: [analyzeResumeTool],
+          }
         });
       } catch (error) {
-        console.error('Groq API Error:', error);
+        console.error('Gemini API Error:', error);
         throw new ApiError(502, 'AI service temporarily unavailable');
       }
 
-      const message = completion?.choices?.[0]?.message;
-      if (!message) {
-        throw new ApiError(500, 'Invalid AI response received');
-      }
+      const functionCalls = completion.functionCalls;
 
       // ---------------- TOOL HANDLING ----------------
-      if (message.tool_calls?.length) {
-        const toolCall = message.tool_calls[0];
-
-        let args;
-
-        try {
-          args = JSON.parse(toolCall.function.arguments);
-        } catch (error) {
-          throw new ApiError(500, 'Failed to parse tool arguments');
-        }
+      if (functionCalls && functionCalls.length > 0) {
+        const functionCall = functionCalls[0];
 
         let toolResult;
-
         try {
+          const args = functionCall.args;
           toolResult = await this.analyzeResumeTool(args.userId, args.resumeId);
         } catch (error) {
           console.error('Tool execution failed:', error);
           toolResult = { error: 'Resume analysis unavailable' };
         }
 
-        // push tool call message
-        messages.push(message);
+        // push assistant's full response parts (preserves thoughts & function calls)
+        contents.push({
+          role: 'model',
+          parts: completion.candidates[0].content.parts,
+        });
 
         // push tool response
-        messages.push({
-          role: 'tool',
-          tool_call_id: toolCall.id,
-          content: JSON.stringify(toolResult),
+        contents.push({
+          role: 'user',
+          parts: [{
+            functionResponse: {
+              name: functionCall.name,
+              response: toolResult,
+            }
+          }],
         });
 
         // ---------------- SECOND CALL (STRUCTURED OUTPUT) ----------------
-        return await this.generateStructuredResponse(messages, responseSchema);
+        return await this.generateStructuredResponse(contents, responseSchema, systemInstruction);
       }
 
       // ---------------- NO TOOL CALLED → FORMAT RESPONSE ----------------
-
-      return await this.generateStructuredResponse(messages, responseSchema);
+      return await this.generateStructuredResponse(contents, responseSchema, systemInstruction);
     } catch (error) {
       if (error instanceof ApiError) {
         throw error;
