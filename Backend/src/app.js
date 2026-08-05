@@ -59,7 +59,7 @@ import chatRouter from './router/chat.router.js';
 import authRoutes from './router/auth.router.js';
 import contactRouter from './router/contact.router.js';
 
-app.get('/', (req, res) => res.status(200).json({ status: '200' }));
+app.get('/', (req, res) => res.status(200).json({ status: 'ok' }));
 app.use('/api/v1', testRoute);
 app.use('/api/v1/jobs', jobRouter);
 app.use('/api/v1/users', userRouter);
