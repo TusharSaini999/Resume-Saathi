@@ -57,6 +57,7 @@ import resumeRouter from './router/resume.router.js';
 import jobRouter from './router/job.router.js';
 import chatRouter from './router/chat.router.js';
 import authRoutes from './router/auth.router.js';
+import contactRouter from './router/contact.router.js';
 
 app.use('/api/v1', testRoute);
 app.use('/api/v1/jobs', jobRouter);
@@ -64,5 +65,6 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/resumes', resumeRouter);
 app.use('/api/v1/chating', chatRouter);
 app.use("/api/v1/auth", authRoutes);
+app.use('/api/v1/contact', contactRouter);
 
 export default app;
