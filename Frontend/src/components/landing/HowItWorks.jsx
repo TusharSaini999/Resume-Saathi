@@ -5,21 +5,21 @@ import ScrollReveal from "../ScrollReveal";
 const steps = [
   {
     icon: FileUp,
-    title: "Upload Resume",
+    title: "Secure Login & Upload",
     description:
-      "Upload your resume in PDF format and let Resume Saathi parse your profile instantly.",
+      "Log in securely using OAuth and upload your PDF. Your data is protected by IP-tracked session management.",
   },
   {
     icon: SearchCheck,
-    title: "ATS + Job Match",
+    title: "Deep ATS & Job Match",
     description:
-      "Run ATS analysis and compare with job descriptions to evaluate keyword coverage, skills alignment, and missing requirements.",
+      "Get a 0-100 match score against your Job Description. Uncover formatting issues, missing skills, and font inconsistencies.",
   },
   {
     icon: BadgeCheck,
-    title: "Chat + Interview Ready",
+    title: "Chat with AI Assistant",
     description:
-      "Use realtime chatbot suggestions and resume-based interview practice before applying.",
+      "Consult the persistent AI chatbot for resume suggestions. Chat histories are securely saved for you to pick up where you left off.",
   },
 ];
 

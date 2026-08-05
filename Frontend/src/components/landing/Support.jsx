@@ -72,11 +72,10 @@ const Support = () => {
                 <ScrollReveal delay={100}>
                   <article className="rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-5 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#FE3E91]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
                     <h3 className="text-base font-bold text-[#1E293B] dark:text-white">
-                      Resume-Based Interview Help
+                      Account & Session Security
                     </h3>
                     <p className="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                      Practice interview questions generated from your resume and role
-                      to improve confidence before interviews.
+                      Protect your privacy with IP-tracked session management and secure OAuth logins across devices.
                     </p>
                   </article>
                 </ScrollReveal>

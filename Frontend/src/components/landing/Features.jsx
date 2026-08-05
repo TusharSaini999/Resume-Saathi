@@ -1,31 +1,31 @@
 import { createElement } from "react";
-import { Gauge, FileSearch, Brain, MessagesSquare } from "lucide-react";
+import { Gauge, FileSearch, Brain, ShieldCheck } from "lucide-react";
 import ScrollReveal from "../ScrollReveal";
 
 const features = [
   {
     icon: Gauge,
-    title: "Resume ATS Analyzer",
+    title: "Advanced AI Resume Analyzer",
     description:
-      "Analyze your resume with an ATS-style scoring system, including formatting checks, keyword relevance, and improvement suggestions.",
+      "Deeply analyze your resume for ATS compatibility, font consistency, spacing issues, and grammar corrections using the Gemini AI engine.",
   },
   {
     icon: FileSearch,
-    title: "Job Description Matcher",
+    title: "Precision Job Matcher",
     description:
-      "Compare your resume with job descriptions to identify missing skills, required keywords, and improve job-role alignment.",
+      "Match your resume to job descriptions to identify missing skills, compare experience requirements, and track keyword match percentages.",
   },
   {
     icon: Brain,
-    title: "Realtime Resume Chatbot",
+    title: "Context-Aware AI Chatbot",
     description:
-      "Interact with an AI chatbot to get real-time resume feedback, section-wise suggestions, and instant improvement guidance.",
+      "Engage with a persistent AI assistant that remembers your resume context. Chat history is saved securely for future sessions.",
   },
   {
-    icon: MessagesSquare,
-    title: "Resume-Based Interview Practice",
+    icon: ShieldCheck,
+    title: "Secure Session Management",
     description:
-      "Practice interview questions generated from your resume and target role with feedback to strengthen preparation.",
+      "Log in securely using Google/LinkedIn OAuth. Monitor active sessions with IP and Geo-location tracking, and remotely log out devices.",
   },
 ];
 

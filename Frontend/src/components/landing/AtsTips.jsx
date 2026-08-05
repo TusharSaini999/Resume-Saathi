@@ -2,12 +2,12 @@ import { CheckCircle2 } from "lucide-react";
 import ScrollReveal from "../ScrollReveal";
 
 const tips = [
-  "Run Resume ATS Analyzer first to identify formatting, keyword, and structure issues.",
-  "Use Job Description Matcher to tailor your resume for every role before applying.",
-  "Use role-specific keywords from the job description naturally in your experience bullets.",
-  "Use the realtime chatbot to improve weak sections with instant AI suggestions.",
-  "Practice resume-based interview questions to prepare concise role-relevant answers.",
-  "Avoid heavy graphics, tables, and multi-column layouts in ATS-sensitive resumes.",
+  "Run the Deep ATS Analyzer to uncover hidden issues like font inconsistencies, tight spacing, and misalignments.",
+  "Ensure your resume strictly matches the Job Description. The Analyzer will assign a 0-100 Match Score.",
+  "Extract exact missing skills directly from the Matcher and weave them naturally into your experience bullets.",
+  "Address any flagged grammatical errors or awkward phrasing identified by the AI analysis engine.",
+  "Consult your persistent AI Chatbot assistant for section-by-section improvements before you hit apply.",
+  "Avoid multi-column layouts, as the format analyzer specifically flags them for ATS risk.",
 ];
 
 const AtsTips = () => {

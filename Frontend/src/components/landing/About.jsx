@@ -16,18 +16,14 @@ const About = () => {
             </h2>
             <p className="mt-4 text-[#64748B] dark:text-[#94A3B8] leading-7">
               Resume Saathi is built to bridge the gap between strong candidate profiles and ATS filtering systems.
-              We combine Resume ATS Analyzer, Job Description Matcher, realtime chatbot help,
-              and resume-based interview preparation to help applicants present their value clearly.
+              Powered by the advanced Gemini AI engine, we provide deep format analysis, precision Job Description matching, and an intelligent Chatbot to help you present your absolute best.
             </p>
             <p className="mt-4 text-[#64748B] dark:text-[#94A3B8] leading-7">
-              From freshers to experienced professionals, the platform supports practical improvements that recruiters
-              can recognize quickly.
+              From freshers to experienced professionals, the platform securely tracks your active sessions across devices while delivering practical improvements that recruiters recognize instantly.
             </p>
 
             <p className="mt-4 text-[#64748B] dark:text-[#94A3B8] leading-7">
-              The experience is designed to feel precise, modern, and useful at every step, from the first upload to
-              the final interview round. Instead of generic advice, Resume Saathi focuses on role-specific insights
-              that help candidates present stronger applications with clarity and confidence.
+              The experience is designed to feel precise, modern, and highly secure at every step. Instead of generic advice, Resume Saathi focuses on role-specific AI insights that help candidates present stronger applications with clarity and confidence.
             </p>
 
           </div>
@@ -41,11 +37,11 @@ const About = () => {
               and stronger in competitive hiring pipelines.
             </p>
             <ul className="mt-4 space-y-3 text-sm leading-6 text-[#64748B] dark:text-[#94A3B8]">
-              <li className="transition-transform duration-300 group-hover:translate-x-1">Improve ATS score with clear and actionable recommendations</li>
-              <li className="transition-transform duration-300 group-hover:translate-x-1">Increase relevance by aligning resumes to specific job descriptions</li>
-              <li className="transition-transform duration-300 group-hover:translate-x-1">Get instant support using realtime chatbot guidance</li>
-              <li className="transition-transform duration-300 group-hover:translate-x-1">Prepare interviews based on your resume and target role</li>
-              <li className="transition-transform duration-300 group-hover:translate-x-1">Support confident applications with role-based resume improvements</li>
+              <li className="transition-transform duration-300 group-hover:translate-x-1">Improve ATS score with deep formatting and font analysis</li>
+              <li className="transition-transform duration-300 group-hover:translate-x-1">Compare experience, education, and skills against your target JD</li>
+              <li className="transition-transform duration-300 group-hover:translate-x-1">Get instant support from our context-aware AI Chatbot</li>
+              <li className="transition-transform duration-300 group-hover:translate-x-1">Rest easy with OAuth security and IP-based session management</li>
+              <li className="transition-transform duration-300 group-hover:translate-x-1">Fix grammar and phrasing issues flagged by the AI engine</li>
             </ul>
           </div>
           </ScrollReveal>

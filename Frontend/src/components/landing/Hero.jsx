@@ -44,9 +44,9 @@ const Hero = () => {
 
           {/* Description */}
           <p className="mt-6 text-base md:text-lg text-[#475569] dark:text-[#94A3B8]">
-            Resume Saathi helps you analyze your resume against job descriptions,
-            uncover ATS issues, and get actionable AI suggestions to boost interview chances.
-            Use realtime chatbot guidance and resume-based interview practice to prepare end-to-end.
+            Resume Saathi leverages Gemini AI to analyze your resume against job descriptions,
+            uncover hidden ATS formatting issues (like margin and font inconsistencies), and provide actionable grammar and keyword suggestions. 
+            Enjoy a highly secure experience with IP-tracked sessions and OAuth logins.
           </p>
 
           {/* Button */}
@@ -64,18 +64,18 @@ const Hero = () => {
           {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-12 text-sm text-[#64748B] dark:text-[#94A3B8]">
             <div>
-              <p className="text-2xl font-bold text-[#FE3E91]">98%</p>
-              User Satisfaction
+              <p className="text-2xl font-bold text-[#FE3E91]">Deep</p>
+              Formatting Analysis
             </div>
 
             <div>
-              <p className="text-2xl font-bold text-[#803AD1]">92%</p>
-              Better ATS Alignment
+              <p className="text-2xl font-bold text-[#803AD1]">100%</p>
+              Data Privacy & Secure Sessions
             </div>
 
             <div>
-              <p className="text-2xl font-bold text-[#CA25AF]">24/7</p>
-              AI Career Assistance
+              <p className="text-2xl font-bold text-[#CA25AF]">Context-Aware</p>
+              Realtime AI Chat
             </div>
           </div>
         </div>
