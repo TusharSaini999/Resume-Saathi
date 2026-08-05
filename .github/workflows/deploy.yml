@@ -19,6 +19,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/apps/Resume-Saathi/Backend
+            cd ~/app/Resume-Saathi/Backend
             git pull origin main
             docker compose up --build -d
