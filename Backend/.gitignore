@@ -6,6 +6,8 @@ node_modules/
 .env.*
 !.env.sample
 
+resumesaathi.pem
+
 # Logs
 logs/
 *.log
