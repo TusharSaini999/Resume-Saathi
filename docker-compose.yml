@@ -21,7 +21,7 @@ services:
       context: ./Frontend
       dockerfile: Dockerfile
       args:
-        VITE_SERVER_URL: ${VITE_SERVER_URL:-http://localhost:5000/api/v1}
+        VITE_SERVER_URL: ${VITE_SERVER_URL:-https://api.resumesaathi.tusharsaini.tech/api/v1}
 
     image: tusharsaini999/resume-saathi-frontend
 
