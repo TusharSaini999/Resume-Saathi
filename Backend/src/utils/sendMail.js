@@ -34,8 +34,12 @@ const transporter = nodemailer.createTransport({
 
 const sendMail = async ({ to, subject, text, html }) => {
   try {
+    const fromAddress = MAIL_FROM.includes("<")
+      ? MAIL_FROM
+      : `"Resume Saathi" <${MAIL_FROM}>`;
+
     const mailOptions = {
-      from: `"Resume Saathi" <${MAIL_MAIL_FROM}>`,
+      from: fromAddress,
       to,
       subject,
       text,
