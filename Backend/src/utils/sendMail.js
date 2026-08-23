@@ -1,35 +1,59 @@
-// @ts-nocheck
 import nodemailer from "nodemailer";
 import ApiError from "./ApiError.js";
 
+const {
+  MAIL_HOST,
+  MAIL_PORT,
+  MAIL_SECURE,
+  MAIL_USER,
+  MAIL_PASS,
+  MAIL_FROM,
+} = process.env;
+
+// Validate required mail configuration at startup
+if (!MAIL_HOST || !MAIL_PORT || !MAIL_USER || !MAIL_PASS || !MAIL_FROM) {
+  throw new Error("Missing required mail environment variables");
+}
+
+const port = Number(MAIL_PORT);
+
+if (!Number.isInteger(port)) {
+  throw new Error("MAIL_PORT must be a valid number");
+}
+
+// Create transporter once and reuse it
+const transporter = nodemailer.createTransport({
+  host: MAIL_HOST,
+  port,
+  secure: MAIL_SECURE === "true", // 465 = true, 587 = false (STARTTLS)
+  auth: {
+    user: MAIL_USER,
+    pass: MAIL_PASS,
+  },
+});
+
 const sendMail = async ({ to, subject, text, html }) => {
   try {
-    //  Create transporter
-    const transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,       // e.g., smtp.gmail.com
-      port: process.env.MAIL_PORT || 465,
-      secure: true,                     // true for 465, false for other ports
-      auth: {
-        user: process.env.MAIL_USER,     // your email
-        pass: process.env.MAIL_PASS      // email app password
-      },
-    });
-
-    // Prepare mail options
     const mailOptions = {
-      from: `"Support" <${process.env.MAIL_USER}>`,
+      from: `"Resume Saathi" <${MAIL_MAIL_FROM}>`,
       to,
       subject,
       text,
       html,
     };
 
-    //  Send email
     const info = await transporter.sendMail(mailOptions);
+
     return info;
   } catch (err) {
     console.error("Error sending email:", err);
-    throw new ApiError(500, "Failed to send email", [], err.stack);
+
+    throw new ApiError(
+      500,
+      "Failed to send email",
+      [],
+      err instanceof Error ? err.stack : undefined
+    );
   }
 };
 

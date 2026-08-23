@@ -53,7 +53,14 @@ const Support = () => {
 
               <p className="mt-4 text-base md:text-lg text-[#64748B] dark:text-[#94A3B8]">
                 Our team is here to support product questions, scoring clarifications,
-                and resume improvement guidance.
+                and resume improvement guidance. Feel free to reach out directly at{" "}
+                <a
+                  href="mailto:support@resumesaathi.tusharsaini.tech"
+                  className="font-semibold text-[#FE3E91] hover:underline"
+                >
+                  support@resumesaathi.tusharsaini.tech
+                </a>
+                .
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-2">
