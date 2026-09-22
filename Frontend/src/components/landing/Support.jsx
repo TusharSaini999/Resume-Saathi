@@ -40,20 +40,19 @@ const Support = () => {
             {/* Left Side: Content */}
             <div className="text-left">
               <p className="text-sm font-bold uppercase tracking-widest text-[#FE3E91]">
-                Support
+                We've Got Your Back
               </p>
 
               <h2 className="mt-3 text-3xl md:text-4xl font-black text-[#1E293B] dark:text-white leading-tight">
-                Need Help With
+                Ready to Boost Your
                 <br className="hidden lg:block" />
                 <span className="bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] bg-clip-text text-transparent">
-                  {" "}Resume Optimization?
+                  {" "}Interview Rate?
                 </span>
               </h2>
 
               <p className="mt-4 text-base md:text-lg text-[#64748B] dark:text-[#94A3B8]">
-                Our team is here to support product questions, scoring clarifications,
-                and resume improvement guidance. Feel free to reach out directly at{" "}
+                Our dedicated support team is ready to help you navigate our AI tools, understand your scores, and ensure you're putting your absolute best foot forward. Drop us a line at{" "}
                 <a
                   href="mailto:support@resumesaathi.tusharsaini.tech"
                   className="font-semibold text-[#FE3E91] hover:underline"
@@ -67,11 +66,10 @@ const Support = () => {
                 <ScrollReveal delay={0}>
                   <article className="rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-5 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#FE3E91]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
                     <h3 className="text-base font-bold text-[#1E293B] dark:text-white">
-                      Realtime Chatbot Support
+                      Instant AI Guidance
                     </h3>
                     <p className="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                      Get instant AI help for resume analysis, section improvements,
-                      and scoring clarification while editing.
+                      Stuck on a bullet point? Our AI assistant gives you real-time suggestions and rewrites instantly.
                     </p>
                   </article>
                 </ScrollReveal>
@@ -79,10 +77,10 @@ const Support = () => {
                 <ScrollReveal delay={100}>
                   <article className="rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-5 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#FE3E91]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
                     <h3 className="text-base font-bold text-[#1E293B] dark:text-white">
-                      Account & Session Security
+                      Absolute Privacy
                     </h3>
                     <p className="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                      Protect your privacy with IP-tracked session management and secure OAuth logins across devices.
+                      Your career moves are private. Benefit from secure session management and seamless logins.
                     </p>
                   </article>
                 </ScrollReveal>
@@ -90,11 +88,10 @@ const Support = () => {
                 <ScrollReveal delay={200}>
                   <article className="rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-5 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#FE3E91]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
                     <h3 className="text-base font-bold text-[#1E293B] dark:text-white">
-                      Resume ATS Analyzer
+                      Beat the ATS
                     </h3>
                     <p className="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                      Check ATS score, keyword gaps, and structure quality to increase
-                      resume shortlist chances.
+                      Stop automated rejections. We analyze keywords, structure, and formatting to maximize your visibility.
                     </p>
                   </article>
                 </ScrollReveal>
@@ -102,11 +99,10 @@ const Support = () => {
                 <ScrollReveal delay={300}>
                   <article className="rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-5 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#FE3E91]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
                     <h3 className="text-base font-bold text-[#1E293B] dark:text-white">
-                      Job Description Matcher
+                      Precision Matching
                     </h3>
                     <p className="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                      Match your resume with job descriptions to find missing
-                      requirements and improve role relevance.
+                      Align your experience perfectly with target job descriptions to stand out to recruiters immediately.
                     </p>
                   </article>
                 </ScrollReveal>

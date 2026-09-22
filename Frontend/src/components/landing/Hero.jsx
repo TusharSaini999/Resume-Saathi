@@ -28,25 +28,23 @@ const Hero = () => {
             bg-[#F9FAFB] dark:bg-[#1F2937] border border-[#E5E7EB] dark:border-[#374151] dark:text-white"
           >
             <Sparkles className="w-4 h-4 text-[#FE3E91]" />
-            AI Powered ATS Resume Analyzer
+            Your Personal AI Career Coach
           </div>
 
           {/* Heading */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight text-[#1E293B] dark:text-white">
-            Improve Your
+            Transform Your Resume into an
             <span className="bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] bg-clip-text text-transparent">
-              {" "}Resume Match Score{" "}
+              {" "}Interview Magnet{" "}
             </span>
             <span className="text-[#803AD1] dark:text-[#FF5FA7]">
-              Before You Apply
+              Instantly
             </span>
           </h1>
 
           {/* Description */}
           <p className="mt-6 text-base md:text-lg text-[#475569] dark:text-[#94A3B8]">
-            Resume Saathi leverages Gemini AI to analyze your resume against job descriptions,
-            uncover hidden ATS formatting issues (like margin and font inconsistencies), and provide actionable grammar and keyword suggestions. 
-            Enjoy a highly secure experience with IP-tracked sessions and OAuth logins.
+            Supercharge your job search with Resume Saathi. Our AI deeply analyzes your resume against target job descriptions to uncover hidden ATS traps, fix formatting inconsistencies, and optimize your keywords. Experience a secure, private platform built to help you get hired faster.
           </p>
 
           {/* Button */}
