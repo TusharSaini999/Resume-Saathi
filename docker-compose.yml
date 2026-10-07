@@ -3,7 +3,7 @@ services:
     build:
       context: ./Backend
       dockerfile: Dockerfile
-    image: tusharsaini999/resume-saathi-backend
+    image: tusharsaini999/resume-saathi:backend-${APP_VERSION:-latest}
     container_name: resume-backend-container
     env_file:
       - ./Backend/.env
@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_SERVER_URL: ${VITE_SERVER_URL:-/api/v1}
-    image: tusharsaini999/resume-saathi-frontend
+    image: tusharsaini999/resume-saathi:frontend-${APP_VERSION:-latest}
     container_name: resume-frontend-container
     ports:
       - "5173:80"
