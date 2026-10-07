@@ -3,17 +3,12 @@ services:
     build:
       context: ./Backend
       dockerfile: Dockerfile
-
     image: tusharsaini999/resume-saathi-backend
-
     container_name: resume-backend-container
-
-    ports:
-      - "5000:5000"
-
     env_file:
       - ./Backend/.env
-
+    networks:
+      - app-network
     restart: unless-stopped
 
   frontend:
@@ -21,19 +16,19 @@ services:
       context: ./Frontend
       dockerfile: Dockerfile
       args:
-        VITE_SERVER_URL: ${VITE_SERVER_URL:-https://api.resumesaathi.tusharsaini.tech/api/v1}
-
+        VITE_SERVER_URL: ${VITE_SERVER_URL:-/api/v1}
     image: tusharsaini999/resume-saathi-frontend
-
     container_name: resume-frontend-container
-
     ports:
       - "5173:80"
-
     env_file:
       - ./Frontend/.env
-
+    networks:
+      - app-network
     depends_on:
       - backend
-
     restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
