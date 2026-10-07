@@ -200,7 +200,7 @@ const Header = () => {
   }, [mobileMenuOpen]);
 
   useEffect(() => {
-    setMobileMenuOpen(false);
+    setTimeout(() => setMobileMenuOpen(false), 0);
   }, [location.pathname]);
 
   const getNavItemClass = useCallback((isActive) =>

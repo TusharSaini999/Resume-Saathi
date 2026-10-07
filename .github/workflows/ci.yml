@@ -1,0 +1,65 @@
+name: CI - Build & Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci-checks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Read Application Version
+        run: |
+          VERSION=$(jq -r '.version' version.json)
+
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+            echo "Invalid version.json"
+            exit 1
+          fi
+
+          echo "Application Version: v$VERSION"
+
+      - name: Frontend - Install Dependencies
+        working-directory: ./Frontend
+        run: npm ci
+
+      - name: Frontend - Run Linter
+        working-directory: ./Frontend
+        run: npm run lint -- --fix
+
+      - name: Commit Auto-fixed Lint Errors
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: auto-fix ESLint errors"
+
+      - name: Frontend - Build Test
+        working-directory: ./Frontend
+        run: npm run build
+
+      - name: Backend - Install Dependencies
+        working-directory: ./Backend
+        run: npm ci
+
+      # Add backend tests here later
+      # - name: Backend - Run Tests
+      #   working-directory: ./Backend
+      #   run: npm test

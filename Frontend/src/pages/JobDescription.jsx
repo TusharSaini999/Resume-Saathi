@@ -11,7 +11,7 @@ import JobAnalysisLoading from "../components/dashboard/jobDescription/JobAnalys
 function JobDescription() {
   const dispatch = useDispatch();
 
-  const history = useSelector((state) => state.jobDec.jobDec) || [];
+  const history = useSelector((state) => state.jobDec.jobDec);
   const loading = useSelector((state) => state.jobDec.loading);
   const loadingStage = useSelector((state) => state.jobDec.loadingStage);
   const error = useSelector((state) => state.jobDec.error);
@@ -28,7 +28,7 @@ function JobDescription() {
 
   const sortedHistory = useMemo(
     () =>
-      [...history].sort((a, b) => {
+      [...(history || [])].sort((a, b) => {
         const aTime = new Date(a?.createdAt || 0).getTime();
         const bTime = new Date(b?.createdAt || 0).getTime();
         return bTime - aTime;
@@ -65,7 +65,7 @@ function JobDescription() {
 
   useEffect(() => {
     if (!visibleHistory.length) {
-      setSelectedId(null);
+      setTimeout(() => setSelectedId(null), 0);
       return;
     }
 
@@ -75,7 +75,7 @@ function JobDescription() {
 
     const selectedStillExists = visibleHistory.some((item) => item?._id === selectedId);
     if (!selectedId || !selectedStillExists) {
-      setSelectedId(visibleHistory[0]?._id || null);
+      setTimeout(() => setSelectedId(visibleHistory[0]?._id || null), 0);
     }
   }, [visibleHistory, selectedId, isCreatingNew]);
 
@@ -84,9 +84,11 @@ function JobDescription() {
       return;
     }
 
-    setSelectedId(sortedHistory[0]?._id || null);
-    setIsCreatingNew(false);
-    setHasSubmittedNew(false);
+    setTimeout(() => {
+      setSelectedId(sortedHistory[0]?._id || null);
+      setIsCreatingNew(false);
+      setHasSubmittedNew(false);
+    }, 0);
   }, [hasSubmittedNew, isCreatingNew, loading, error, sortedHistory]);
 
   const selectedJob = useMemo(
