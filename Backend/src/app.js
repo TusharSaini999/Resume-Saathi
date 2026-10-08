@@ -47,7 +47,10 @@ app.use(express.static('public'));
 // Cookie parser
 app.use(cookieParser());
 
-app.set('trust proxy', true);
+// Trust exactly ONE proxy hop (the Nginx reverse proxy on the same host).
+// This makes req.ip, req.protocol, and secure cookies work correctly
+// when traffic arrives via X-Forwarded-For / X-Forwarded-Proto headers.
+app.set('trust proxy', 1);
 
 app.use(passport.initialize());
 
@@ -60,6 +63,7 @@ import authRoutes from './router/auth.router.js';
 import contactRouter from './router/contact.router.js';
 
 app.get('/', (req, res) => res.status(200).json({ message: 'ok', status: '200' }));
+app.get('/api/v1/healthcheck', (req, res) => res.status(200).json({ status: 'ok', time: new Date().toISOString() }));
 app.use('/api/v1', testRoute);
 app.use('/api/v1/jobs', jobRouter);
 app.use('/api/v1/users', userRouter);
