@@ -1,0 +1,91 @@
+name: CD - Build & Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'version.json'
+
+jobs:
+  build-and-push:
+    name: Build, Tag & Push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read Application Version
+        id: get_version
+        run: |
+          VERSION=$(jq -r '.version' version.json)
+          echo "VERSION=v$VERSION" >> $GITHUB_ENV
+          echo "version=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check and Create Tag
+        id: tag
+        run: |
+          if git rev-parse ${{ env.VERSION }} >/dev/null 2>&1; then
+            echo "Tag ${{ env.VERSION }} already exists. Skipping image push."
+            echo "deploy=false" >> $GITHUB_OUTPUT
+          else
+            echo "Creating and pushing tag ${{ env.VERSION }}"
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git tag ${{ env.VERSION }}
+            git push origin ${{ env.VERSION }}
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to Docker Hub
+        if: steps.tag.outputs.deploy == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+      - name: Build and Push Backend
+        if: steps.tag.outputs.deploy == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Backend
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/resume-saathi:backend-latest
+            ${{ secrets.DOCKER_USERNAME }}/resume-saathi:backend-${{ steps.get_version.outputs.version }}
+
+      - name: Build and Push Frontend
+        if: steps.tag.outputs.deploy == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Frontend
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/resume-saathi:frontend-latest
+            ${{ secrets.DOCKER_USERNAME }}/resume-saathi:frontend-${{ steps.get_version.outputs.version }}
+          build-args: |
+            VITE_SERVER_URL=/api/v1
+
+      - name: Configure AWS Credentials
+        if: steps.tag.outputs.deploy == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy via AWS Systems Manager
+        if: steps.tag.outputs.deploy == 'true'
+        run: |
+          aws ssm send-command \
+            --instance-ids "${{ secrets.AWS_INSTANCE_ID }}" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Pull latest Docker images and restart containers via Docker Compose" \
+            --parameters 'commands=["cd /home/ubuntu/resumesaathi || cd ~/resumesaathi","export APP_VERSION=${{ steps.get_version.outputs.version }}","docker compose pull || docker-compose pull","docker compose up -d --remove-orphans || docker-compose up -d --remove-orphans","docker image prune -f || true"]' \
+            --output text
+            
+          echo "Deployment command sent successfully to the server via SSM!"
