@@ -11,7 +11,7 @@ services:
       - app-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:5000/api/v1/healthcheck >/dev/null 2>&1 || wget -qO- http://localhost:5000/health >/dev/null 2>&1 || wget -qO- http://localhost:5000/ >/dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5000/api/v1/healthcheck >/dev/null 2>&1 || wget -qO- http://127.0.0.1:5000/healthcheck >/dev/null 2>&1 || wget -qO- http://127.0.0.1:5000/health >/dev/null 2>&1 || wget -qO- http://127.0.0.1:5000/ >/dev/null 2>&1 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -35,7 +35,7 @@ services:
       backend:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost/ >/dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
