@@ -63,6 +63,7 @@ import authRoutes from './router/auth.router.js';
 import contactRouter from './router/contact.router.js';
 
 app.get('/', (req, res) => res.status(200).json({ message: 'ok', status: '200' }));
+app.get('/healthcheck', (req, res) => res.status(200).json({ status: 'ok', time: new Date().toISOString() }));
 app.get('/api/v1/healthcheck', (req, res) => res.status(200).json({ status: 'ok', time: new Date().toISOString() }));
 app.use('/api/v1', testRoute);
 app.use('/api/v1/jobs', jobRouter);
