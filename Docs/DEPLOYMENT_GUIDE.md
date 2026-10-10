@@ -6,17 +6,29 @@ Comprehensive technical documentation covering the production architecture, auto
 
 ## 1. System Architecture
 
-The production environment runs on **Ubuntu 22.04 / 24.04 (AWS EC2)** using a containerized Docker Compose micro-service topology fronted by a host Nginx reverse proxy.
+The production environment is globally accelerated and secured via **AWS CloudFront CDN** and **AWS Certificate Manager (ACM)**, fronting an **AWS EC2 (Ubuntu 22.04 / 24.04)** instance running a containerized Docker Compose micro-service topology behind a host Nginx reverse proxy.
 
 ```
-Internet (HTTP: 80 / HTTPS: 443)
+Global Users (Worldwide / Web Clients - Port 443)
        │
        ▼
  ┌────────────────────────────────────────────────────────┐
- │ Host Nginx (1.28) + Let's Encrypt SSL Certbot           │
- │  - https://resumesaathi.tusharsaini.tech               │
- │  - 301 Redirect: www -> non-www                         │
- │  - 301 Redirect: trailing-slash -> non-trailing slash   │
+ │ AWS CloudFront CDN (Global Edge POPs e.g. DEL51)       │
+ │  - Custom Domain: resumesaathi.tusharsaini.tech        │
+ │  - SSL / TLS: AWS Certificate Manager (Auto-Renewing) │
+ │  - AWS WAF: Rate Limiting & Bot Protection             │
+ │  - SPA Fallback: 403 / 404 -> /index.html (200 OK)     │
+ │  - Custom Origin Header: X-Origin-Verify: <SECRET>     │
+ └───────┬──────────────────────────────────┬─────────────┘
+         │ Default (*) - CachingOptimized   │ /api/* - CachingDisabled
+         │ (Edge Cache HIT: JS, CSS, Media) │ (Dynamic Passthrough)
+         │ HTTPS (Port 443 - TLSv1.2/1.3)   │ HTTPS (Port 443 - TLSv1.2/1.3)
+         ▼                                  ▼
+ ┌────────────────────────────────────────────────────────┐
+ │ AWS EC2 Host Nginx Reverse Proxy (Ports 443 & 80)      │
+ │  - Origin SSL: Let's Encrypt (Certbot TLSv1.2 / 1.3)   │
+ │  - Origin Cloaking: Enforces X-Origin-Verify header   │
+ │  - Drops direct IP/scanners immediately (HTTP 444)     │
  └───────┬──────────────────────────────────┬─────────────┘
          │ (proxy_pass: 127.0.0.1:3000)     │ (proxy_pass: /api/ -> 127.0.0.1:3000)
          ▼                                  ▼
@@ -99,14 +111,19 @@ When running on `t3.small` (2.0 GB RAM), system memory is utilized as follows:
 
 ---
 
-### Firewall & AWS Security Groups
-Configure your AWS EC2 Security Group (or firewall) with these inbound rules:
+### Firewall & AWS Security Groups (Origin Cloaking Model)
+Configure your AWS EC2 Security Group with these inbound rules:
 
 | Type | Protocol | Port Range | Source | Purpose |
 | :--- | :--- | :--- | :--- | :--- |
 | **SSH** | TCP | `22` | Your IP / Bastion | Secure shell administration |
-| **HTTP** | TCP | `80` | `0.0.0.0/0` | Let's Encrypt validation & HTTP-to-HTTPS redirect |
-| **HTTPS** | TCP | `443` | `0.0.0.0/0` | Production SSL traffic |
+| **HTTP** | TCP | `80` | `0.0.0.0/0` | Let's Encrypt ACME verification & HTTP-to-HTTPS redirect |
+| **HTTPS** | TCP | `443` | `0.0.0.0/0` | Production SSL traffic protected by `X-Origin-Verify` secret |
+
+> [!IMPORTANT]
+> **Why 0.0.0.0/0 with Secret Header Cloaking?**
+> AWS CloudFront Prefix Lists contain 55 IP rules, overflowing AWS Security Group limits when combined across ports 80 and 443. Furthermore, dynamic regional edge POPs (like DEL51 Delhi) connect to origins from edge ranges outside the prefix list unless paid Origin Shield is active.
+> Opening Port 443 to `0.0.0.0/0` and enforcing `$http_x_origin_verify` inside Nginx (`return 444;`) provides superior security: direct IP scanners are killed immediately at the socket level without consuming compute resources, while all CloudFront edge requests pass through seamlessly.
 
 > [!NOTE]
 > Ports `3000` (Frontend) and `5000` (Backend) do **not** need to be opened in your AWS Security Group. They run strictly on the internal loopback interface (`127.0.0.1`) and Docker bridge network (`app-network`), fronted safely by host Nginx.
@@ -318,6 +335,12 @@ sudo docker logs -f resume-frontend-container --tail 100
 
 A public-safe template is available in `Docs/sample.env` and `Backend/.env.example`.
 
+### Origin Cloaking & Host Proxy (`deploy.env`)
+
+| Variable | Type / Default | Description |
+| :--- | :--- | :--- |
+| `ORIGIN_VERIFY_SECRET` | Secret String | Shared secret token passed in CloudFront `X-Origin-Verify` custom header. Nginx drops any request without this token with code `444`. **Must never contain `$` signs.** |
+
 ### Backend Service (`backend.env`)
 
 | Variable | Type / Default | Description |
@@ -528,6 +551,47 @@ cd /home/ubuntu/resumesaathi && sudo docker compose restart
 # Test and reload Nginx
 sudo nginx -t && sudo systemctl reload nginx
 
-# Test Let's Encrypt SSL certificate renewal
-sudo certbot renew --dry-run
+# Invalidate CloudFront edge cache (after new frontend release)
+aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths "/*"
 ```
+
+---
+
+## 10. AWS CloudFront CDN & ACM SSL Architecture
+
+Resume-Saathi utilizes **AWS CloudFront** as an edge content delivery network fronting the EC2 origin server for global latency reduction, edge caching, and DDoS defense.
+
+### 10.1 SSL/TLS Management via AWS Certificate Manager (ACM)
+
+- **Region Requirement**: The public SSL certificate is provisioned in `us-east-1` (N. Virginia), as required by AWS for all CloudFront custom domain distributions.
+- **Validation Method**: DNS Validation using Route 53 CNAME record (`_xxxxx.resumesaathi.tusharsaini.tech` -> `_xxxxx.acm-validations.aws.`).
+- **Zero-Touch Auto-Renewal**: AWS automatically validates and renews the certificate 60 days before expiration without manual intervention, server restarts, or cron jobs.
+
+### 10.2 Cache Behaviors & Route Precedence
+
+CloudFront enforces route-based caching using strict rule precedence:
+
+| Precedence | Path Pattern | Origin | Cache Policy | Origin Request Policy | Purpose |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **0 (Top)** | `/api/*` | EC2 Origin (Port 80) | `Managed-CachingDisabled` | `Managed-AllViewerExceptHostHeader` / `AllViewer` | Dynamic pass-through for auth, JWT, MongoDB operations, and Gemini LLM analysis. Prevents stale data and user cache collisions. |
+| **1 (Default)** | `Default (*)` | EC2 Origin (Port 80) | `Managed-CachingOptimized` | None | Edge caching for React SPA assets (`.js`, `.css`, images, fonts). Achieves `Hit from cloudfront` at local edge PoPs (e.g., Delhi `DEL51`). |
+
+### 10.3 Single Page Application (SPA) Error Responses
+
+Because client-side routing is handled in the browser by `react-router-dom`, deep links and page refreshes (e.g., `/auth/login`, `/dashboard`) require custom error fallback rules:
+- **HTTP 403 (Forbidden)** ➔ Response: `/index.html` (HTTP 200 OK)
+- **HTTP 404 (Not Found)** ➔ Response: `/index.html` (HTTP 200 OK)
+
+### 10.4 EC2 Security Group Lockdown (Network Isolation)
+
+To prevent attackers from discovering the public EC2 IPv4 address and bypassing CloudFront's cache, WAF, and rate limiting:
+1. In the EC2 Security Group inbound rules, remove `0.0.0.0/0` on Port 80.
+2. Restrict HTTP (Port 80) traffic to the **AWS CloudFront Origin-Facing Managed Prefix List**:
+   - `com.amazonaws.global.cloudfront.origin-facing` (`pl-58a04531`).
+3. Port 22 (SSH) remains restricted to admin IPs.
+
+### 10.5 Host Nginx Configuration & Redirect Loop Prevention
+
+CloudFront connects to the EC2 origin over HTTP (Port 80) and handles SSL termination at the edge. To prevent infinite 301 redirect loops (`ERR_TOO_MANY_REDIRECTS`), host Nginx:
+1. Listens on Port 80 with wildcard catch-all: `server_name resumesaathi.tusharsaini.tech www.resumesaathi.tusharsaini.tech _;`.
+2. Serves requests directly to the local frontend container (`127.0.0.1:3000`) without issuing HTTP-to-HTTPS redirects at the host level (handled upstream by CloudFront viewer protocol policy).

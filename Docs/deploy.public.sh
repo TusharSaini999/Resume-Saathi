@@ -54,6 +54,8 @@ fi
 # ─── Domain & SSL ─────────────────────────────────────────────────────────────
 FRONTEND_DOMAIN="${FRONTEND_DOMAIN:-resumesaathi.yourdomain.com}"
 SSL_EMAIL="${SSL_EMAIL:-admin@${FRONTEND_DOMAIN}}"
+# CloudFront secret header (X-Origin-Verify) to block direct IP access & DDoS:
+ORIGIN_VERIFY_SECRET="${ORIGIN_VERIFY_SECRET:-}"
 
 # ─── Docker Hub ───────────────────────────────────────────────────────────────
 DOCKER_USER="${DOCKER_USER:-your_dockerhub_username}"
@@ -334,26 +336,49 @@ fi
 sudo docker compose ps
 
 # ─── Step 7: Nginx + SSL ──────────────────────────────────────────────────────
-# Traffic routing architecture (internal Docker network):
+# ─── Step 7: Nginx + SSL ──────────────────────────────────────────────────────
+# Traffic routing architecture (CloudFront & EC2 End-to-End SSL):
 #
-#   Internet
-#      │
-#      ▼
-#   Host Nginx  (port 80/443)
-#      └─ ${FRONTEND_DOMAIN}  ─► 127.0.0.1:${FRONTEND_PORT} (frontend container)
-#                                      │
-#                          location /      ─► static files
-#                          location /api/  ─► backend:${BACKEND_PORT}  [internal only]
+#   Global Visitors (HTTPS : 443)
+#          │
+#          ▼
+#   AWS CloudFront CDN (ACM SSL us-east-1)
+#          │  (HTTPS : 443 — End-to-End TLSv1.2/1.3)
+#          ▼
+#   Host Nginx (EC2 - Port 443 SSL / Port 80 HTTP)
+#          │  (Let's Encrypt Certificate)
+#          └─► 127.0.0.1:${FRONTEND_PORT} (frontend container)
+#                        │
+#            location /      ─► static files
+#            location /api/  ─► backend:${BACKEND_PORT} [internal Docker bridge]
 #
 # The backend is NEVER directly reachable from the host or the internet.
 
 if ! step_done "step7_nginx"; then
-  info "[7/7] Configuring Nginx reverse proxy..."
+  info "[7/7] Configuring Nginx reverse proxy & ACME challenge support..."
+  sudo mkdir -p /var/www/certbot
+
+  HEADER_SECURITY_CHECK=""
+  if [ -n "$ORIGIN_VERIFY_SECRET" ]; then
+    HEADER_SECURITY_CHECK="
+    # ── CloudFront Origin Verification (Block direct IP access & DDoS) ──
+    # Drops direct requests from scanners, bots, or hackers (code 444: connection closed immediately)
+    if (\$http_x_origin_verify != \"${ORIGIN_VERIFY_SECRET}\") {
+        return 444;
+    }"
+  fi
 
   cat > /tmp/nginx-frontend.conf <<NGINXEOF
 server {
     listen 80;
-    server_name ${FRONTEND_DOMAIN} www.${FRONTEND_DOMAIN};
+    listen [::]:80;
+    server_name ${FRONTEND_DOMAIN} www.${FRONTEND_DOMAIN} origin.${FRONTEND_DOMAIN} _;
+
+    # ACME challenge for Let's Encrypt / Certbot verification
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+${HEADER_SECURITY_CHECK}
 
     # Redirect www to non-www
     if (\$host = www.${FRONTEND_DOMAIN}) {
@@ -378,8 +403,6 @@ server {
     }
 
     # ── Backend API reverse proxy ─────────────────────────────
-    # Forwarded to frontend container, which routes to backend:${BACKEND_PORT}
-    # over Docker's internal network (backend is not directly exposed).
     location /api/ {
         proxy_pass         http://127.0.0.1:${FRONTEND_PORT};
         proxy_http_version 1.1;
@@ -411,44 +434,169 @@ else
   skip
 fi
 
-# ── Issue SSL certificate ─────────────────────────────────────────────────────
+# ── Issue SSL certificate & enable Port 443 HTTPS ─────────────────────────────
 if ! step_done "step7_ssl"; then
-  info "Issuing SSL certificate for $FRONTEND_DOMAIN ..."
-  if sudo certbot --nginx \
+  info "Checking and issuing SSL certificate for $FRONTEND_DOMAIN (Certbot / Let's Encrypt)..."
+  sudo mkdir -p /var/www/certbot
+
+  CERT_DOMAINS=("-d" "$FRONTEND_DOMAIN" "-d" "www.$FRONTEND_DOMAIN" "-d" "origin.$FRONTEND_DOMAIN")
+
+  if sudo certbot certonly --webroot -w /var/www/certbot \
+    "${CERT_DOMAINS[@]}" \
+    --agree-tos \
+    --email "$SSL_EMAIL" \
+    --non-interactive \
+    --keep-until-expiring 2>/dev/null; then
+    success "SSL certificate issued for $FRONTEND_DOMAIN, www, and origin."
+  elif sudo certbot certonly --webroot -w /var/www/certbot \
     -d "$FRONTEND_DOMAIN" \
     -d "www.$FRONTEND_DOMAIN" \
     --agree-tos \
     --email "$SSL_EMAIL" \
     --non-interactive \
-    --redirect \
+    --keep-until-expiring 2>/dev/null; then
+    success "SSL certificate issued for $FRONTEND_DOMAIN and www."
+  elif sudo certbot certonly --webroot -w /var/www/certbot \
+    -d "$FRONTEND_DOMAIN" \
+    --agree-tos \
+    --email "$SSL_EMAIL" \
+    --non-interactive \
+    --keep-until-expiring 2>/dev/null; then
+    success "SSL certificate issued for $FRONTEND_DOMAIN."
+  elif sudo certbot --nginx \
+    -d "$FRONTEND_DOMAIN" \
+    --agree-tos \
+    --email "$SSL_EMAIL" \
+    --non-interactive \
+    --no-redirect \
     --keep-until-expiring; then
-    sudo systemctl enable --now certbot.timer 2>/dev/null || true
-
-    # Ensure www redirects to non-www in HTTPS
-    if ! grep -q 'if ($host = www.' "/etc/nginx/sites-available/$FRONTEND_DOMAIN" 2>/dev/null; then
-      sudo sed -i "/server_name ${FRONTEND_DOMAIN} www.${FRONTEND_DOMAIN};/a \    if (\$host = www.${FRONTEND_DOMAIN}) { return 301 https://${FRONTEND_DOMAIN}\$request_uri; }" "/etc/nginx/sites-available/$FRONTEND_DOMAIN"
-      sudo nginx -t && sudo systemctl reload nginx
-    fi
-
-    mark_done "step7_ssl"
-    success "SSL certificate issued, www-redirect configured & auto-renewal enabled."
+    success "SSL certificate issued via nginx plugin."
   else
-    warn "Issuing certificate for both $FRONTEND_DOMAIN and www failed."
-    warn "Falling back to $FRONTEND_DOMAIN only..."
-    if sudo certbot --nginx \
-      -d "$FRONTEND_DOMAIN" \
-      --agree-tos \
-      --email "$SSL_EMAIL" \
-      --non-interactive \
-      --redirect \
-      --keep-until-expiring; then
-      sudo systemctl enable --now certbot.timer 2>/dev/null || true
-      mark_done "step7_ssl"
-      success "SSL certificate issued for $FRONTEND_DOMAIN & auto-renewal enabled."
-    else
-      warn "SSL certificate could not be issued (verify DNS A record for $FRONTEND_DOMAIN)."
-      warn "Site remains accessible via HTTP on port 80."
+    warn "Automated certbot issuance encountered an error."
+  fi
+
+  # Check if certificate files exist and install full HTTPS + HTTP configuration
+  CERT_PATH="/etc/letsencrypt/live/$FRONTEND_DOMAIN/fullchain.pem"
+  KEY_PATH="/etc/letsencrypt/live/$FRONTEND_DOMAIN/privkey.pem"
+
+  if [ -f "$CERT_PATH" ] && [ -f "$KEY_PATH" ]; then
+    info "Applying complete HTTPS (Port 443 SSL) + HTTP (Port 80) configuration to Nginx..."
+
+    HEADER_SECURITY_CHECK=""
+    if [ -n "$ORIGIN_VERIFY_SECRET" ]; then
+      HEADER_SECURITY_CHECK="
+    # ── CloudFront Origin Verification (Block direct IP access & DDoS) ──
+    # Drops direct requests from scanners, bots, or hackers (code 444: connection closed immediately)
+    if (\$http_x_origin_verify != \"${ORIGIN_VERIFY_SECRET}\") {
+        return 444;
+    }"
     fi
+
+    cat > /tmp/nginx-frontend-ssl.conf <<NGINXEOF
+# ── HTTP (Port 80) ──────────────────────────────────────────
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${FRONTEND_DOMAIN} www.${FRONTEND_DOMAIN} origin.${FRONTEND_DOMAIN} _;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+${HEADER_SECURITY_CHECK}
+
+    # Redirect www to non-www
+    if (\$host = www.${FRONTEND_DOMAIN}) {
+        return 301 https://${FRONTEND_DOMAIN}\$request_uri;
+    }
+
+    rewrite ^/(?!api/)(.+)/$ /\$1 permanent;
+
+    client_max_body_size 20M;
+
+    location / {
+        proxy_pass         http://127.0.0.1:${FRONTEND_PORT};
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade    \$http_upgrade;
+        proxy_set_header   Connection "upgrade";
+        proxy_set_header   Host       \$host;
+        proxy_set_header   X-Real-IP  \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto \$scheme;
+    }
+
+    location /api/ {
+        proxy_pass         http://127.0.0.1:${FRONTEND_PORT};
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade    \$http_upgrade;
+        proxy_set_header   Connection "upgrade";
+        proxy_set_header   Host       \$host;
+        proxy_set_header   X-Real-IP  \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto \$scheme;
+
+        proxy_connect_timeout 60s;
+        proxy_send_timeout    180s;
+        proxy_read_timeout    180s;
+    }
+}
+
+# ── HTTPS (Port 443) — CloudFront to Origin End-to-End SSL ─
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name ${FRONTEND_DOMAIN} www.${FRONTEND_DOMAIN} origin.${FRONTEND_DOMAIN};
+
+    ssl_certificate     ${CERT_PATH};
+    ssl_certificate_key ${KEY_PATH};
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+${HEADER_SECURITY_CHECK}
+
+    # Redirect www to non-www
+    if (\$host = www.${FRONTEND_DOMAIN}) {
+        return 301 https://${FRONTEND_DOMAIN}\$request_uri;
+    }
+
+    rewrite ^/(?!api/)(.+)/$ /\$1 permanent;
+
+    client_max_body_size 20M;
+
+    location / {
+        proxy_pass         http://127.0.0.1:${FRONTEND_PORT};
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade    \$http_upgrade;
+        proxy_set_header   Connection "upgrade";
+        proxy_set_header   Host       \$host;
+        proxy_set_header   X-Real-IP  \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto https;
+    }
+
+    location /api/ {
+        proxy_pass         http://127.0.0.1:${FRONTEND_PORT};
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade    \$http_upgrade;
+        proxy_set_header   Connection "upgrade";
+        proxy_set_header   Host       \$host;
+        proxy_set_header   X-Real-IP  \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto https;
+
+        proxy_connect_timeout 60s;
+        proxy_send_timeout    180s;
+        proxy_read_timeout    180s;
+    }
+}
+NGINXEOF
+    sudo cp /tmp/nginx-frontend-ssl.conf "/etc/nginx/sites-available/$FRONTEND_DOMAIN"
+    sudo ln -sf "/etc/nginx/sites-available/$FRONTEND_DOMAIN" "/etc/nginx/sites-enabled/$FRONTEND_DOMAIN"
+    sudo nginx -t && sudo systemctl reload nginx
+    sudo systemctl enable --now certbot.timer 2>/dev/null || true
+    mark_done "step7_ssl"
+    success "End-to-End HTTPS (Port 443) enabled with active SSL certificates and auto-renewal."
+  else
+    warn "SSL certificate files not found at $CERT_PATH. Remaining on Port 80 HTTP."
   fi
 else
   skip
