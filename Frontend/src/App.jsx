@@ -24,6 +24,7 @@ function App({ children }) {
           dispatch(setError(response.message || "Failed to fetch profile"));
         }
       } catch (error) {
+        console.error(error);
         dispatch(setError("Something went wrong while fetching"));
       } finally {
         dispatch(setAuthResolved(true));

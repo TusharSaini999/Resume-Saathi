@@ -3,37 +3,45 @@ services:
     build:
       context: ./Backend
       dockerfile: Dockerfile
-
-    image: tusharsaini999/resume-saathi-backend
-
+    image: tusharsaini999/resume-saathi:backend-${APP_VERSION:-latest}
     container_name: resume-backend-container
-
-    ports:
-      - "5000:5000"
-
     env_file:
       - ./Backend/.env
-
+    networks:
+      - app-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5000/api/v1/healthcheck >/dev/null 2>&1 || wget -qO- http://127.0.0.1:5000/healthcheck >/dev/null 2>&1 || wget -qO- http://127.0.0.1:5000/health >/dev/null 2>&1 || wget -qO- http://127.0.0.1:5000/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
 
   frontend:
     build:
       context: ./Frontend
       dockerfile: Dockerfile
       args:
-        VITE_SERVER_URL: ${VITE_SERVER_URL:-http://localhost:5000/api/v1}
-
-    image: tusharsaini999/resume-saathi-frontend
-
+        VITE_SERVER_URL: ${VITE_SERVER_URL:-/api/v1}
+    image: tusharsaini999/resume-saathi:frontend-${APP_VERSION:-latest}
     container_name: resume-frontend-container
-
     ports:
       - "5173:80"
-
     env_file:
       - ./Frontend/.env
-
+    networks:
+      - app-network
     depends_on:
-      - backend
-
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge

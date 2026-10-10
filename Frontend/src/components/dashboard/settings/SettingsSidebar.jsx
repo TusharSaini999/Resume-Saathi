@@ -8,7 +8,9 @@ const SettingsSidebar = ({ tabItems, activeTab, onTabChange }) => {
         </p>
 
         <div className="space-y-2.5">
-          {tabItems.map(({ key, label, icon: Icon }) => {
+          {tabItems.map((item) => {
+             
+            const { key, label, icon: Icon } = item;
             const isActive = activeTab === key;
             return (
               <button

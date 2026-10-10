@@ -1,1 +1,23 @@
+# Environment & Secrets
+.env
+.env.*
+*.env
+!.env.example
+!.env.sample
+
+# Private keys & certificates
+*.pem
+*.key
+*.crt
+
+# Dependency & build folders
+node_modules/
+dist/
+build/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Feature notes
 Fetuer.txt

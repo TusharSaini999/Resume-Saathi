@@ -7,16 +7,21 @@ import {
   Sparkles,
   AlertTriangle,
 } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+const loadingTexts = [
+  "Thinking...",
+  "Processing...",
+  "Analyzing...",
+  "Generating response...",
+];
 
 export default function ChatMessages({
   setMobileSidebarOpen,
   activeChatTitle = "Resume Chat",
 }) {
-  const dispatch = useDispatch();
-
   const error = useSelector((state) => state.chat.error);
   const messages = useSelector((state) => state.chat.currentChat || []);
   const isInitialLoading = useSelector((state) => state.chat.initialLoading);
@@ -24,13 +29,6 @@ export default function ChatMessages({
   const activeChat = useSelector((state) => state.chat.activeChat);
   const initialError = useSelector((state) => state.chat.initialError);
   const bottomRef = useRef(null);
-
-  const loadingTexts = [
-    "Thinking...",
-    "Processing...",
-    "Analyzing...",
-    "Generating response...",
-  ];
   const [loadingIndex, setLoadingIndex] = useState(0);
 
   // Auto scroll when messages / typing changes
@@ -43,7 +41,7 @@ export default function ChatMessages({
   // Rotate loading text while AI is typing
   useEffect(() => {
     if (!isTyping) {
-      setLoadingIndex(0);
+      setTimeout(() => setLoadingIndex(0), 0);
       return;
     }
     const interval = setInterval(() => {

@@ -4,7 +4,10 @@ node_modules/
 # Environment variables
 .env
 .env.*
+!.env.example
 !.env.sample
+
+resumesaathi.pem
 
 # Logs
 logs/

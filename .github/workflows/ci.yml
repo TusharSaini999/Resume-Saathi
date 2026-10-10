@@ -1,0 +1,88 @@
+name: CI - Build & Check
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  ci-checks:
+    name: Build & Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            Frontend/package-lock.json
+            Backend/package-lock.json
+
+
+      - name: Read Application Version
+        id: version
+        run: |
+          if [ ! -f version.json ]; then
+            echo "version.json not found"
+            exit 1
+          fi
+
+          VERSION=$(jq -r '.version' version.json)
+
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+            echo "Invalid version.json"
+            exit 1
+          fi
+
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version format: $VERSION"
+            echo "Expected format: MAJOR.MINOR.PATCH"
+            exit 1
+          fi
+
+          echo "Application Version: v$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+
+      - name: Frontend - Install Dependencies
+        working-directory: ./Frontend
+        run: npm ci
+
+      - name: Frontend - Lint
+        working-directory: ./Frontend
+        run: npm run lint
+
+      - name: Frontend - Build
+        working-directory: ./Frontend
+        run: npm run build
+
+
+      - name: Backend - Install Dependencies
+        working-directory: ./Backend
+        run: npm ci
+
+      # Enable when backend tests are available
+      # - name: Backend - Test
+      #   working-directory: ./Backend
+      #   run: npm test
+
+
+      - name: CI Summary
+        run: |
+          echo "================================="
+          echo "CI PASSED"
+          echo "Application Version: v${{ steps.version.outputs.version }}"
+          echo "================================="

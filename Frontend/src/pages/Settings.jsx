@@ -62,6 +62,7 @@ const Settings = () => {
     if (activeTab === "sessions") {
       loadSessions();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const handleChangePassword = async (event) => {

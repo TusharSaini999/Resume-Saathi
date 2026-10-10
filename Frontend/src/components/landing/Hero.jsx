@@ -28,25 +28,23 @@ const Hero = () => {
             bg-[#F9FAFB] dark:bg-[#1F2937] border border-[#E5E7EB] dark:border-[#374151] dark:text-white"
           >
             <Sparkles className="w-4 h-4 text-[#FE3E91]" />
-            AI Powered ATS Resume Analyzer
+            Your Personal AI Career Coach
           </div>
 
           {/* Heading */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight text-[#1E293B] dark:text-white">
-            Improve Your
+            Transform Your Resume into an
             <span className="bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] bg-clip-text text-transparent">
-              {" "}Resume Match Score{" "}
+              {" "}Interview Magnet{" "}
             </span>
             <span className="text-[#803AD1] dark:text-[#FF5FA7]">
-              Before You Apply
+              Instantly
             </span>
           </h1>
 
           {/* Description */}
           <p className="mt-6 text-base md:text-lg text-[#475569] dark:text-[#94A3B8]">
-            Resume Saathi helps you analyze your resume against job descriptions,
-            uncover ATS issues, and get actionable AI suggestions to boost interview chances.
-            Use realtime chatbot guidance and resume-based interview practice to prepare end-to-end.
+            Supercharge your job search with Resume Saathi. Our AI deeply analyzes your resume against target job descriptions to uncover hidden ATS traps, fix formatting inconsistencies, and optimize your keywords. Experience a secure, private platform built to help you get hired faster.
           </p>
 
           {/* Button */}
@@ -64,18 +62,18 @@ const Hero = () => {
           {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-12 text-sm text-[#64748B] dark:text-[#94A3B8]">
             <div>
-              <p className="text-2xl font-bold text-[#FE3E91]">98%</p>
-              User Satisfaction
+              <p className="text-2xl font-bold text-[#FE3E91]">Deep</p>
+              Formatting Analysis
             </div>
 
             <div>
-              <p className="text-2xl font-bold text-[#803AD1]">92%</p>
-              Better ATS Alignment
+              <p className="text-2xl font-bold text-[#803AD1]">100%</p>
+              Data Privacy & Secure Sessions
             </div>
 
             <div>
-              <p className="text-2xl font-bold text-[#CA25AF]">24/7</p>
-              AI Career Assistance
+              <p className="text-2xl font-bold text-[#CA25AF]">Context-Aware</p>
+              Realtime AI Chat
             </div>
           </div>
         </div>

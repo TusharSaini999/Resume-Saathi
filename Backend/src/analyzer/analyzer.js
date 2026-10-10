@@ -1,19 +1,34 @@
-import Groq from 'groq-sdk';
+import { GoogleGenAI, Type } from '@google/genai';
 import ApiError from '../utils/ApiError.js';
 
 class Analyzer {
   constructor() {
-    this.groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const keysStr = process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY;
+    if (!keysStr) {
+      throw new Error('GEMINI_API_KEYS or GEMINI_API_KEY is missing in environment variables');
+    }
+
+    this.apiKeys = keysStr.split(',').map(key => key.trim()).filter(Boolean);
+    if (this.apiKeys.length === 0) {
+      throw new Error('No valid Gemini API keys found');
+    }
+
+    this.clients = this.apiKeys.map(apiKey => new GoogleGenAI({ apiKey }));
+    this.keyIndex = 0;
+  }
+
+  getClient() {
+    const client = this.clients[this.keyIndex];
+    this.keyIndex = (this.keyIndex + 1) % this.clients.length;
+    return client;
   }
 
   async analyzePdf(pdfText) {
     try {
-      const response = await this.groq.chat.completions.create({
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-        messages: [
-          {
-            role: 'system',
-            content: `
+      const client = this.getClient();
+      const model = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+
+      const systemInstruction = `
 You are an expert resume analyzer designed to evaluate resumes for quality, ATS compatibility, and professional writing standards.
 
 Your task is to carefully analyze a resume and return a structured JSON response that follows the schema provided.
@@ -73,11 +88,204 @@ Output Rules:
 - Do NOT include explanations outside the JSON.
 - Ensure the output strictly matches the provided schema.
 - Do not return suggestions as simple strings; they must always be objects with issue, recommendation, section, and priority fields.
-`,
+`;
+
+      const responseSchema = {
+        type: Type.OBJECT,
+        properties: {
+          summary: {
+            type: Type.OBJECT,
+            properties: {
+              overall_rating: { type: Type.NUMBER },
+              ats_compatibility: { type: Type.STRING, description: "Low, Medium, or High" },
+              strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
+              weaknesses: { type: Type.ARRAY, items: { type: Type.STRING } },
+            },
+            required: ['overall_rating', 'ats_compatibility', 'strengths', 'weaknesses'],
           },
+          sections_present: { type: Type.ARRAY, items: { type: Type.STRING } },
+          missing_sections: { type: Type.ARRAY, items: { type: Type.STRING } },
+          format_analysis: {
+            type: Type.OBJECT,
+            properties: {
+              format_issues: { type: Type.ARRAY, items: { type: Type.STRING } },
+              format_score: { type: Type.NUMBER },
+            },
+            required: ['format_issues', 'format_score'],
+          },
+          keyword_analysis: {
+            type: Type.OBJECT,
+            properties: {
+              keyword_score: { type: Type.NUMBER },
+              keywords_found: { type: Type.ARRAY, items: { type: Type.STRING } },
+            },
+            required: ['keyword_score', 'keywords_found'],
+          },
+          ats_analysis: {
+            type: Type.OBJECT,
+            properties: {
+              ats_score: { type: Type.NUMBER },
+              compatibility: { type: Type.STRING, description: "Low, Medium, or High" },
+              recommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
+            },
+            required: ['ats_score', 'compatibility', 'recommendations'],
+          },
+          experience_analysis: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                role: { type: Type.STRING },
+                company: { type: Type.STRING },
+                duration: { type: Type.STRING },
+                achievements: { type: Type.ARRAY, items: { type: Type.STRING } },
+                depth_score: { type: Type.NUMBER },
+                recommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
+              },
+              required: [
+                'role',
+                'company',
+                'duration',
+                'achievements',
+                'depth_score',
+                'recommendations',
+              ],
+            },
+          },
+          english_problem: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                sentence: { type: Type.STRING },
+                problem_type: { type: Type.STRING },
+                issue_description: { type: Type.STRING },
+                suggested_fix: { type: Type.STRING },
+              },
+              required: ['sentence', 'problem_type', 'issue_description', 'suggested_fix'],
+            },
+          },
+          suggestions: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                issue: { type: Type.STRING },
+                recommendation: { type: Type.STRING },
+                section: { type: Type.STRING },
+                priority: { type: Type.STRING, description: "Low, Medium, or High" },
+              },
+              required: ['issue', 'recommendation', 'section', 'priority'],
+            },
+          },
+          formated_analysis: {
+            type: Type.OBJECT,
+            properties: {
+              font_analysis: {
+                type: Type.OBJECT,
+                properties: {
+                  avg_font_size: { type: Type.NUMBER },
+                  min_font_size: { type: Type.NUMBER },
+                  max_font_size: { type: Type.NUMBER },
+                  font_variations: { type: Type.NUMBER },
+                  inconsistent_fonts: { type: Type.BOOLEAN },
+                },
+                required: [
+                  'avg_font_size',
+                  'min_font_size',
+                  'max_font_size',
+                  'font_variations',
+                  'inconsistent_fonts',
+                ],
+              },
+              spacing_analysis: {
+                type: Type.OBJECT,
+                properties: {
+                  avg_line_height: { type: Type.NUMBER },
+                  min_line_height: { type: Type.NUMBER },
+                  max_line_height: { type: Type.NUMBER },
+                  excessive_spacing_detected: { type: Type.BOOLEAN },
+                  compressed_spacing_detected: { type: Type.BOOLEAN },
+                },
+                required: [
+                  'avg_line_height',
+                  'min_line_height',
+                  'max_line_height',
+                  'excessive_spacing_detected',
+                  'compressed_spacing_detected',
+                ],
+              },
+              column_analysis: {
+                type: Type.OBJECT,
+                properties: {
+                  multi_column_detected: { type: Type.BOOLEAN },
+                  column_count: { type: Type.NUMBER },
+                },
+                required: ['multi_column_detected', 'column_count'],
+              },
+              margin_analysis: {
+                type: Type.OBJECT,
+                properties: {
+                  left_margin: { type: Type.NUMBER },
+                  right_margin: { type: Type.NUMBER },
+                  top_margin: { type: Type.NUMBER },
+                  bottom_margin: { type: Type.NUMBER },
+                  margin_issue_detected: { type: Type.BOOLEAN },
+                },
+                required: [
+                  'left_margin',
+                  'right_margin',
+                  'top_margin',
+                  'bottom_margin',
+                  'margin_issue_detected',
+                ],
+              },
+              alignment_analysis: {
+                type: Type.OBJECT,
+                properties: {
+                  centered_text_detected: { type: Type.BOOLEAN },
+                  inconsistent_alignment: { type: Type.BOOLEAN },
+                },
+                required: ['centered_text_detected', 'inconsistent_alignment'],
+              },
+              layout_score: { type: Type.NUMBER },
+              ats_risk_level: { type: Type.STRING, description: "Low, Medium, or High" },
+              suggestions: { type: Type.STRING },
+            },
+            required: [
+              'font_analysis',
+              'spacing_analysis',
+              'column_analysis',
+              'margin_analysis',
+              'alignment_analysis',
+              'layout_score',
+              'ats_risk_level',
+              'suggestions',
+            ],
+          },
+        },
+        required: [
+          'summary',
+          'sections_present',
+          'missing_sections',
+          'format_analysis',
+          'keyword_analysis',
+          'ats_analysis',
+          'experience_analysis',
+          'english_problem',
+          'suggestions',
+          'formated_analysis',
+        ],
+      };
+
+      const response = await client.models.generateContent({
+        model,
+        contents: [
           {
             role: 'user',
-            content: `Analyze the following resume strictly in JSON according to this structure:
+            parts: [
+              {
+                text: `Analyze the following resume strictly in JSON according to this structure:
 
 {
   "summary": { "overall_rating": 0, "ats_compatibility": "Medium", "strengths": [], "weaknesses": [] },
@@ -103,241 +311,32 @@ Output Rules:
  
 Resume text:
 """${pdfText}"""
-`,
+`
+              }
+            ],
           },
         ],
-        temperature: 0,
-        max_completion_tokens: 8192,
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: 'resume_analysis',
-            strict: true,
-            schema: {
-              type: 'object',
-              properties: {
-                summary: {
-                  type: 'object',
-                  properties: {
-                    overall_rating: { type: 'number' },
-                    ats_compatibility: { type: 'string', enum: ['Low', 'Medium', 'High'] },
-                    strengths: { type: 'array', items: { type: 'string' } },
-                    weaknesses: { type: 'array', items: { type: 'string' } },
-                  },
-                  required: ['overall_rating', 'ats_compatibility', 'strengths', 'weaknesses'],
-                  additionalProperties: false,
-                },
-                sections_present: { type: 'array', items: { type: 'string' } },
-                missing_sections: { type: 'array', items: { type: 'string' } },
-                format_analysis: {
-                  type: 'object',
-                  properties: {
-                    format_issues: { type: 'array', items: { type: 'string' } },
-                    format_score: { type: 'number' },
-                  },
-                  required: ['format_issues', 'format_score'],
-                  additionalProperties: false,
-                },
-                keyword_analysis: {
-                  type: 'object',
-                  properties: {
-                    keyword_score: { type: 'number' },
-                    keywords_found: { type: 'array', items: { type: 'string' } },
-                  },
-                  required: ['keyword_score', 'keywords_found'],
-                  additionalProperties: false,
-                },
-                ats_analysis: {
-                  type: 'object',
-                  properties: {
-                    ats_score: { type: 'number' },
-                    compatibility: { type: 'string', enum: ['Low', 'Medium', 'High'] },
-                    recommendations: { type: 'array', items: { type: 'string' } },
-                  },
-                  required: ['ats_score', 'compatibility', 'recommendations'],
-                  additionalProperties: false,
-                },
-                experience_analysis: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      role: { type: 'string' },
-                      company: { type: 'string' },
-                      duration: { type: 'string' },
-                      achievements: { type: 'array', items: { type: 'string' } },
-                      depth_score: { type: 'number' },
-                      recommendations: { type: 'array', items: { type: 'string' } },
-                    },
-                    required: [
-                      'role',
-                      'company',
-                      'duration',
-                      'achievements',
-                      'depth_score',
-                      'recommendations',
-                    ],
-                    additionalProperties: false,
-                  },
-                },
-                english_problem: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      sentence: { type: 'string' },
-                      problem_type: { type: 'string' },
-                      issue_description: { type: 'string' },
-                      suggested_fix: { type: 'string' },
-                    },
-                    required: ['sentence', 'problem_type', 'issue_description', 'suggested_fix'],
-                    additionalProperties: false,
-                  },
-                },
-                suggestions: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      issue: { type: 'string' },
-                      recommendation: { type: 'string' },
-                      section: { type: 'string' },
-                      priority: { type: 'string', enum: ['Low', 'Medium', 'High'] },
-                    },
-                    required: ['issue', 'recommendation', 'section', 'priority'],
-                    additionalProperties: false,
-                  },
-                },
-                formated_analysis: {
-                  type: 'object',
-                  properties: {
-                    font_analysis: {
-                      type: 'object',
-                      properties: {
-                        avg_font_size: { type: 'number' },
-                        min_font_size: { type: 'number' },
-                        max_font_size: { type: 'number' },
-                        font_variations: { type: 'number' },
-                        inconsistent_fonts: { type: 'boolean' },
-                      },
-                      required: [
-                        'avg_font_size',
-                        'min_font_size',
-                        'max_font_size',
-                        'font_variations',
-                        'inconsistent_fonts',
-                      ],
-                      additionalProperties: false,
-                    },
-                    spacing_analysis: {
-                      type: 'object',
-                      properties: {
-                        avg_line_height: { type: 'number' },
-                        min_line_height: { type: 'number' },
-                        max_line_height: { type: 'number' },
-                        excessive_spacing_detected: { type: 'boolean' },
-                        compressed_spacing_detected: { type: 'boolean' },
-                      },
-                      required: [
-                        'avg_line_height',
-                        'min_line_height',
-                        'max_line_height',
-                        'excessive_spacing_detected',
-                        'compressed_spacing_detected',
-                      ],
-                      additionalProperties: false,
-                    },
-                    column_analysis: {
-                      type: 'object',
-                      properties: {
-                        multi_column_detected: { type: 'boolean' },
-                        column_count: { type: 'number' },
-                      },
-                      required: ['multi_column_detected', 'column_count'],
-                      additionalProperties: false,
-                    },
-                    margin_analysis: {
-                      type: 'object',
-                      properties: {
-                        left_margin: { type: 'number' },
-                        right_margin: { type: 'number' },
-                        top_margin: { type: 'number' },
-                        bottom_margin: { type: 'number' },
-                        margin_issue_detected: { type: 'boolean' },
-                      },
-                      required: [
-                        'left_margin',
-                        'right_margin',
-                        'top_margin',
-                        'bottom_margin',
-                        'margin_issue_detected',
-                      ],
-                      additionalProperties: false,
-                    },
-                    alignment_analysis: {
-                      type: 'object',
-                      properties: {
-                        centered_text_detected: { type: 'boolean' },
-                        inconsistent_alignment: { type: 'boolean' },
-                      },
-                      required: ['centered_text_detected', 'inconsistent_alignment'],
-                      additionalProperties: false,
-                    },
-                    layout_score: { type: 'number' },
-                    ats_risk_level: { type: 'string', enum: ['Low', 'Medium', 'High'] },
-                    suggestions: { type: 'string' },
-                  },
-                  required: [
-                    'font_analysis',
-                    'spacing_analysis',
-                    'column_analysis',
-                    'margin_analysis',
-                    'alignment_analysis',
-                    'layout_score',
-                    'ats_risk_level',
-                    'suggestions',
-                  ],
-                  additionalProperties: false,
-                },
-              },
-              required: [
-                'summary',
-                'sections_present',
-                'missing_sections',
-                'format_analysis',
-                'keyword_analysis',
-                'ats_analysis',
-                'experience_analysis',
-                'english_problem',
-                'suggestions',
-                'formated_analysis',
-              ],
-              additionalProperties: false,
-            },
-          },
+        config: {
+          systemInstruction,
+          temperature: 0.0,
+          responseMimeType: 'application/json',
+          responseSchema,
         },
       });
 
-      const analysisResult = response.choices[0].message.content;
-      const analysisResultJSON = JSON.parse(analysisResult);
-
+      const analysisResultJSON = JSON.parse(response.text);
       return analysisResultJSON;
     } catch (error) {
       console.error(error);
       throw new ApiError(500, 'Failed to analyze PDF');
     }
   }
+
   async analyzeJDToResume(resumeText, jobDescriptionText) {
     try {
-      const response = await this.groq.chat.completions.create({
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-        temperature: 0,
-        max_completion_tokens: 8192,
-
-        messages: [
-          {
-            role: 'system',
-            content: `
+      const client = this.getClient();
+      const model = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+      const systemInstruction = `
 You are an expert AI recruiter and resume evaluator.
 
 Your task is to compare a candidate's RESUME with a JOB DESCRIPTION
@@ -348,43 +347,20 @@ Evaluate the following:
 1. Job Title Extraction
 Extract the job title from the Job Description.
 
-Return:
-- title
-
 2. Overall Match Score (0–100)
 Evaluate how well the resume matches the job description.
 
 3. Skills Analysis
 Extract skills from the JD and compare with the resume.
 
-Return:
-- matched_skills
-- missing_skills
-- extra_skills
-
 4. Experience Comparison
 Compare required experience from the JD with candidate experience.
-
-Return:
-- required_experience
-- candidate_experience
-- experience_match (true/false)
 
 5. Education Comparison
 Compare education requirements with the candidate’s education.
 
-Return:
-- required_education
-- candidate_education
-- education_match (true/false)
-
 6. Keyword Match
 Extract important keywords from the JD and check their presence.
-
-Return:
-- total_keywords
-- matched_keywords
-- percentage
 
 7. Suggestions
 Provide practical improvements to help the candidate improve the resume for this job.
@@ -393,12 +369,73 @@ Rules:
 - Return ONLY valid JSON
 - Follow the schema strictly
 - Do NOT add explanations outside JSON
-`,
-          },
+`;
 
+      const responseSchema = {
+        type: Type.OBJECT,
+        properties: {
+          title: { type: Type.STRING },
+          match_score: { type: Type.NUMBER },
+          skills: {
+            type: Type.OBJECT,
+            properties: {
+              matched_skills: { type: Type.ARRAY, items: { type: Type.STRING } },
+              missing_skills: { type: Type.ARRAY, items: { type: Type.STRING } },
+              extra_skills: { type: Type.ARRAY, items: { type: Type.STRING } },
+            },
+            required: ['matched_skills', 'missing_skills', 'extra_skills'],
+          },
+          experience: {
+            type: Type.OBJECT,
+            properties: {
+              required_experience: { type: Type.STRING },
+              candidate_experience: { type: Type.STRING },
+              experience_match: { type: Type.BOOLEAN },
+            },
+            required: ['required_experience', 'candidate_experience', 'experience_match'],
+          },
+          education: {
+            type: Type.OBJECT,
+            properties: {
+              required_education: { type: Type.STRING },
+              candidate_education: { type: Type.STRING },
+              education_match: { type: Type.BOOLEAN },
+            },
+            required: ['required_education', 'candidate_education', 'education_match'],
+          },
+          keyword_match: {
+            type: Type.OBJECT,
+            properties: {
+              total_keywords: { type: Type.NUMBER },
+              matched_keywords: { type: Type.NUMBER },
+              percentage: { type: Type.NUMBER },
+            },
+            required: ['total_keywords', 'matched_keywords', 'percentage'],
+          },
+          suggestions: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+          },
+        },
+        required: [
+          'title',
+          'match_score',
+          'skills',
+          'experience',
+          'education',
+          'keyword_match',
+          'suggestions',
+        ],
+      };
+
+      const response = await client.models.generateContent({
+        model,
+        contents: [
           {
             role: 'user',
-            content: `
+            parts: [
+              {
+                text: `
 Analyze the Resume against the Job Description.
 
 Return JSON strictly in this format:
@@ -434,107 +471,20 @@ Job Description:
 
 Resume:
 """${resumeText}"""
-`,
-          },
+`
+              }
+            ]
+          }
         ],
-
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: 'jd_resume_analysis',
-            strict: true,
-
-            schema: {
-              type: 'object',
-
-              properties: {
-                title: {
-                  type: 'string',
-                },
-
-                match_score: {
-                  type: 'number',
-                },
-
-                skills: {
-                  type: 'object',
-                  properties: {
-                    matched_skills: {
-                      type: 'array',
-                      items: { type: 'string' },
-                    },
-                    missing_skills: {
-                      type: 'array',
-                      items: { type: 'string' },
-                    },
-                    extra_skills: {
-                      type: 'array',
-                      items: { type: 'string' },
-                    },
-                  },
-                  required: ['matched_skills', 'missing_skills', 'extra_skills'],
-                  additionalProperties: false,
-                },
-
-                experience: {
-                  type: 'object',
-                  properties: {
-                    required_experience: { type: 'string' },
-                    candidate_experience: { type: 'string' },
-                    experience_match: { type: 'boolean' },
-                  },
-                  required: ['required_experience', 'candidate_experience', 'experience_match'],
-                  additionalProperties: false,
-                },
-
-                education: {
-                  type: 'object',
-                  properties: {
-                    required_education: { type: 'string' },
-                    candidate_education: { type: 'string' },
-                    education_match: { type: 'boolean' },
-                  },
-                  required: ['required_education', 'candidate_education', 'education_match'],
-                  additionalProperties: false,
-                },
-
-                keyword_match: {
-                  type: 'object',
-                  properties: {
-                    total_keywords: { type: 'number' },
-                    matched_keywords: { type: 'number' },
-                    percentage: { type: 'number' },
-                  },
-                  required: ['total_keywords', 'matched_keywords', 'percentage'],
-                  additionalProperties: false,
-                },
-
-                suggestions: {
-                  type: 'array',
-                  items: {
-                    type: 'string',
-                  },
-                },
-              },
-
-              required: [
-                'title',
-                'match_score',
-                'skills',
-                'experience',
-                'education',
-                'keyword_match',
-                'suggestions',
-              ],
-
-              additionalProperties: false,
-            },
-          },
+        config: {
+          systemInstruction,
+          temperature: 0.0,
+          responseMimeType: 'application/json',
+          responseSchema,
         },
       });
 
-      const result = response.choices[0].message.content;
-      return JSON.parse(result);
+      return JSON.parse(response.text);
     } catch (error) {
       console.error(error);
       throw new ApiError(500, 'JD Resume analysis failed');

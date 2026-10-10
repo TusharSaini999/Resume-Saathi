@@ -1,31 +1,31 @@
 import { createElement } from "react";
-import { Gauge, FileSearch, Brain, MessagesSquare } from "lucide-react";
+import { Gauge, FileSearch, Brain, ShieldCheck } from "lucide-react";
 import ScrollReveal from "../ScrollReveal";
 
 const features = [
   {
     icon: Gauge,
-    title: "Resume ATS Analyzer",
+    title: "Beat the ATS Filters",
     description:
-      "Analyze your resume with an ATS-style scoring system, including formatting checks, keyword relevance, and improvement suggestions.",
+      "Stop getting rejected by bots. Our AI uncovers hidden formatting traps, fixes spacing inconsistencies, and polishes your grammar instantly.",
   },
   {
     icon: FileSearch,
-    title: "Job Description Matcher",
+    title: "Hyper-Targeted Matching",
     description:
-      "Compare your resume with job descriptions to identify missing skills, required keywords, and improve job-role alignment.",
+      "Instantly discover missing keywords and skill gaps by comparing your resume directly against your dream job's exact description.",
   },
   {
     icon: Brain,
-    title: "Realtime Resume Chatbot",
+    title: "Your 24/7 AI Career Assistant",
     description:
-      "Interact with an AI chatbot to get real-time resume feedback, section-wise suggestions, and instant improvement guidance.",
+      "Chat directly with an AI that knows your resume inside and out. Get instant feedback, rewrite bullet points, and prepare for interviews.",
   },
   {
-    icon: MessagesSquare,
-    title: "Resume-Based Interview Practice",
+    icon: ShieldCheck,
+    title: "Bank-Grade Privacy",
     description:
-      "Practice interview questions generated from your resume and target role with feedback to strengthen preparation.",
+      "Your career data belongs to you. Enjoy seamless logins and total control over your active sessions across all devices.",
   },
 ];
 
@@ -43,16 +43,15 @@ const Features = () => {
             </p>
 
             <h2 className="mt-3 text-3xl md:text-4xl font-black text-[#1E293B] dark:text-white">
-              Built for
+              Everything You Need to
               <span className="bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] bg-clip-text text-transparent">
                 {" "}
-                Real Resume Outcomes
+                Get Hired Faster
               </span>
             </h2>
 
             <p className="mt-4 text-[#64748B] dark:text-[#94A3B8]">
-              These core capabilities help you analyze, match, improve, and
-              prepare before every application.
+              Stop guessing what recruiters want. Our powerful suite of tools ensures your application stands out from the competition.
             </p>
           </div>
         </ScrollReveal>

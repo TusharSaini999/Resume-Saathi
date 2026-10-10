@@ -1,4 +1,3 @@
-import { use, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Loader2 } from "lucide-react";
 import ResumeUpload from "../components/dashboard/ResumeUpload";

@@ -1,6 +1,8 @@
 node_modules
 npm-debug.log
 
+resumesaathi.pem
+
 .env
 
 .git
@@ -18,3 +20,5 @@ coverage
 
 .vscode
 .idea
+
+uploads

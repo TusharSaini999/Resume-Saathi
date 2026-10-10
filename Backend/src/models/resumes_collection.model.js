@@ -19,6 +19,10 @@ const resumesCollectionSchema = new mongoose.Schema(
     raw_pdf_response: {
       type: String,
       required: [true, "Raw PDF response is required"], // original PDF content or metadata
+    },
+    cloudinary_public_id: {
+      type: String,
+      required: false, // for storing the public_id for later deletion
     }
   },
   {

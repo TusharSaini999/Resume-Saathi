@@ -5,21 +5,21 @@ import ScrollReveal from "../ScrollReveal";
 const steps = [
   {
     icon: FileUp,
-    title: "Upload Resume",
+    title: "1. Upload with Confidence",
     description:
-      "Upload your resume in PDF format and let Resume Saathi parse your profile instantly.",
+      "Sign in seamlessly and upload your resume. We process everything in a highly secure, private environment so your data stays yours.",
   },
   {
     icon: SearchCheck,
-    title: "ATS + Job Match",
+    title: "2. Uncover Your True Score",
     description:
-      "Run ATS analysis and compare with job descriptions to evaluate keyword coverage, skills alignment, and missing requirements.",
+      "Paste your target job description and watch our AI instantly reveal your match score, missing skills, and hidden formatting traps.",
   },
   {
     icon: BadgeCheck,
-    title: "Chat + Interview Ready",
+    title: "3. Perfect and Apply",
     description:
-      "Use realtime chatbot suggestions and resume-based interview practice before applying.",
+      "Use your built-in AI assistant to rewrite weak bullet points, fill skill gaps, and generate the perfect resume ready for recruiters.",
   },
 ];
 
@@ -31,14 +31,13 @@ const HowItWorks = () => {
         <div className="max-w-3xl">
           <p className="text-sm font-bold uppercase tracking-widest text-[#FE3E91]">How It Works</p>
           <h2 className="mt-3 text-3xl md:text-4xl font-black text-[#1E293B] dark:text-white">
-            Three Simple Steps to
+            Your Blueprint to
             <span className="bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] bg-clip-text text-transparent">
-              {" "}Improve Your Resume
+              {" "}Career Success
             </span>
           </h2>
           <p className="mt-4 text-[#64748B] dark:text-[#94A3B8]">
-            Resume Saathi gives you a practical workflow from upload to ATS optimization, job matching,
-            AI chat guidance, and interview preparation.
+            We've streamlined the painful optimization process into three incredibly easy steps. Go from upload to interview-ready in minutes.
           </p>
         </div>
         </ScrollReveal>
