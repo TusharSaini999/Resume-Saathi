@@ -119,7 +119,7 @@ CLOUDINARY_API_SECRET="${CLOUDINARY_API_SECRET:-your_cloudinary_api_secret}"
 
 # Google Gemini AI
 GEMINI_API_KEYS="${GEMINI_API_KEYS:-your_gemini_api_key_1}"
-GEMINI_MODEL="${GEMINI_MODEL:-gemini-2.5-flash}"
+GEMINI_MODEL="${GEMINI_MODEL:-gemini-3.5-flash-lite}"
 
 # OAuth Providers
 GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID:-your_google_client_id.apps.googleusercontent.com}"
