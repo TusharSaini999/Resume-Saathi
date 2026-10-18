@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
+import path from 'path';
 import ApiError from './ApiError.js';
 
 class Cloudinary {
@@ -17,12 +18,17 @@ class Cloudinary {
         throw new Error('No file provided');
       }
 
-      // Upload file to Cloudinary
-      const result = await cloudinary.uploader.upload(file.path, {
+      const ext = path.extname(file.originalname || file.path || '').replace('.', '').toLowerCase();
+      const uploadOptions = {
         folder: folderName,
-        resource_type: 'raw', // auto detect image/video
-        format: "pdf",
-      });
+        resource_type: 'raw',
+      };
+      if (ext) {
+        uploadOptions.format = ext;
+      }
+
+      // Upload file to Cloudinary
+      const result = await cloudinary.uploader.upload(file.path, uploadOptions);
       // Remove file from local storage after upload
       fs.unlinkSync(file.path);
 

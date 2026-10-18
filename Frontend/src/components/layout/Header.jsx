@@ -16,6 +16,7 @@ const navItems = [
 
 const dashboardNavItems = [
   { label: "Resume", path: "/dashboard" },
+  { label: "Career Openings", path: "/dashboard/careers" },
   { label: "Job Description", path: "/dashboard/job" },
   { label: "Chat", path: "/dashboard/chat" },
   { label: "Settings", path: "/dashboard/settings" },

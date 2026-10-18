@@ -48,4 +48,29 @@ const verifyJwt = asyncHandler(async (req, res, next) => {
   }
 });
 
+export const optionalVerifyJwt = asyncHandler(async (req, res, next) => {
+  try {
+    const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      req.user = null;
+      return next();
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const session = await Session.findOne({ token, is_active: true });
+    if (!session) {
+      req.user = null;
+      return next();
+    }
+
+    const user = await User.findById(decodedToken.id);
+    req.user = user || null;
+    next();
+  } catch {
+    // If token is invalid or expired, continue as unauthenticated guest
+    req.user = null;
+    next();
+  }
+});
+
 export default verifyJwt;

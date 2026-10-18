@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router";
 import { Sparkles } from "lucide-react";
 import { submitJD } from "../context/Thunk/CheckJD";
 import JobHistoryPanel from "../components/dashboard/jobDescription/JobHistoryPanel";
@@ -10,6 +11,7 @@ import JobAnalysisLoading from "../components/dashboard/jobDescription/JobAnalys
 
 function JobDescription() {
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const history = useSelector((state) => state.jobDec.jobDec);
   const loading = useSelector((state) => state.jobDec.loading);
@@ -19,10 +21,12 @@ function JobDescription() {
   const resumeContext = useSelector((state) => state.resume.resume);
 
   const [selectedId, setSelectedId] = useState(null);
-  const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [isCreatingNew, setIsCreatingNew] = useState(
+    Boolean(location.state?.prefillCompany || location.state?.prefillDescription)
+  );
   const [hasSubmittedNew, setHasSubmittedNew] = useState(false);
-  const [companyName, setCompanyName] = useState("");
-  const [description, setDescription] = useState("");
+  const [companyName, setCompanyName] = useState(location.state?.prefillCompany || "");
+  const [description, setDescription] = useState(location.state?.prefillDescription || "");
   const [formError, setFormError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 

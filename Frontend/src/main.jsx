@@ -15,6 +15,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import VerifyEmailUserUpdate from "./pages/VerifyEmailUserUpdate";
 import Resume from "./pages/Resume";
 import JobDescription from "./pages/JobDescription";
+import CareerOpenings from "./pages/CareerOpenings";
 import Settings from "./pages/Settings";
 import { Provider } from "react-redux";
 import store from "./store/store.js";
@@ -29,8 +30,17 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Landing />,
-      }
+      },
+      {
+        path: "/careers",
+        element: <CareerOpenings />,
+      },
     ],
+  },
+  {
+    path: "/careers",
+    element: <CareerOpenings />,
+    errorElement: <GlobalError />,
   },
   {
     path: "/auth",
@@ -71,6 +81,10 @@ const router = createBrowserRouter([
       {
         path:"/dashboard",
         element:<Resume/>
+      },
+      {
+        path:"/dashboard/careers",
+        element:<CareerOpenings/>
       },
       {
         path:"/dashboard/job",
