@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import MainLayout from "./layout/MainLayout.jsx";
 import AuthLayout from "./layout/AuthLayout.jsx";
 import DashboardLayout from "./layout/DashboardLayout.jsx";
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 import "./index.css";
 import App from "./App";
 import Landing from "./pages/Landing";
@@ -33,14 +33,9 @@ const router = createBrowserRouter([
       },
       {
         path: "/careers",
-        element: <CareerOpenings />,
+        element: <Navigate to="/dashboard/careers" replace />,
       },
     ],
-  },
-  {
-    path: "/careers",
-    element: <CareerOpenings />,
-    errorElement: <GlobalError />,
   },
   {
     path: "/auth",

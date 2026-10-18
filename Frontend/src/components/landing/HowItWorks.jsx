@@ -1,25 +1,31 @@
 import { createElement } from "react";
-import { FileUp, SearchCheck, BadgeCheck } from "lucide-react";
+import { FileUp, SearchCheck, Briefcase, BadgeCheck } from "lucide-react";
 import ScrollReveal from "../ScrollReveal";
 
 const steps = [
   {
     icon: FileUp,
-    title: "1. Upload with Confidence",
+    title: "1. Upload Resume",
     description:
-      "Sign in seamlessly and upload your resume. We process everything in a highly secure, private environment so your data stays yours.",
+      "Upload your resume securely. We process everything in a private environment so your personal data stays safe.",
   },
   {
     icon: SearchCheck,
-    title: "2. Uncover Your True Score",
+    title: "2. ATS & Stack Analysis",
     description:
-      "Paste your target job description and watch our AI instantly reveal your match score, missing skills, and hidden formatting traps.",
+      "AI extracts your genuine skills, flags formatting traps, and infers your target tech stacks and industry roles.",
+  },
+  {
+    icon: Briefcase,
+    title: "3. Live ATS Job Discovery",
+    description:
+      "Browse live openings from official Greenhouse, Lever, and LinkedIn portals, pre-scored for match compatibility.",
   },
   {
     icon: BadgeCheck,
-    title: "3. Perfect and Apply",
+    title: "4. Tailor & Apply",
     description:
-      "Use your built-in AI assistant to rewrite weak bullet points, fill skill gaps, and generate the perfect resume ready for recruiters.",
+      "Tailor your resume for any opening with 1-click, polish bullet points, and apply directly with confidence.",
   },
 ];
 
@@ -37,12 +43,12 @@ const HowItWorks = () => {
             </span>
           </h2>
           <p className="mt-4 text-[#64748B] dark:text-[#94A3B8]">
-            We've streamlined the painful optimization process into three incredibly easy steps. Go from upload to interview-ready in minutes.
+            We've streamlined the entire job search into four powerful steps. Go from resume upload to interview-ready applications in minutes.
           </p>
         </div>
         </ScrollReveal>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map(({ icon: Icon, title, description }, index) => (
             <ScrollReveal key={title} delay={index * 120}>
               <article className="how-card rounded-2xl border border-[#E5E7EB] dark:border-[#374151] p-6 bg-[#F8FAFC] dark:bg-[#1F2937] h-full">

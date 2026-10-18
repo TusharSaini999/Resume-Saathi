@@ -1,5 +1,5 @@
 import { Router } from "express";
-import verifyJwt, { optionalVerifyJwt } from "../middlewares/auth.middleware.js";
+import verifyJwt from "../middlewares/auth.middleware.js";
 import {
   getCompanies,
   getCompanyProfile,
@@ -18,25 +18,31 @@ import {
 
 const careerRouter = Router();
 
-// Public / Personalized Discovery Endpoints
+// Public Health Check
 careerRouter.get("/health", getHealth);
-careerRouter.get("/companies", optionalVerifyJwt, getCompanies);
-careerRouter.get("/companies/:slug", optionalVerifyJwt, getCompanyProfile);
-careerRouter.get("/verify-online", optionalVerifyJwt, verifyJobOnline);
-careerRouter.post("/verify-online", optionalVerifyJwt, verifyJobOnline);
-careerRouter.post("/check-job", optionalVerifyJwt, verifyJobOnline);
-careerRouter.get("/scan-portal", optionalVerifyJwt, scanCompanyPortal);
-careerRouter.post("/scan-portal", optionalVerifyJwt, scanCompanyPortal);
-careerRouter.get("/jobs", optionalVerifyJwt, getCareerJobs);
-careerRouter.post("/jobs/full-description", optionalVerifyJwt, getFullJobDescription);
-careerRouter.get("/jobs/full-description", optionalVerifyJwt, getFullJobDescription);
-careerRouter.post("/clear-cache", optionalVerifyJwt, purgeCache);
-careerRouter.post("/post-job", optionalVerifyJwt, postJobProfile);
 
-// Authenticated Candidate Application Tracking
-careerRouter.post("/track", verifyJwt, trackJob);
-careerRouter.get("/tracked", verifyJwt, getTrackedJobs);
-careerRouter.patch("/tracked/:id", verifyJwt, updateTrackedStatus);
-careerRouter.delete("/tracked/:id", verifyJwt, deleteTrackedJob);
+// Authenticated Endpoints: Requires Valid User Authentication
+careerRouter.use(verifyJwt);
+
+// Discovery & Verification Endpoints
+careerRouter.get("/companies", getCompanies);
+careerRouter.get("/companies/:slug", getCompanyProfile);
+careerRouter.get("/verify-online", verifyJobOnline);
+careerRouter.post("/verify-online", verifyJobOnline);
+careerRouter.post("/check-job", verifyJobOnline);
+careerRouter.get("/scan-portal", scanCompanyPortal);
+careerRouter.post("/scan-portal", scanCompanyPortal);
+careerRouter.get("/jobs", getCareerJobs);
+careerRouter.post("/jobs/full-description", getFullJobDescription);
+careerRouter.get("/jobs/full-description", getFullJobDescription);
+careerRouter.post("/clear-cache", purgeCache);
+careerRouter.post("/post-job", postJobProfile);
+
+// Candidate Application Tracking Endpoints
+careerRouter.post("/track", trackJob);
+careerRouter.get("/tracked", getTrackedJobs);
+careerRouter.patch("/tracked/:id", updateTrackedStatus);
+careerRouter.delete("/tracked/:id", deleteTrackedJob);
 
 export default careerRouter;
+

@@ -1,8 +1,20 @@
 import { createElement } from "react";
-import { Gauge, FileSearch, Brain, ShieldCheck } from "lucide-react";
+import { Gauge, FileSearch, Brain, ShieldCheck, Building2, Sparkles } from "lucide-react";
 import ScrollReveal from "../ScrollReveal";
 
 const features = [
+  {
+    icon: Building2,
+    title: "Live ATS Job Discovery & Verification",
+    description:
+      "Explore real-time job openings scanned directly from official company ATS portals (Greenhouse, Lever, SmartRecruiters, TCS iON) and verified LinkedIn requisitions with live online probing.",
+  },
+  {
+    icon: Sparkles,
+    title: "Inferred Roles & Tech Stacks Matching",
+    description:
+      "Our AI derives your true industry roles (e.g. SDE, Full Stack, Product Manager) and complete tech stacks (e.g. MERN, Python/Django) to surface relevant openings even without exact title matches.",
+  },
   {
     icon: Gauge,
     title: "Beat the ATS Filters",

@@ -1,12 +1,12 @@
 # Resume Saathi 🚀
 
-Resume Saathi is an AI-powered ATS resume analysis platform. It helps users upload resumes, receive structured feedback, compare resumes against job descriptions, and improve quality with AI-driven suggestions.
+Resume Saathi is an AI-powered ATS resume analysis and live job discovery platform. It helps users upload resumes, receive structured feedback, discover live verified requisitions from official ATS portals (Greenhouse, Lever, SmartRecruiters, LinkedIn), infer genuine industry roles and tech stacks, and match against job descriptions using Google Gemini 3.5 Flash Lite.
 
 ## Technology Stack ⚙️
 
 - Frontend: React, Vite, Redux Toolkit, Tailwind CSS
 - Backend: Node.js, Express, MongoDB (Mongoose)
-- AI integration: Google GenAI SDK (Gemini API)
+- AI integration: Google GenAI SDK (Gemini 3.5 Flash Lite)
 - Authentication: JWT, Google OAuth, LinkedIn OAuth
 - File services: Multer, Cloudinary
 - Cloud & DevOps: AWS (CloudFront CDN, EC2,  ACM), Docker, Nginx
@@ -67,6 +67,8 @@ Frontend default URL: http://localhost:5173 🌐
 
 ## Project Documentation 📚
 
+- Career Openings & ATS Discovery: [Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md)
+- Career Openings Guide (DOCX): [Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx](file:///c:/Project/Resume-Saathi/Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx)
 - Backend guide: Backend/README.md
 - Frontend guide: Frontend/README.md
 - Deployment guide: Docs/DEPLOYMENT_GUIDE.md
