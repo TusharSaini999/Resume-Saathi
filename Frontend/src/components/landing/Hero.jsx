@@ -1,4 +1,4 @@
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Briefcase } from "lucide-react";
 import { BUTTON_CLASS } from "../../constants/style";
 import { Link } from "react-router";
 import { useSelector } from "react-redux";
@@ -28,7 +28,7 @@ const Hero = () => {
             bg-[#F9FAFB] dark:bg-[#1F2937] border border-[#E5E7EB] dark:border-[#374151] dark:text-white"
           >
             <Sparkles className="w-4 h-4 text-[#FE3E91]" />
-            Your Personal AI Career Coach
+            Your Personal AI Career Coach &amp; Live Job Finder
           </div>
 
           {/* Heading */}
@@ -44,23 +44,34 @@ const Hero = () => {
 
           {/* Description */}
           <p className="mt-6 text-base md:text-lg text-[#475569] dark:text-[#94A3B8]">
-            Supercharge your job search with Resume Saathi. Our AI deeply analyzes your resume against target job descriptions to uncover hidden ATS traps, fix formatting inconsistencies, and optimize your keywords. Experience a secure, private platform built to help you get hired faster.
+            Supercharge your job search with Resume Saathi. Our AI deeply analyzes your resume against target job descriptions, discovers live verified openings directly from official ATS boards (Greenhouse, Lever, SmartRecruiters, LinkedIn), and matches you by inferred tech stacks and industry roles.
           </p>
 
-          {/* Button */}
-          <div className="flex flex-wrap gap-4 mt-8">
+          {/* Buttons */}
+          <div className="flex flex-wrap items-center gap-4 mt-8">
             <Link
               to={isLoggedIn ? "/dashboard" : "/auth/login"}
               className={`flex items-center gap-2 ${BUTTON_CLASS}`}
               style={{ boxShadow: "0 10px 25px rgba(254,62,145,0.25)" }}
             >
-              Analyze Resume
+              <span>Analyze Resume</span>
               <ArrowRight size={18} />
+            </Link>
+
+            <Link
+              to={isLoggedIn ? "/dashboard/careers" : "/auth/login"}
+              className="flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 bg-slate-100 dark:bg-slate-800/90 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-700 rounded-xl transition-all shadow-sm hover:scale-105 active:scale-95"
+            >
+              <Briefcase size={18} className="text-[#FE3E91]" />
+              <span>Explore Live Openings</span>
+              <span className="px-1.5 py-0.5 text-[10px] font-black rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                {isLoggedIn ? "Live ATS" : "Sign In to Access"}
+              </span>
             </Link>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-12 text-sm text-[#64748B] dark:text-[#94A3B8]">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-12 text-sm text-[#64748B] dark:text-[#94A3B8]">
             <div>
               <p className="text-2xl font-bold text-[#FE3E91]">Deep</p>
               Formatting Analysis
@@ -68,12 +79,17 @@ const Hero = () => {
 
             <div>
               <p className="text-2xl font-bold text-[#803AD1]">100%</p>
-              Data Privacy & Secure Sessions
+              Data Privacy &amp; Security
             </div>
 
             <div>
               <p className="text-2xl font-bold text-[#CA25AF]">Context-Aware</p>
               Realtime AI Chat
+            </div>
+
+            <div>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">Live ATS</p>
+              Direct Portal Job Sync
             </div>
           </div>
         </div>

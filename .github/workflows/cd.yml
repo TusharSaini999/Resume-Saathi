@@ -6,6 +6,13 @@ on:
       - main
     paths:
       - 'version.json'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force re-build & deploy even if tag already exists'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build-and-push:
@@ -29,15 +36,20 @@ jobs:
       - name: Check and Create Tag
         id: tag
         run: |
-          if git rev-parse ${{ env.VERSION }} >/dev/null 2>&1; then
+          FORCE="${{ github.event.inputs.force_deploy }}"
+          if git rev-parse ${{ env.VERSION }} >/dev/null 2>&1 && [ "$FORCE" != "true" ]; then
             echo "Tag ${{ env.VERSION }} already exists. Skipping image push."
             echo "deploy=false" >> $GITHUB_OUTPUT
           else
-            echo "Creating and pushing tag ${{ env.VERSION }}"
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            git tag ${{ env.VERSION }}
-            git push origin ${{ env.VERSION }}
+            if git rev-parse ${{ env.VERSION }} >/dev/null 2>&1; then
+              echo "Tag ${{ env.VERSION }} exists, but force_deploy is enabled. Proceeding."
+            else
+              echo "Creating and pushing tag ${{ env.VERSION }}"
+              git config --global user.name "github-actions[bot]"
+              git config --global user.email "github-actions[bot]@users.noreply.github.com"
+              git tag ${{ env.VERSION }}
+              git push origin ${{ env.VERSION }}
+            fi
             echo "deploy=true" >> $GITHUB_OUTPUT
           fi
 
