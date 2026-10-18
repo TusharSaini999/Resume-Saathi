@@ -361,7 +361,7 @@ A public-safe template is available in `Docs/sample.env` and `Backend/.env.examp
 | `MAIL_FROM` | Email Address | Sender identity (e.g. `support@resumesaathi.tusharsaini.tech`) |
 | `CLOUDINARY_*` | Cloud Name, Key, Secret | Cloudinary storage credentials |
 | `GEMINI_API_KEYS` | Comma-separated keys | Gemini API keys rotated across AI analysis requests |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Gemini model identifier |
+| `GEMINI_MODEL` | `gemini-3.5-flash-lite` | Gemini model identifier |
 | `GOOGLE_CLIENT_*` | Client ID / Secret | Google OAuth 2.0 Credentials |
 | `LINKEDIN_CLIENT_*`| Client ID / Secret | LinkedIn OAuth 2.0 Credentials |
 | `IPWHO_API_KEY` | Secret String | IP lookup geolocation API key |

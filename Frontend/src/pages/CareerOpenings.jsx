@@ -30,7 +30,6 @@ import {
   trackJobThunk,
   updateTrackedStatusThunk,
   deleteTrackedJobThunk,
-  purgeCacheThunk,
   scanCompanyPortalThunk,
   setTrackFilter,
   setEmploymentTypeFilter,
@@ -39,7 +38,6 @@ import {
   setFresherOnlyFilter,
   setLocationFilter,
   setCountryFilter,
-  setCategoryFilter,
   setStrictAiOnlyFilter,
   setRealOnlyFilter,
   setPortalSourceFilter,
@@ -59,7 +57,7 @@ import CompanyProfileModal from "../components/career/CompanyProfileModal";
 import ApplicationTracker from "../components/career/ApplicationTracker";
 import CareerFilterBar from "../components/career/CareerFilterBar";
 import AgUiSearchConsole from "../components/career/AgUiSearchConsole";
-import { TECH_COUNTRIES, getCountryData } from "../constants/techLocations";
+import { TECH_COUNTRIES } from "../constants/techLocations";
 
 const GRADIENT_PRIMARY =
   "bg-gradient-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5]";
@@ -87,7 +85,6 @@ export default function CareerOpenings() {
     jobs,
     totalJobs,
     candidateProfile,
-    availableTracks,
     availableStreams,
     hasResume,
     trackedJobs,
@@ -101,9 +98,6 @@ export default function CareerOpenings() {
     availableCountries,
     portalSourceFilter,
     portalCounts,
-    scannedAt,
-    isLiveScan,
-    scanTelemetry,
     strictAiOnlyFilter,
     realOnlyFilter,
     loading,
@@ -116,7 +110,7 @@ export default function CareerOpenings() {
   const [customCompanyInput, setCustomCompanyInput] = useState("");
   const [roleSearchInput, setRoleSearchInput] = useState("");
   const [customLocationInput, setCustomLocationInput] = useState("");
-  const [minScoreFilter, setMinScoreFilter] = useState(0);
+  const minScoreFilter = 0;
   const [sortBy, setSortBy] = useState("match"); // "match" | "recent" | "company" | "title"
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -472,27 +466,6 @@ export default function CareerOpenings() {
           : "Showing all discoverable roles."
       )
     );
-  };
-
-  const handleClearAndRescan = async () => {
-    try {
-      await dispatch(purgeCacheThunk()).unwrap();
-      dispatch(
-        fetchCareerJobsThunk({
-          country: countryFilter,
-          location: locationFilter,
-          track: trackFilter,
-          stream: streamFilter,
-          employmentType: employmentTypeFilter,
-          experienceLevel: experienceLevelFilter,
-          fresherOnly: fresherOnlyFilter,
-          forceRefresh: true,
-        })
-      );
-      dispatch(setSuccess("Live re-scanning all official company ATS boards..."));
-    } catch (err) {
-      dispatch(setError(err || "Failed to purge cache"));
-    }
   };
 
   const handleCheckJobOnline = async (job, e) => {
@@ -1209,14 +1182,6 @@ export default function CareerOpenings() {
       return matchStatus && matchQuery;
     });
   }, [trackedJobs, trackerStatusTab, trackerSearch]);
-
-  const timeAgoString = useMemo(() => {
-    if (!scannedAt) return "Just now";
-    const diff = Math.floor((Date.now() - new Date(scannedAt).getTime()) / 60000);
-    if (diff <= 1) return "Just now";
-    if (diff < 60) return `${diff}m ago`;
-    return `${Math.floor(diff / 60)}h ago`;
-  }, [scannedAt]);
 
   const handleTailorResume = (job) => {
     navigate("/dashboard/job", {

@@ -89,7 +89,7 @@ CLOUDINARY_API_KEY="${CLOUDINARY_API_KEY:-your_cloudinary_api_key}"
 CLOUDINARY_API_SECRET="${CLOUDINARY_API_SECRET:-your_cloudinary_api_secret}"
 
 GEMINI_API_KEYS="${GEMINI_API_KEYS:-your_gemini_api_key_1,your_gemini_api_key_2}"
-GEMINI_MODEL="${GEMINI_MODEL:-gemini-2.5-flash}"
+GEMINI_MODEL="${GEMINI_MODEL:-gemini-3.5-flash-lite}"
 
 GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID:-your_google_client_id.apps.googleusercontent.com}"
 GOOGLE_CLIENT_SECRET="${GOOGLE_CLIENT_SECRET:-your_google_client_secret}"

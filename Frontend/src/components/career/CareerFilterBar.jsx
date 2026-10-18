@@ -22,7 +22,7 @@ export default function CareerFilterBar({
   roleSearchInput,
   setRoleSearchInput,
   customCompanyInput,
-  setCustomCompanyInput,
+
   customLocationInput,
   setCustomLocationInput,
   countryFilter = "India",
@@ -30,7 +30,7 @@ export default function CareerFilterBar({
   availableCountries = [],
   locationFilter,
   onLocationChange,
-  popularLocations,
+
   trackFilter,
   onTrackChange,
   candidateProfile,
@@ -53,7 +53,7 @@ export default function CareerFilterBar({
   categoryCounts = {},
   selectedCategory = "All",
   onCategoryChange,
-  categories,
+
   selectedCompanySlug,
   onSelectQuickCompany,
   filteredCompaniesList,
@@ -87,7 +87,7 @@ export default function CareerFilterBar({
   const resumeSkills = candidateProfile?.resumeKeywords || candidateProfile?.skills || [];
   const inferredStacks = candidateProfile?.inferredStacks || [];
   const derivedRoleTitles = candidateProfile?.derivedRoleTitles || [];
-  const primaryInferredStack = candidateProfile?.primaryInferredStack || inferredStacks[0] || null;
+
 
   const extractedResumeKeywords = Array.from(
     new Set([...roleKeywords, ...resumeSkills])
