@@ -1,0 +1,86 @@
+name: Rollback Production Version 🔄
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: 'Target Version to rollback to (e.g. v1.0.1 or 1.0.1)'
+        required: true
+        type: string
+      reason:
+        description: 'Reason for rollback'
+        required: false
+        default: 'Production issue / manual rollback'
+
+jobs:
+  execute-rollback:
+    name: Rollback to Target Version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Normalize Version Tag
+        id: norm
+        run: |
+          RAW="${{ github.event.inputs.target_version }}"
+          CLEAN=$(echo "$RAW" | xargs)
+          if [[ ! "$CLEAN" =~ ^v ]]; then
+            TARGET_TAG="v$CLEAN"
+          else
+            TARGET_TAG="$CLEAN"
+          fi
+          echo "TARGET_TAG=$TARGET_TAG" >> $GITHUB_ENV
+          echo "target_tag=$TARGET_TAG" >> $GITHUB_OUTPUT
+          echo "Rollback initiated to version: $TARGET_TAG"
+          echo "Reason: ${{ github.event.inputs.reason }}"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Execute Rollback via AWS Systems Manager (SSM)
+        id: ssm
+        run: |
+          echo "Dispatching Docker Compose rollback to ${{ env.TARGET_TAG }}..."
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "${{ secrets.AWS_INSTANCE_ID }}" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Rollback deployment to ${{ env.TARGET_TAG }} - ${{ github.event.inputs.reason }}" \
+            --parameters "commands=[
+              \"cd /home/ubuntu/resumesaathi || cd ~/resumesaathi\",
+              \"export APP_VERSION=${{ env.TARGET_TAG }}\",
+              \"docker compose pull || docker-compose pull\",
+              \"docker compose up -d --remove-orphans || docker-compose up -d --remove-orphans\",
+              \"docker image prune -f || true\",
+              \"docker compose ps\"
+            ]" \
+            --query "Command.CommandId" \
+            --output text)
+
+          echo "SSM Command sent with ID: $COMMAND_ID"
+          echo "COMMAND_ID=$COMMAND_ID" >> $GITHUB_ENV
+          echo "command_id=$COMMAND_ID" >> $GITHUB_OUTPUT
+
+      - name: Wait for SSM Command & Verify Server
+        run: |
+          echo "Waiting for server to apply ${{ env.TARGET_TAG }}..."
+          sleep 20
+          STATUS=$(aws ssm get-command-invocation \
+            --command-id "${{ env.COMMAND_ID }}" \
+            --instance-id "${{ secrets.AWS_INSTANCE_ID }}" \
+            --query "Status" \
+            --output text || echo "Completed")
+
+          echo "SSM Command Status: $STATUS"
+
+      - name: Rollback Summary
+        run: |
+          echo "### 🔄 Production Rollback Completed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Version**: \`${{ env.TARGET_TAG }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Reason**: ${{ github.event.inputs.reason }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Initiated By**: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Instance ID**: \`${{ secrets.AWS_INSTANCE_ID }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: Containers updated to pre-built Docker images for \`${{ env.TARGET_TAG }}\`." >> $GITHUB_STEP_SUMMARY

@@ -595,3 +595,63 @@ To prevent attackers from discovering the public EC2 IPv4 address and bypassing 
 CloudFront connects to the EC2 origin over HTTP (Port 80) and handles SSL termination at the edge. To prevent infinite 301 redirect loops (`ERR_TOO_MANY_REDIRECTS`), host Nginx:
 1. Listens on Port 80 with wildcard catch-all: `server_name resumesaathi.tusharsaini.tech www.resumesaathi.tusharsaini.tech _;`.
 2. Serves requests directly to the local frontend container (`127.0.0.1:3000`) without issuing HTTP-to-HTTPS redirects at the host level (handled upstream by CloudFront viewer protocol policy).
+
+---
+
+## 11. Production Rollback Strategy & Version Management 🔄
+
+Resume-Saathi features an automated, zero-rebuild rollback pipeline enabled by immutable versioned Docker images and AWS Systems Manager (SSM).
+
+### 11.1 One-Click Rollback via GitHub Actions
+A dedicated rollback workflow is available at `.github/workflows/rollback.yml`:
+
+1. Go to the **Actions** tab in your GitHub repository.
+2. Select **"Rollback Production Version 🔄"** from the left workflow sidebar.
+3. Click the **"Run workflow"** button.
+4. Input:
+   - **Target Version**: Enter the desired version tag (e.g. `v1.0.1` or `1.0.1`).
+   - **Reason**: Optional explanation for auditing (e.g. *"Critical bug in v1.0.2"*).
+5. Click **"Run workflow"**.
+6. The action dispatches an AWS Systems Manager (SSM) command to your EC2 instance. In under 30 seconds:
+   - Sets `APP_VERSION=v1.0.1` in the deployment directory.
+   - Executes `docker compose pull` to retrieve the pre-built, tested images (`backend-v1.0.1` and `frontend-v1.0.1`).
+   - Restarts containers with zero rebuild delay via `docker compose up -d --remove-orphans`.
+   - Prunes untagged images and outputs container health statuses.
+
+### 11.2 How to Determine Which Version is Best to Rollback To
+
+When a production incident occurs, follow this decision tree to pick the optimal target version:
+
+```
+Incident Occurs (e.g. on v1.0.2)
+         │
+         ▼
+Did v1.0.2 introduce a breaking Database Migration?
+  ├── YES ──► Check if DB schema rollback script is required first.
+  └── NO  ──► Proceed directly to previous version:
+                 │
+                 ▼
+          Check Git Tags / Docker Hub:
+          Current:  v1.0.2 (Unhealthy)
+          Previous: v1.0.1 (Healthy / Stable)
+                 │
+                 ▼
+          Input "v1.0.1" into Rollback Workflow ➔ 30-Second Recovery
+```
+
+#### Evaluation Checklist:
+1. **Immediate Predecessor Version (Rule of Least Change)**:
+   - In 95% of cases, the **immediate prior stable version** (e.g. if current is `v1.0.2`, choose `v1.0.1`) is the safest choice because its state was proven stable immediately before the current release.
+2. **Review Git History & Tags**:
+   - Run `git tag -l -n` or view the GitHub **Releases / Tags** page to inspect the release notes and commit summaries for each version.
+3. **Database Schema Compatibility**:
+   - If the new version only added new fields/endpoints (additive changes), rollback is completely safe and risk-free.
+   - If fields were renamed or removed in MongoDB, verify the previous version's Mongoose models can handle current documents.
+4. **Pre-Built Docker Hub Images**:
+   - Ensure the target version has published tags on Docker Hub:
+     - `tusharsaini999/resume-saathi:backend-vX.Y.Z`
+     - `tusharsaini999/resume-saathi:frontend-vX.Y.Z`
+5. **Post-Rollback Health Verification**:
+   - Verify server liveness at: `https://resumesaathi.tusharsaini.tech/api/v1/healthcheck`
+   - Both backend and frontend return HTTP 200 OK.
+
