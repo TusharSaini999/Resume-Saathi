@@ -15,7 +15,7 @@ import {
   FileText,
   Target,
 } from "lucide-react";
-import { stripHtml } from "./JobDetailsModal";
+import { stripHtml } from "../../utils/textSanitizer";
 
 export default function JobCard({
   job,
@@ -428,6 +428,16 @@ export default function JobCard({
 
         {/* Right CTAs: Details + Apply */}
         <div className="flex items-center gap-2">
+          {onTailorResume && (
+            <button
+              onClick={() => onTailorResume(job)}
+              className="hidden lg:inline-flex px-2.5 py-1.5 rounded-xl text-xs font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/50 border border-purple-200 dark:border-purple-800 transition-colors"
+              title="Tailor your resume for this opening"
+            >
+              Tailor
+            </button>
+          )}
+
           <button
             onClick={() => onOpenDetails(job)}
             className="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-colors"

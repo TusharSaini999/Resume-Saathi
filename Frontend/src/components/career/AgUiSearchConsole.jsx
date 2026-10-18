@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Sparkles, Globe, ShieldCheck, Cpu, Terminal, ArrowRight, Zap } from "lucide-react";
+import { Sparkles, ShieldCheck, Cpu, Terminal } from "lucide-react";
 
-export default function AgUiSearchConsole({ roleQuery, location, company, GRADIENT_PRIMARY }) {
+export default function AgUiSearchConsole({ roleQuery, location, company }) {
   const [activeStep, setActiveStep] = useState(0);
 
   const steps = [
