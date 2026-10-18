@@ -25,7 +25,7 @@ class Chat {
   }
 
   async generateStructuredResponse(contents, responseSchema, systemInstruction) {
-    const model = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+    const model = (process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite').replace(/3\.5l-/i, '3.5-').trim();
 
     const attempts = [
       { temperature: 0.2 },
@@ -325,7 +325,7 @@ ${query}
 
       try {
         completion = await client.models.generateContent({
-          model: process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite',
+          model: (process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite').replace(/3\.5l-/i, '3.5-').trim(),
           contents,
           config: {
             systemInstruction,

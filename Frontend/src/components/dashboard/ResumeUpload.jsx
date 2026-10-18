@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, File, X } from "lucide-react";
+import { Upload, File, FileText, X } from "lucide-react";
 
 const ResumeUpload = ({ onUpload, loading }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -17,16 +17,30 @@ const ResumeUpload = ({ onUpload, loading }) => {
   };
 
   const validateFile = (file) => {
-    const validTypes = ["application/pdf"];
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (!file) return false;
 
-    if (!validTypes.includes(file.type)) {
-      setFileError("Please upload a PDF file (.pdf) only");
+    const ext = (file.name || "").split(".").pop().toLowerCase();
+    const allowedExts = ["pdf", "docx", "doc"];
+    const allowedMimes = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/msword",
+      "application/octet-stream",
+      "application/x-zip-compressed",
+      "application/zip"
+    ];
+
+    const hasValidExt = allowedExts.includes(ext);
+    const hasValidMime = allowedMimes.includes(file.type) || !file.type;
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    if (!hasValidExt && !hasValidMime) {
+      setFileError("Please upload a PDF (.pdf) or Word document (.docx)");
       return false;
     }
 
     if (file.size > maxSize) {
-      setFileError("File size must be less than 5MB");
+      setFileError("File size must be less than 10MB");
       return false;
     }
 
@@ -73,19 +87,33 @@ const ResumeUpload = ({ onUpload, loading }) => {
     return `${(sizeInBytes / 1024).toFixed(2)} KB`;
   };
 
+  const getFileBadge = (filename) => {
+    const ext = (filename || "").split(".").pop().toUpperCase();
+    if (ext === "DOCX" || ext === "DOC") {
+      return {
+        label: "DOCX",
+        bg: "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 border-blue-500/20",
+      };
+    }
+    return {
+      label: "PDF",
+      bg: "bg-[#fe3e91]/10 text-[#fe3e91] dark:bg-[#fe3e91]/20 dark:text-[#ff5fa7] border-[#fe3e91]/20",
+    };
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto">
       <div className="rounded-3xl border border-[#e2e8f0] bg-white p-5 shadow-xl sm:p-7 md:p-8 dark:border-[#334155] dark:bg-[#0f172a]">
         <div className="text-center">
           <p className="inline-flex items-center rounded-full bg-[#fce7f3] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#be185d] dark:bg-[#3b0a2a] dark:text-[#f9a8d4]">
-            Resume Checker
+            AI Resume Analyzer
           </p>
           <h3 className="mt-3 bg-[linear-gradient(120deg,#ff7ab8_0%,#fe3e91_28%,#ca25af_62%,#7a4cff_100%)] bg-clip-text text-3xl font-black tracking-[-0.01em] text-transparent md:text-4xl dark:bg-[linear-gradient(120deg,#ffd1e7_0%,#ff84bf_30%,#e879f9_65%,#a5b4fc_100%)]">
             Upload Your Resume
           </h3>
           <div className="mx-auto mt-2 h-1.5 w-28 rounded-full bg-[linear-gradient(90deg,rgba(254,62,145,0.25)_0%,rgba(202,37,175,0.95)_45%,rgba(122,76,255,0.85)_100%)] dark:bg-[linear-gradient(90deg,rgba(255,132,191,0.35)_0%,rgba(232,121,249,0.95)_50%,rgba(165,180,252,0.9)_100%)]" />
           <p className="mt-3 text-sm text-[#64748b] dark:text-[#cbd5e1]">
-            Drag and drop your PDF, or click browse. We will analyze it in one step.
+            Drag and drop your PDF or DOCX file, or click browse. Full multi-agent AI analysis across all sections.
           </p>
         </div>
 
@@ -105,10 +133,12 @@ const ResumeUpload = ({ onUpload, loading }) => {
           </div>
 
           <p className="text-base font-bold text-[#1E293B] sm:text-lg dark:text-white">
-            {selectedFile ? "File selected" : "Drop your PDF here"}
+            {selectedFile ? "File selected" : "Drop your PDF or DOCX here"}
           </p>
           <p className="mt-1 text-sm text-[#64748b] dark:text-[#94a3b8]">
-            {selectedFile ? "You can change it any time before clicking analyze." : "or click Browse PDF below"}
+            {selectedFile
+              ? "You can change it any time before clicking analyze."
+              : "or click Browse File below"}
           </p>
 
           <div className="mt-5">
@@ -116,12 +146,12 @@ const ResumeUpload = ({ onUpload, loading }) => {
               htmlFor="resume-input"
               className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5] px-6 py-3 text-sm font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25"
             >
-              {selectedFile && !fileError ? "Choose Another PDF" : "Browse PDF"}
+              {selectedFile && !fileError ? "Choose Another File" : "Browse PDF / DOCX"}
             </label>
             <input
               id="resume-input"
               type="file"
-              accept=".pdf,application/pdf"
+              accept=".pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword"
               onChange={handleChange}
               disabled={loading}
               className="hidden"
@@ -129,9 +159,15 @@ const ResumeUpload = ({ onUpload, loading }) => {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs">
-            <span className="rounded-full bg-white px-3 py-1 text-[#475569] dark:bg-[#1e293b] dark:text-[#cbd5e1]">PDF only</span>
-            <span className="rounded-full bg-white px-3 py-1 text-[#475569] dark:bg-[#1e293b] dark:text-[#cbd5e1]">Max 5MB</span>
-            <span className="rounded-full bg-white px-3 py-1 text-[#475569] dark:bg-[#1e293b] dark:text-[#cbd5e1]">Fast scan</span>
+            <span className="rounded-full bg-white px-3 py-1 font-semibold text-[#475569] shadow-xs dark:bg-[#1e293b] dark:text-[#cbd5e1]">
+              PDF &amp; DOCX
+            </span>
+            <span className="rounded-full bg-white px-3 py-1 font-semibold text-[#475569] shadow-xs dark:bg-[#1e293b] dark:text-[#cbd5e1]">
+              Max 10MB
+            </span>
+            <span className="rounded-full bg-white px-3 py-1 font-semibold text-[#475569] shadow-xs dark:bg-[#1e293b] dark:text-[#cbd5e1]">
+              Deep AI scan
+            </span>
           </div>
         </div>
 
@@ -145,11 +181,24 @@ const ResumeUpload = ({ onUpload, loading }) => {
           <div className="mt-4 rounded-2xl border border-[#dbe2ea] bg-[#f8fafc] p-4 dark:border-[#475569] dark:bg-[#111827]/70">
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
-                <File size={18} className="shrink-0 text-[#fe3e91]" />
+                {selectedFile.name.toLowerCase().endsWith(".docx") || selectedFile.name.toLowerCase().endsWith(".doc") ? (
+                  <FileText size={22} className="shrink-0 text-blue-500" />
+                ) : (
+                  <File size={22} className="shrink-0 text-[#fe3e91]" />
+                )}
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-[#1E293B] dark:text-white">
-                    {selectedFile.name}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="truncate text-sm font-semibold text-[#1E293B] dark:text-white">
+                      {selectedFile.name}
+                    </p>
+                    <span
+                      className={`inline-block shrink-0 rounded border px-1.5 py-0.5 text-[10px] font-bold ${
+                        getFileBadge(selectedFile.name).bg
+                      }`}
+                    >
+                      {getFileBadge(selectedFile.name).label}
+                    </span>
+                  </div>
                   <p className="text-xs text-[#64748b] dark:text-[#94a3b8]">
                     {formatFileSize(selectedFile.size)}
                   </p>

@@ -30,15 +30,26 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter for PDF validation
+// File filter for PDF and DOCX validation
 const fileFilter = (req, file, cb) => {
-  const allowedMime = "application/pdf";
-  const ext = path.extname(file.originalname).toLowerCase();
+  const ext = path.extname(file.originalname || "").toLowerCase();
+  const allowedExts = [".pdf", ".docx", ".doc"];
+  const allowedMimes = [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/msword",
+    "application/octet-stream",
+    "application/x-zip-compressed",
+    "application/zip"
+  ];
 
-  if (file.mimetype === allowedMime && ext === ".pdf") {
+  const hasValidExt = allowedExts.includes(ext);
+  const hasValidMime = allowedMimes.includes(file.mimetype) || !file.mimetype;
+
+  if (hasValidExt && hasValidMime) {
     cb(null, true);
   } else {
-    cb(new ApiError(400, "Only PDF files are allowed"), false);
+    cb(new ApiError(400, "Only PDF (.pdf) and Word (.docx) files are allowed"), false);
   }
 };
 

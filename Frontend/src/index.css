@@ -103,11 +103,13 @@ button:hover {
 	cursor: pointer;
 }
 
-.history-scroll-hidden {
+.history-scroll-hidden,
+.no-scrollbar {
 	scrollbar-width: none;
 	-ms-overflow-style: none;
 }
 
-.history-scroll-hidden::-webkit-scrollbar {
+.history-scroll-hidden::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
 	display: none;
 }

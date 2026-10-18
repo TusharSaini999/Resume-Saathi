@@ -23,10 +23,10 @@ const classifyError = (message) => {
     };
   }
 
-  if (normalized.includes("format") || normalized.includes("pdf") || normalized.includes("type")) {
+  if (normalized.includes("format") || normalized.includes("pdf") || normalized.includes("docx") || normalized.includes("type")) {
     return {
       label: "Unsupported Format",
-      suggestion: "Upload a clean .pdf file only.",
+      suggestion: "Upload a clean .pdf or .docx file.",
       tone: "blue",
     };
   }
@@ -127,9 +127,9 @@ const AnalysisError = ({ error, onReupload }) => {
             Quick Fixes
           </h4>
           <ul className="space-y-2 text-sm text-[#64748b] dark:text-[#cbd5e1]">
-            <li>• Upload a different PDF file</li>
-            <li>• Ensure file format is .pdf only</li>
-            <li>• Keep file size below 5MB</li>
+            <li>• Upload a different PDF or Word document</li>
+            <li>• Ensure file format is .pdf or .docx</li>
+            <li>• Keep file size below 10MB</li>
             <li>• Remove password protection if enabled</li>
           </ul>
         </div>

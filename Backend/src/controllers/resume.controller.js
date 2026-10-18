@@ -93,7 +93,7 @@ const uploadResume = asyncHandler(async (req, res) => {
   const pdfText = await pdfParser.getText(file.path);
   const formatResume = await pdfParser.getAllPagesRawContent(file.path);
   if (!pdfText || !formatResume) {
-    throw new ApiError(500, 'Failed to parse resume PDF');
+    throw new ApiError(500, 'Failed to parse resume document');
   }
   const resUpload = await cloudinary.fileUpload(file);
 
