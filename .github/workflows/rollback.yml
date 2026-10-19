@@ -1,4 +1,4 @@
-name: Rollback Production Version 🔄
+name: Rollback Production Version
 
 on:
   workflow_dispatch:
