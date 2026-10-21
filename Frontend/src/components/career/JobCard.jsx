@@ -408,15 +408,17 @@ export default function JobCard({
               checkingOnline?.online === true
                 ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700"
                 : checkingOnline?.online === false
-                ? "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-300 dark:border-amber-700"
+                ? "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-300 dark:border-rose-700"
                 : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-purple-400 hover:text-purple-600"
             }`}
             title="Probe official portal to verify live requisition status"
           >
             {checkingOnline?.checking ? (
               <RefreshCw className="w-3 h-3 animate-spin text-purple-600" />
-            ) : checkingOnline?.online ? (
+            ) : checkingOnline?.online === true ? (
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            ) : checkingOnline?.online === false ? (
+              <span className="w-2 h-2 rounded-full bg-rose-500" />
             ) : (
               <ShieldCheck className="w-3.5 h-3.5 text-purple-500" />
             )}

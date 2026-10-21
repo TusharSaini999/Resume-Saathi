@@ -682,7 +682,7 @@ export async function getJobsForCandidate(userId, options = {}) {
       rawJobs = memoryCached.jobs;
       scannedAt = new Date(memoryCached.timestamp);
     } else {
-      // Check MongoDB cache
+      // Check MongoDB cache (filter strictly for genuine live openings)
       try {
         const mongoQuery = companySlug ? { companySlug } : {};
         const storedJobs = await DiscoveredCareerJob.find(mongoQuery)
@@ -690,9 +690,10 @@ export async function getJobsForCandidate(userId, options = {}) {
           .limit(300)
           .lean();
 
-        if (storedJobs && storedJobs.length > 0) {
-          rawJobs = storedJobs;
-          scannedAt = storedJobs[0].scannedAt || new Date();
+        const validStoredJobs = (storedJobs || []).filter((j) => isRealOpeningUrl(j.applyUrl));
+        if (validStoredJobs.length > 0) {
+          rawJobs = validStoredJobs;
+          scannedAt = validStoredJobs[0].scannedAt || new Date();
           jobsCache.set(cacheKey, { timestamp: scannedAt.getTime(), jobs: rawJobs });
         }
       } catch (dbErr) {
@@ -711,6 +712,9 @@ export async function getJobsForCandidate(userId, options = {}) {
     } else {
       rawJobs = await fetchAllCuratedJobs(25, roleQuery, candidateProfile.skills || []);
     }
+
+    // Filter strictly to ensure 100% genuine live requisitions
+    rawJobs = (rawJobs || []).filter((j) => isRealOpeningUrl(j.applyUrl));
 
     // Update in-memory cache
     jobsCache.set(cacheKey, { timestamp: Date.now(), jobs: rawJobs });
@@ -907,13 +911,10 @@ export async function getJobsForCandidate(userId, options = {}) {
     }
   }
 
-  // 3.5 Real Openings Filter: Prefer verified openings, keep valid apply URLs
+  // 3.5 Real Openings Filter: Strictly require genuine verified opening URLs
   const isRealOnlyActive = realOnly === true || realOnly === "true";
   if (isRealOnlyActive) {
-    const realMatches = filteredJobs.filter((j) => j.applyUrl && (isRealOpeningUrl(j.applyUrl) || j.source === "linkedin" || j.isRealOpening !== false));
-    if (realMatches.length > 0) {
-      filteredJobs = realMatches;
-    }
+    filteredJobs = filteredJobs.filter((j) => isRealOpeningUrl(j.applyUrl));
   }
 
   // 4. Domain Track Filter (Tech vs Management) - ONLY filter if user EXPLICITLY requested a specific track (not "All", not default)
@@ -1100,9 +1101,13 @@ export async function getJobsForCandidate(userId, options = {}) {
     }
   }
 
-  // Final Guard: If tight filters wiped out all results, restore rawJobs so user is never left with 0 jobs!
+  // Final Guard: If tight filters wiped out all results, restore rawJobs (filtered strictly for real openings)
   if (filteredJobs.length === 0 && rawJobs.length > 0) {
-    filteredJobs = rawJobs;
+    filteredJobs = rawJobs.filter((j) => isRealOpeningUrl(j.applyUrl));
+  }
+
+  if (isRealOnlyActive) {
+    filteredJobs = filteredJobs.filter((j) => isRealOpeningUrl(j.applyUrl));
   }
 
   // Deduplicate jobs by unique requisition key (applyUrl or company + title)

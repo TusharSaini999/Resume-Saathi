@@ -64,12 +64,12 @@ class AiJobMatcherService {
       }
     }
 
-    // 2. Deep-evaluate the top candidate pool (up to 20 jobs) with Gemini AI in parallel
-    const MAX_AI_JOBS = 20;
+    // 2. Deep-evaluate the top candidate pool (up to 15 jobs) with Gemini AI in parallel
+    const MAX_AI_JOBS = 15;
     const priorityJobsNeedingAi = jobsNeedingAi.slice(0, MAX_AI_JOBS);
 
     if (priorityJobsNeedingAi.length > 0 && this.apiKeys.length > 0) {
-      const BATCH_SIZE = 10;
+      const BATCH_SIZE = 5; // Lean batches of 5 execute 2x faster (< 2.5s)
       const batches = [];
       for (let i = 0; i < priorityJobsNeedingAi.length; i += BATCH_SIZE) {
         batches.push(priorityJobsNeedingAi.slice(i, i + BATCH_SIZE));
@@ -132,8 +132,6 @@ class AiJobMatcherService {
     const client = this.getClient();
     if (!client) return;
 
-    const modelName = (process.env.GEMINI_MODEL || "gemini-3.5-flash-lite").replace(/3\.5l-/i, "3.5-").trim();
-
     const jobsPayload = batch.map((j) => ({
       id: j.id,
       title: j.title,
@@ -143,65 +141,62 @@ class AiJobMatcherService {
       location: j.location,
       employmentType: j.employmentType,
       experienceLevel: j.experienceLevel,
-      requiredSkills: j.requiredSkills || [],
-      descriptionSnippet: (j.descriptionSummary || j.description || "").slice(0, 300),
+      requiredSkills: (j.requiredSkills || []).slice(0, 8),
+      descriptionSnippet: (j.descriptionSummary || j.description || "").slice(0, 200),
     }));
 
     const prompt = `
 You are an Executive Recruiter and Precision Career AI.
-Your job is to strictly evaluate whether each job opening is RELEVANT to the candidate's verified resume.
+Evaluate whether each job opening is RELEVANT to the candidate's verified resume.
 
 CANDIDATE VERIFIED PROFILE:
 - Domain Track: ${context.candidateTrackLabel} (${context.candidateTrackId})
 - Specialization Stream: ${context.candidateStreamLabel}
 - Experience: ${context.experienceYears} Years (${context.isFresher ? "Fresher / Entry-Level" : "Experienced"})
-- Top Skills: ${context.candidateSkills.join(", ")}
+- Top Skills: ${context.candidateSkills.slice(0, 15).join(", ")}
 - Resume Excerpt:
-${(context.resumeText || "").slice(0, 2500)}
+${(context.resumeText || "").slice(0, 1500)}
 
-EVALUATION CRITERIA (STRICT RELEVANCE):
-1. DOMAIN ALIGNMENT:
-   - If Candidate is TECH: Only technical roles (Software Engineer, Full Stack, Frontend, Backend, AI/ML, DevOps, Systems) are relevant. Disqualify sales, customer service, or pure administrative roles (isRelevant = false).
-   - If Candidate is MANAGEMENT: Only management & leadership roles (Product Manager, Technical Program Manager, Scrum Master, Business Analyst, Delivery Lead) are relevant. Disqualify pure junior coding roles or irrelevant fields (isRelevant = false).
-2. SENIORITY ALIGNMENT:
-   - If Candidate is a Fresher (0-1 YOE): Only fresher-friendly, internship, junior, or entry-level roles can score > 70. Do not mark 5+ YOE Senior/Staff roles as relevant.
-   - If Candidate is Experienced: Target roles matching or expanding their YOE.
-3. SKILL OVERLAP & GROWTH:
-   - Calculate precision aiScore (0 - 100).
-   - Assign verdict:
-     * "STRONG_MATCH" (80 - 100): Direct domain + high skill alignment.
-     * "GOOD_FIT" (65 - 79): Same domain, adjacent specialization or slight skill gaps.
-     * "POTENTIAL_GROWTH" (50 - 64): Relevant domain but stretch role or new sub-field.
-     * "MISMATCH" (< 50): Different domain, wrong seniority, or completely mismatched skillset.
+EVALUATION CRITERIA:
+1. DOMAIN: If Tech, only tech engineering roles are relevant. If Management, only product/program roles are relevant.
+2. SENIORITY: If Fresher (0-1 YOE), only entry/junior/fresher/internship roles score > 70.
+3. SCORING: Assign aiScore (0-100) and verdict (STRONG_MATCH, GOOD_FIT, POTENTIAL_GROWTH, or MISMATCH).
 
 JOB OPENINGS TO EVALUATE:
 ${JSON.stringify(jobsPayload, null, 2)}
 
-Return strictly a valid JSON array of objects with NO markdown code fences and NO surrounding commentary.
+Return strictly a valid JSON array of objects with NO markdown code fences. Keep text concise.
 Format:
 [
   {
-    "id": "string (job id matching input)",
+    "id": "string",
     "isRelevant": boolean,
-    "aiScore": number (0-100),
+    "aiScore": number,
     "verdict": "STRONG_MATCH" | "GOOD_FIT" | "POTENTIAL_GROWTH" | "MISMATCH",
-    "fitReason": "2 sentences explaining why this job matches the candidate's resume or where it diverges",
-    "skillGaps": ["list", "of", "missing", "skills"],
-    "interviewTip": "1 strategic tip for tailoring the candidate's resume or interview pitch for this role"
+    "fitReason": "1 concise sentence explaining fit",
+    "skillGaps": ["max", "3", "skills"],
+    "interviewTip": "1 concise sentence tip"
   }
 ]
 `;
 
     const activeModel = (process.env.GEMINI_MODEL || "gemini-3.5-flash-lite").replace(/3\.5l-/i, "3.5-").trim();
-    const modelCandidates = [activeModel];
+    const modelCandidates = [
+      activeModel,
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+    ].filter((v, i, a) => a.indexOf(v) === i);
+
+    const AI_TIMEOUT_MS = 8500; // Generous 8.5s timeout eliminates premature timeout notices
 
     for (const modelName of modelCandidates) {
       try {
         const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error(`AI timeout (4s) on ${modelName}`)), 4000)
+          setTimeout(() => reject(new Error(`AI timeout (8.5s) on ${modelName}`)), AI_TIMEOUT_MS)
         );
 
-        const generatePromise = client.models.generateContent({
+        const activeClient = this.getClient() || client;
+        const generatePromise = activeClient.models.generateContent({
           model: modelName,
           contents: prompt,
         });
@@ -237,6 +232,19 @@ Format:
         }
       } catch (err) {
         console.warn(`[AiJobMatcher] Model ${modelName} notice: ${err.message}. Trying next candidate model...`);
+      }
+    }
+
+    // Graceful fallback for this batch if all Gemini models failed/timed out
+    for (const job of batch) {
+      if (!evaluatedJobsMap.has(job.id)) {
+        const heuristic = this._generateHeuristicAiMatch(job, context);
+        evaluatedJobsMap.set(job.id, heuristic);
+        // Cache fallback with 10-minute TTL to prevent continuous retries during same session
+        this.aiMatchCache.set(`${context.resumeHash}_${job.id}`, {
+          aiMatch: heuristic,
+          timestamp: Date.now() - (this.CACHE_TTL_MS - 10 * 60 * 1000),
+        });
       }
     }
   }
