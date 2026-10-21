@@ -503,12 +503,15 @@ export default function CareerOpenings() {
           job,
         });
 
+        const isTimedOut = res.data.probe?.verdict === "TIMED_OUT";
+        const statusText = res.data.online ? "Verified Live" : (isTimedOut ? "Timed Out" : "Closed / Expired");
+
         setCheckingOnlineJobs((prev) => ({
           ...prev,
           [jobId]: {
             checking: false,
             online: res.data.online,
-            statusText: res.data.online ? "Verified Live" : "Check Portal",
+            statusText,
             portalType: res.data.portalType,
             verifiedAt: res.data.verifiedAt,
           },
@@ -518,6 +521,12 @@ export default function CareerOpenings() {
           dispatch(
             setSuccess(
               `✓ Verified online: ${job.title} at ${job.company} is actively accepting applications!`
+            )
+          );
+        } else {
+          dispatch(
+            setError(
+              `Notice: ${job.title} at ${job.company} is ${isTimedOut ? "timing out" : "no longer active or closed"}.`
             )
           );
         }
@@ -531,7 +540,7 @@ export default function CareerOpenings() {
         });
         setCheckingOnlineJobs((prev) => ({
           ...prev,
-          [jobId]: { checking: false, online: true, statusText: "Online" },
+          [jobId]: { checking: false, online: false, statusText: "Unavailable" },
         }));
       }
     } catch {
@@ -539,12 +548,12 @@ export default function CareerOpenings() {
         isOpen: true,
         loading: false,
         data: null,
-        error: "Network error while probing official career portal.",
+        error: "Network error or timeout while probing official career portal.",
         job,
       });
       setCheckingOnlineJobs((prev) => ({
         ...prev,
-        [jobId]: { checking: false, online: true, statusText: "Online" },
+        [jobId]: { checking: false, online: false, statusText: "Timed Out" },
       }));
     }
   };
@@ -591,11 +600,19 @@ export default function CareerOpenings() {
           result: res.data,
           error: null,
         }));
-        dispatch(
-          setSuccess(
-            `✓ Verified Link: ${res.data.job?.company || "Company"} - ${res.data.probe?.statusBadge || "Active"}`
-          )
-        );
+        if (res.data.online) {
+          dispatch(
+            setSuccess(
+              `✓ Active Opening: ${res.data.job?.company || "Company"} - ${res.data.probe?.statusBadge || "Active"}`
+            )
+          );
+        } else {
+          dispatch(
+            setError(
+              `Notice: ${res.data.job?.company || "Company"} - ${res.data.probe?.statusBadge || "Closed / Inactive"}`
+            )
+          );
+        }
       } else {
         setUniversalLinkCheckerModal((prev) => ({
           ...prev,

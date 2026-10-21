@@ -21,9 +21,11 @@ export async function fetchGreenhouseJobs(companySlug, companyName = "") {
     const url = `https://boards-api.greenhouse.io/v1/boards/${companySlug}/jobs`;
     const res = await fetch(url, {
       headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         Accept: "application/json",
       },
-      signal: AbortSignal.timeout(8000), // 8s timeout
+      signal: AbortSignal.timeout(6500), // 6.5s timeout
     });
 
     if (!res.ok) {

@@ -91,17 +91,35 @@ export default function UniversalLinkCheckerModal({
           )}
 
           {result && (
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 space-y-3">
+            <div className={`p-4 rounded-2xl border space-y-3 ${
+              result.online
+                ? "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60"
+                : "bg-rose-50/40 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/60"
+            }`}>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1">
-                  <CheckCircle className="w-4 h-4" />
-                  {result.probe?.statusBadge || "Verified Online"}
+                <span className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${
+                  result.online
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-rose-600 dark:text-rose-400"
+                }`}>
+                  {result.online ? (
+                    <CheckCircle className="w-4 h-4 shrink-0" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                  )}
+                  {result.probe?.statusBadge || (result.online ? "Verified Online" : "Position Closed / Inaccessible")}
                 </span>
 
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
                   {result.portalType || "External Job Post"}
                 </span>
               </div>
+
+              {result.probe?.statusSummary && (
+                <p className={`text-xs ${result.online ? "text-emerald-700 dark:text-emerald-300" : "text-rose-700 dark:text-rose-300"}`}>
+                  {result.probe.statusSummary}
+                </p>
+              )}
 
               {result.job && (
                 <div className="space-y-1 pt-1">

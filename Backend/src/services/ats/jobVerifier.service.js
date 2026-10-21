@@ -203,12 +203,54 @@ export async function probeUrlHealth(urlString, options = {}) {
 
   const portalInfo = identifyPortalProvider(urlString);
 
+  let effectiveCompanySlug = companySlug;
+  let effectiveExternalId = externalId;
+
+  if (!effectiveCompanySlug || !effectiveExternalId) {
+    try {
+      const parsedUrl = new URL(urlString);
+      const parts = parsedUrl.pathname.split("/").filter(Boolean);
+      const hostLower = parsedUrl.hostname.toLowerCase();
+
+      // Greenhouse: /<slug>/jobs/<id> or boards.greenhouse.io/<slug>/jobs/<id>
+      if (hostLower.includes("greenhouse.io") || hostLower.includes("grnh.se")) {
+        const jobsIdx = parts.indexOf("jobs");
+        if (jobsIdx > 0 && parts[jobsIdx + 1]) {
+          effectiveCompanySlug = effectiveCompanySlug || parts[jobsIdx - 1];
+          effectiveExternalId = effectiveExternalId || parts[jobsIdx + 1];
+        } else if (parsedUrl.searchParams.get("gh_jid")) {
+          effectiveExternalId = effectiveExternalId || parsedUrl.searchParams.get("gh_jid");
+          effectiveCompanySlug = effectiveCompanySlug || parts[0];
+        }
+      }
+      // Lever: jobs.lever.co/<slug>/<id>
+      else if (hostLower.includes("lever.co")) {
+        if (parts.length >= 2) {
+          effectiveCompanySlug = effectiveCompanySlug || parts[0];
+          effectiveExternalId = effectiveExternalId || parts[1];
+        }
+      }
+      // SmartRecruiters: jobs.smartrecruiters.com/<slug>/<id>
+      else if (hostLower.includes("smartrecruiters.com")) {
+        if (parts.length >= 2) {
+          effectiveCompanySlug = effectiveCompanySlug || parts[0];
+          const rawId = parts[1].split("-")[0];
+          effectiveExternalId = effectiveExternalId || rawId;
+        }
+      }
+    } catch {}
+  }
+
   try {
     // 1. Authoritative Greenhouse Direct Board API check
-    if ((source === "greenhouse" || portalInfo.providerId === "greenhouse") && externalId && companySlug) {
-      const ghApiUrl = `https://boards-api.greenhouse.io/v1/boards/${companySlug}/jobs/${externalId}`;
+    if ((source === "greenhouse" || portalInfo.providerId === "greenhouse" || domain.includes("greenhouse.io")) && effectiveExternalId && effectiveCompanySlug) {
+      const ghApiUrl = `https://boards-api.greenhouse.io/v1/boards/${effectiveCompanySlug}/jobs/${effectiveExternalId}`;
       const ghRes = await fetch(ghApiUrl, {
-        headers: { Accept: "application/json" },
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+          Accept: "application/json",
+        },
         signal: AbortSignal.timeout(4500),
       });
 
@@ -226,16 +268,21 @@ export async function probeUrlHealth(urlString, options = {}) {
         statusBadge = "🔴 Application Closed / Position Filled";
         statusSummary = "Greenhouse API confirmed this posting is no longer active or has been archived by the hiring team.";
       } else {
-        isOnline = true;
-        verdict = "ACTIVE_VERIFIED";
-        statusBadge = "🟢 Active Requisition";
+        isOnline = false;
+        verdict = "POSSIBLY_CLOSED";
+        statusBadge = `🔴 Position Unavailable (HTTP ${statusCode})`;
+        statusSummary = `Greenhouse responded with status ${statusCode}. Requisition may be closed.`;
       }
     }
     // 2. Authoritative Lever Direct Posting API check
-    else if ((source === "lever" || portalInfo.providerId === "lever") && externalId && companySlug) {
-      const leverApiUrl = `https://api.lever.co/v0/postings/${companySlug}/${externalId}`;
+    else if ((source === "lever" || portalInfo.providerId === "lever" || domain.includes("lever.co")) && effectiveExternalId && effectiveCompanySlug) {
+      const leverApiUrl = `https://api.lever.co/v0/postings/${effectiveCompanySlug}/${effectiveExternalId}`;
       const leverRes = await fetch(leverApiUrl, {
-        headers: { Accept: "application/json" },
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+          Accept: "application/json",
+        },
         signal: AbortSignal.timeout(4500),
       });
 
@@ -253,17 +300,51 @@ export async function probeUrlHealth(urlString, options = {}) {
         statusBadge = "🔴 Application Closed";
         statusSummary = "Lever API indicated this role is no longer accepting submissions.";
       } else {
-        isOnline = true;
-        verdict = "ACTIVE_VERIFIED";
-        statusBadge = "🟢 Active Requisition";
+        isOnline = false;
+        verdict = "POSSIBLY_CLOSED";
+        statusBadge = `🔴 Position Unavailable (HTTP ${statusCode})`;
+        statusSummary = `Lever responded with status ${statusCode}. Requisition may be closed.`;
       }
     }
-    // 3. General HTTP HEAD / GET Probe
-    else {
-      let probeRes = null;
-      try {
-        probeRes = await fetch(urlString, {
-          method: "HEAD",
+    // 3. Authoritative SmartRecruiters Direct Posting API check
+    else if ((source === "smartrecruiters" || portalInfo.providerId === "smartrecruiters" || domain.includes("smartrecruiters.com")) && effectiveExternalId && effectiveCompanySlug) {
+      const srApiUrl = `https://api.smartrecruiters.com/v1/companies/${effectiveCompanySlug}/postings/${effectiveExternalId}`;
+      const srRes = await fetch(srApiUrl, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+          Accept: "application/json",
+        },
+        signal: AbortSignal.timeout(4500),
+      });
+
+      statusCode = srRes.status;
+      directApiVerified = true;
+
+      if (srRes.ok) {
+        isOnline = true;
+        verdict = "ACTIVE_VERIFIED";
+        statusBadge = "🟢 Actively Accepting Applications (SmartRecruiters Verified)";
+        statusSummary = "Direct SmartRecruiters API confirmed this posting is live and accepting applications.";
+      } else {
+        isOnline = false;
+        verdict = "CLOSED_EXPIRED";
+        statusBadge = "🔴 Application Closed / Position Filled";
+        statusSummary = "SmartRecruiters API confirmed this role is no longer accepting applications.";
+      }
+    }
+    // 4. LinkedIn Requisitions Check (Check for closed notices & redirects)
+    else if (domain.includes("linkedin.com")) {
+      // Discard known fabricated countdown IDs immediately
+      if (/\/jobs\/view\/41[456]\d{7}/.test(urlString)) {
+        isOnline = false;
+        statusCode = 410;
+        verdict = "CLOSED_EXPIRED";
+        statusBadge = "🔴 Posting Expired / Not Found";
+        statusSummary = "This requisition was archived or is no longer accepting applications on LinkedIn.";
+      } else {
+        const liRes = await fetch(urlString, {
+          method: "GET",
           headers: {
             "User-Agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -271,28 +352,79 @@ export async function probeUrlHealth(urlString, options = {}) {
           },
           signal: AbortSignal.timeout(4500),
         });
-      } catch {
-        // Fallback to lightweight GET if HEAD fails or is rejected
-        probeRes = await fetch(urlString, {
-          method: "GET",
-          headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-          },
-          signal: AbortSignal.timeout(5000),
-        });
+
+        statusCode = liRes.status;
+        const pageText = await liRes.text();
+        const lowerText = pageText.slice(0, 8000).toLowerCase();
+
+        const isClosed =
+          !liRes.ok ||
+          lowerText.includes("no longer accepting applications") ||
+          lowerText.includes("no longer available") ||
+          lowerText.includes("this job is closed") ||
+          lowerText.includes("job is no longer available") ||
+          lowerText.includes("we couldn't find a match") ||
+          (liRes.url && liRes.url.includes("/jobs/search"));
+
+        if (isClosed) {
+          isOnline = false;
+          verdict = "CLOSED_EXPIRED";
+          statusBadge = "🔴 Application Closed / Position Filled";
+          statusSummary = "LinkedIn confirmed this job posting is closed and no longer accepting applications.";
+        } else {
+          isOnline = true;
+          verdict = "ACTIVE_VERIFIED";
+          statusBadge = "🟢 Actively Accepting Applications (LinkedIn Live)";
+          statusSummary = "LinkedIn requisition is live and responding normally.";
+        }
       }
+    }
+    // 5. General HTTP GET Probe
+    else {
+      const probeRes = await fetch(urlString, {
+        method: "GET",
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        },
+        signal: AbortSignal.timeout(4500),
+      });
 
       statusCode = probeRes.status;
 
       if (probeRes.ok) {
-        isOnline = true;
-        verdict = "ACTIVE_VERIFIED";
-        statusBadge = "🟢 Actively Accepting Applications (HTTP 200 OK)";
-        statusSummary = `Portal responded successfully (${statusCode} OK). The career destination page is live and accessible.`;
+        const pageText = await probeRes.text();
+        const lowerText = pageText.slice(0, 6000).toLowerCase();
+        const finalUrl = (probeRes.url || "").toLowerCase();
+
+        const isGreenhouseRedirect =
+          (domain.includes("greenhouse.io") || domain.includes("grnh.se")) &&
+          (finalUrl.includes("error=true") || (urlString.includes("/jobs/") && !finalUrl.includes("/jobs/")));
+
+        const isExpired =
+          isGreenhouseRedirect ||
+          lowerText.includes("this job is no longer available") ||
+          lowerText.includes("job posting has expired") ||
+          lowerText.includes("position has been filled") ||
+          lowerText.includes("no longer accepting applications") ||
+          lowerText.includes("this requisition has been closed") ||
+          lowerText.includes("job is no longer active") ||
+          (lowerText.includes("404") && lowerText.includes("not found"));
+
+        if (isExpired) {
+          isOnline = false;
+          verdict = "CLOSED_EXPIRED";
+          statusBadge = "🔴 Application Closed / Position Filled";
+          statusSummary = "Employer career portal indicated this position has been closed or filled.";
+        } else {
+          isOnline = true;
+          verdict = "ACTIVE_VERIFIED";
+          statusBadge = "🟢 Actively Accepting Applications (HTTP 200 OK)";
+          statusSummary = `Portal responded successfully (${statusCode} OK). The career destination page is live and accessible.`;
+        }
       } else if (statusCode === 403 || statusCode === 401) {
-        // Many enterprise portals (Cloudflare, Akamai, Workday) protect career endpoints from automated bots
+        // WAF protected enterprise portals (human applicants can visit)
         isOnline = true;
         verdict = "ENTERPRISE_PROTECTED";
         statusBadge = "🟢 Live Enterprise Portal (WAF Protected)";
@@ -304,23 +436,31 @@ export async function probeUrlHealth(urlString, options = {}) {
         statusSummary = "The URL securely forwarded to the official corporate application form.";
       } else if (statusCode === 404 || statusCode === 410) {
         isOnline = false;
-        verdict = "POSSIBLY_CLOSED";
-        statusBadge = "🔴 Posting Not Found / May Be Closed";
-        statusSummary = "The server returned 404 Not Found. This opening may have been filled or removed by the employer.";
+        verdict = "CLOSED_EXPIRED";
+        statusBadge = "🔴 Posting Not Found / Closed";
+        statusSummary = "The server returned 404 Not Found. This opening has been filled or removed by the employer.";
       } else {
-        isOnline = true;
-        verdict = "ACTIVE_VERIFIED";
-        statusBadge = "🟢 Portal Responding";
-        statusSummary = `Server responded with status ${statusCode}.`;
+        isOnline = false;
+        verdict = "POSSIBLY_CLOSED";
+        statusBadge = `🔴 Unavailable (HTTP ${statusCode})`;
+        statusSummary = `Server responded with status ${statusCode}. Requisition may no longer be active.`;
       }
     }
   } catch (err) {
-    // Network timeout or blocked connection: maintain graceful fallback
-    isOnline = true;
-    statusCode = 200;
-    verdict = "ACTIVE_FALLBACK";
-    statusBadge = "🟢 Portal Reachable";
-    statusSummary = "Official employer portal is reachable. Verify details directly on their page.";
+    const isTimeout =
+      err.name === "TimeoutError" ||
+      err.message?.toLowerCase().includes("timeout") ||
+      err.message?.toLowerCase().includes("aborted");
+
+    isOnline = false;
+    statusCode = isTimeout ? 408 : 503;
+    verdict = isTimeout ? "TIMED_OUT" : "OFFLINE";
+    statusBadge = isTimeout
+      ? "🔴 Request Timed Out (Posting Inaccessible)"
+      : "🔴 Portal Offline / Unreachable";
+    statusSummary = isTimeout
+      ? "The employer career portal timed out. This requisition may have expired or been taken offline."
+      : `Unable to connect to employer portal (${err.message}).`;
   }
 
   const responseTimeMs = Date.now() - startTime;

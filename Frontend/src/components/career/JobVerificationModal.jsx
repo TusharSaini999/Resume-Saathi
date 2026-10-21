@@ -87,15 +87,15 @@ export default function JobVerificationModal({ modalState, onClose, GRADIENT_PRI
                 className={`p-4 rounded-2xl border flex items-center justify-between ${
                   data.online
                     ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/80 text-emerald-900 dark:text-emerald-200"
-                    : "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/80 text-amber-900 dark:text-amber-200"
+                    : "bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/80 text-rose-900 dark:text-rose-200"
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                       data.online
-                        ? "bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600"
-                        : "bg-amber-100 dark:bg-amber-900/60 text-amber-600"
+                        ? "bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-300"
+                        : "bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-300"
                     }`}
                   >
                     {data.online ? (
@@ -106,12 +106,13 @@ export default function JobVerificationModal({ modalState, onClose, GRADIENT_PRI
                   </div>
                   <div>
                     <div className="text-sm font-bold">
-                      {data.online ? "Verified Live Requisition" : "Portal Notice"}
+                      {data.online ? "Verified Live Requisition" : (data.probe?.statusBadge || "Requisition Closed / Inaccessible")}
                     </div>
                     <div className="text-xs opacity-85">
-                      {data.online
-                        ? "Actively accepting candidate applications online."
-                        : "Opening may be closed or undergoing portal maintenance."}
+                      {data.probe?.statusSummary ||
+                        (data.online
+                          ? "Actively accepting candidate applications online."
+                          : "Opening is closed, expired, or timed out.")}
                     </div>
                   </div>
                 </div>
@@ -122,15 +123,29 @@ export default function JobVerificationModal({ modalState, onClose, GRADIENT_PRI
                 <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>Portal Type:</span>
                   <span className="font-semibold text-slate-900 dark:text-white">
-                    {data.portalType || "Official ATS Board"}
+                    {data.portalType || data.probe?.portalProvider || "Official ATS Board"}
                   </span>
                 </div>
                 <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>Requisition Status:</span>
-                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                    {data.probe?.statusBadge || "Active & Live"}
+                  <span
+                    className={`font-semibold ${
+                      data.online
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-rose-600 dark:text-rose-400"
+                    }`}
+                  >
+                    {data.probe?.statusBadge || (data.online ? "🟢 Active & Live" : "🔴 Closed / Timed out")}
                   </span>
                 </div>
+                {data.responseTimeMs && (
+                  <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                    <span>Response Time:</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">
+                      {data.responseTimeMs} ms
+                    </span>
+                  </div>
+                )}
                 {data.verifiedAt && (
                   <div className="flex justify-between text-slate-600 dark:text-slate-400">
                     <span>Probed At:</span>
