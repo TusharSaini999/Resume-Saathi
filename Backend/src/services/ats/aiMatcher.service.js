@@ -231,7 +231,7 @@ Format:
           return; // Successfully evaluated this batch
         }
       } catch (err) {
-        console.warn(`[AiJobMatcher] Model ${modelName} notice: ${err.message}. Trying next candidate model...`);
+        // model candidate notice silenced
       }
     }
 

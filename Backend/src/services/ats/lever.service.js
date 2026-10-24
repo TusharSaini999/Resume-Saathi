@@ -61,7 +61,7 @@ export async function fetchLeverJobs(companySlug, companyName = "") {
       };
     });
   } catch (error) {
-    console.error(`[Lever] Error fetching jobs for ${companySlug}:`, error.message);
+    // error silenced
     return [];
   }
 }
@@ -97,7 +97,7 @@ export async function fetchSingleLeverJob(companySlug, jobId) {
       hostedUrl: data.hostedUrl || data.applyUrl,
     };
   } catch (err) {
-    console.warn(`[Lever] Error fetching single job ${jobId}:`, err.message);
+    // error silenced
     return null;
   }
 }

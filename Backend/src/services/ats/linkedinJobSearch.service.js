@@ -13,6 +13,7 @@ class LinkedInJobSearchService {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
     this.cache = new Map();
     this.CACHE_TTL_MS = 20 * 60 * 1000; // 20 minutes
+    this.rateLimitedUntil = 0;
   }
 
   /**
@@ -29,6 +30,7 @@ class LinkedInJobSearchService {
 
     const queryTerms = [cleanCompany, cleanRole].filter(Boolean).join(" ");
     if (!queryTerms) return [];
+    if (Date.now() < this.rateLimitedUntil) return [];
 
     const cacheKey = `${queryTerms.toLowerCase()}_${cleanLoc.toLowerCase()}`;
     const cached = this.cache.get(cacheKey);
@@ -47,11 +49,13 @@ class LinkedInJobSearchService {
           Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
           "Accept-Language": "en-US,en;q=0.9",
         },
-        signal: AbortSignal.timeout(9000),
+        signal: AbortSignal.timeout(3500),
       });
 
       if (!response.ok) {
-        console.warn(`[LinkedInService] HTTP ${response.status} fetching LinkedIn jobs for: ${queryTerms}`);
+        if (response.status === 429 || response.status === 999 || response.status === 403 || response.status === 401) {
+          this.rateLimitedUntil = Date.now() + 15 * 60 * 1000; // 15 min cooldown on cloud hosting IP
+        }
         return [];
       }
 
@@ -83,7 +87,7 @@ class LinkedInJobSearchService {
 
       return jobs.slice(0, limit);
     } catch (err) {
-      console.warn(`[LinkedInService] Note fetching LinkedIn jobs for ${queryTerms}:`, err.message);
+      // note silenced
       return [];
     }
   }
@@ -148,7 +152,7 @@ class LinkedInJobSearchService {
           }
         }
       } catch (err) {
-        console.warn(`[LinkedInService] Dynamic crawl note for "${role}":`, err.message);
+        // note silenced
       }
     }
 
@@ -193,7 +197,7 @@ class LinkedInJobSearchService {
           Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
           "Accept-Language": "en-US,en;q=0.9",
         },
-        signal: AbortSignal.timeout(9000),
+        signal: AbortSignal.timeout(3500),
       });
 
       if (!response.ok) {
@@ -265,7 +269,7 @@ class LinkedInJobSearchService {
 
       return result;
     } catch (err) {
-      console.warn(`[LinkedInService] Failed fetching full JD for ${jobId}:`, err.message);
+      // note silenced
       return null;
     }
   }

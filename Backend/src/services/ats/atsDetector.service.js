@@ -167,7 +167,7 @@ export async function fetchJobsForCompany(companyIdentifier, roleQuery = "", loc
         );
         if (liveJobs && liveJobs.length > 0) candidateJobs.push(...liveJobs);
       } catch (err) {
-        console.warn(`[AtsDetector] Live AI search note for ${registered.name}: ${err.message}`);
+        // AI search fallback note silenced
       }
     }
   }
@@ -191,7 +191,7 @@ export async function fetchJobsForCompany(companyIdentifier, roleQuery = "", loc
       }
     }
   } catch (liErr) {
-    console.warn(`[AtsDetector] LinkedIn search note for ${companyName}:`, liErr.message);
+    // LinkedIn search note silenced
   }
 
   if (candidateJobs.length > 0) {
@@ -219,9 +219,8 @@ export async function fetchJobsForCompany(companyIdentifier, roleQuery = "", loc
  * Fetch curated jobs across all verified live ATS boards in parallel.
  * Returns only real, live, currently open requisitions with zero timeouts.
  */
-export async function fetchAllCuratedJobs(limitPerCompany = 30, roleQuery = "", candidateKeywords = []) {
-  const searchKeywords = Array.isArray(candidateKeywords) ? candidateKeywords.map((k) => k.toLowerCase()) : [];
-  const primaryRole = roleQuery || (searchKeywords.length > 0 ? searchKeywords[0] : "");
+export async function fetchAllCuratedJobs(limitPerCompany = 30, roleQuery = "") {
+  const primaryRole = (roleQuery || "").trim();
 
   // Query verified live ATS boards in parallel
   const promises = VERIFIED_LIVE_ATS_COMPANIES.map(async (company) => {
@@ -237,7 +236,7 @@ export async function fetchAllCuratedJobs(limitPerCompany = 30, roleQuery = "", 
 
       let list = jobs.filter((j) => isRealOpeningUrl(j.applyUrl));
 
-      if (primaryRole && primaryRole.trim()) {
+      if (primaryRole) {
         list = list.filter((j) => matchesSmartRoleQuery(j, primaryRole));
       }
 

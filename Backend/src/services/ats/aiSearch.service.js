@@ -24,7 +24,7 @@ class AiCareerSearchService {
     try {
       const client = this.getClient();
       if (!client) {
-        console.warn("[AiSearch] No Gemini API key available for live career search.");
+        // key check silenced
         return [];
       }
 
@@ -69,7 +69,7 @@ Each object MUST have:
           });
           if (response && response.text) break;
         } catch (mErr) {
-          console.warn(`[AiSearch] Model ${model} notice: ${mErr.message}`);
+          // note silenced
         }
       }
 
@@ -134,7 +134,7 @@ Each object MUST have:
 
       return [];
     } catch (error) {
-      console.error(`[AiSearch] Error searching jobs for ${companyName}:`, error.message);
+      // error silenced
       return [];
     }
   }

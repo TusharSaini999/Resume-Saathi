@@ -32,7 +32,7 @@ export async function clearCareerCache() {
   jobsCache.clear();
   aiJobMatcherService.clearAiCache();
   try {
-    await DiscoveredCareerJob.deleteMany({});
+    // DiscoveredCareerJob preserved in database; cache maps purged
   } catch (e) {
     console.warn("[CareerService] Clear cache warning:", e.message);
   }
@@ -710,7 +710,21 @@ export async function getJobsForCandidate(userId, options = {}) {
     if (companySlug) {
       rawJobs = await fetchJobsForCompany(companySlug, roleQuery, location);
     } else {
-      rawJobs = await fetchAllCuratedJobs(25, roleQuery, candidateProfile.skills || []);
+      {
+      const liveDiscovered = await fetchAllCuratedJobs(30, roleQuery);
+      // Merge live discovered jobs with existing stored jobs in database
+      const poolMap = new Map();
+      for (const j of rawJobs) {
+        const k = j.applyUrl || `${j.companySlug || j.company}_${j.externalId || j.id || j.title}`;
+        if (k) poolMap.set(k, j);
+      }
+      for (const j of liveDiscovered) {
+        const k = j.applyUrl || `${j.companySlug || j.company}_${j.externalId || j.id || j.title}`;
+        if (k) poolMap.set(k, j);
+      }
+      rawJobs = Array.from(poolMap.values());
+      if (rawJobs.length === 0) rawJobs = liveDiscovered;
+    }
     }
 
     // Filter strictly to ensure 100% genuine live requisitions
@@ -810,7 +824,7 @@ export async function getJobsForCandidate(userId, options = {}) {
           }
         }
       } catch (err) {
-        console.warn("[CareerService] All-inferred crawler note:", err.message);
+        // note silenced
       }
     }
   } else if (roleQuery && roleQuery.trim()) {
@@ -819,7 +833,7 @@ export async function getJobsForCandidate(userId, options = {}) {
     // If local cache had very few matches for this role, execute live ATS discovery for this query
     if (filteredJobs.length < 3) {
       try {
-        const liveDiscovered = await fetchAllCuratedJobs(25, roleQuery, candidateProfile.skills || []);
+        const liveDiscovered = await fetchAllCuratedJobs(25, roleQuery);
         if (liveDiscovered.length > 0) {
           const existingIds = new Set(filteredJobs.map((j) => j.externalId || j.id || j.applyUrl));
           for (const newJob of liveDiscovered) {
@@ -831,7 +845,7 @@ export async function getJobsForCandidate(userId, options = {}) {
           }
         }
       } catch (err) {
-        console.warn("[CareerService] Live role discovery note:", err.message);
+        // note silenced
       }
     }
 
@@ -854,7 +868,7 @@ export async function getJobsForCandidate(userId, options = {}) {
         }
       }
     } catch (liErr) {
-      console.warn("[CareerService] Live LinkedIn role discovery note:", liErr.message);
+      // note silenced
     }
   } else if (!roleQuery && candidateProfile.skills?.length > 0 && isLiveScan) {
     // If user has a resume but didn't type a specific query, dynamically crawl live LinkedIn jobs for candidate's actual resume technologies AND derived roles
@@ -878,7 +892,7 @@ export async function getJobsForCandidate(userId, options = {}) {
         }
       }
     } catch (crawlErr) {
-      console.warn("[CareerService] Dynamic resume crawl note:", crawlErr.message);
+      // note silenced
     }
   }
 
@@ -906,7 +920,7 @@ export async function getJobsForCandidate(userId, options = {}) {
           }
         }
       } catch (locCrawlErr) {
-        console.warn("[CareerService] Location crawl note:", locCrawlErr.message);
+        // note silenced
       }
     }
   }
