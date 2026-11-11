@@ -13,6 +13,13 @@ Resume Saathi is an AI-powered ATS resume analysis and live job discovery platfo
 
 ## Architecture Flow 📐
 
+<p align="center">
+  <img src="./Docs/assets/architecture-3d.svg" alt="Resume Saathi 3D Cloud Architecture" width="100%" />
+</p>
+
+<details>
+<summary><b>View Architecture Mermaid Flowchart</b></summary>
+
 ```mermaid
 flowchart TD
   classDef client fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,rx:12,ry:12
@@ -51,6 +58,8 @@ flowchart TD
   BE <--> Gemini
   BE <--> ATS
 ```
+
+</details>
 
 ## Repository Structure 🗂️
 

@@ -6,6 +6,13 @@ A complete, end-to-end technical guide for configuring **AWS CloudFront CDN**, *
 
 ## 1. Architecture Overview
 
+<p align="center">
+  <img src="./assets/architecture-3d.svg" alt="Resume Saathi 3D Cloud Architecture" width="100%" />
+</p>
+
+<details>
+<summary><b>View CloudFront &amp; EC2 Architecture Mermaid Flowchart</b></summary>
+
 ```mermaid
 flowchart TD
   classDef client fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,rx:12,ry:12
@@ -65,6 +72,8 @@ flowchart TD
   BackendApp --> DB
   BackendApp --> AI
 ```
+
+</details>
 
 ---
 

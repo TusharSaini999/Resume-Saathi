@@ -8,6 +8,13 @@ Comprehensive technical documentation covering the production architecture, auto
 
 The production environment is globally accelerated and secured via **AWS CloudFront CDN** and **AWS Certificate Manager (ACM)**, fronting an **AWS EC2 (Ubuntu 22.04 / 24.04)** instance running a containerized Docker Compose micro-service topology behind a host Nginx reverse proxy.
 
+<p align="center">
+  <img src="./assets/architecture-3d.svg" alt="Resume Saathi 3D Cloud Architecture" width="100%" />
+</p>
+
+<details>
+<summary><b>View Architecture Mermaid Flowchart</b></summary>
+
 ```mermaid
 flowchart TD
   classDef client fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,rx:12,ry:12
@@ -68,6 +75,8 @@ flowchart TD
   BackendApp --> GeminiAI
   BackendApp --> SES
 ```
+
+</details>
 
 ---
 

@@ -8,6 +8,13 @@ The **Career Openings & Live ATS Job Discovery Engine** transforms Resume Saathi
 
 ## 1. Core Architecture & Features 🏗️
 
+<p align="center">
+  <img src="./assets/ats-discovery-3d.svg" alt="Resume Saathi 3D ATS & Career Discovery Pipeline" width="100%" />
+</p>
+
+<details>
+<summary><b>View ATS Discovery Pipeline Mermaid Flowchart</b></summary>
+
 ```mermaid
 flowchart TD
   classDef ats fill:#0369a1,stroke:#0284c7,stroke-width:2px,color:#ffffff,rx:8,ry:8
@@ -60,6 +67,8 @@ flowchart TD
   Scorer --> Tracker
   Candidate -->|Manage Pipeline| Tracker
 ```
+
+</details>
 
 ### Key Pillars:
 1. **Direct Official ATS Openings**: Zero dead ends or third-party spam. Pulls live openings straight from official company career portals (`boards.greenhouse.io`, `jobs.lever.co`, `smartrecruiters.com`, etc.).

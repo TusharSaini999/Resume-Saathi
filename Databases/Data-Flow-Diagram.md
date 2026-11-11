@@ -1,5 +1,10 @@
 # ResumeSaathi Data Flow Diagram
 
+<p align="center">
+  <img src="./DataFlow.png" alt="ResumeSaathi Data Flow Diagram" width="100%" />
+</p>
+
+
 ## Level 0 Overview
 
 ```mermaid

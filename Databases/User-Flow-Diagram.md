@@ -1,5 +1,10 @@
 # ResumeSaathi User Flow Diagram
 
+<p align="center">
+  <img src="./UserFlow.png" alt="ResumeSaathi User Flow Diagram" width="100%" />
+</p>
+
+
 ```mermaid
 flowchart TD
   classDef start fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff,rx:20,ry:20
