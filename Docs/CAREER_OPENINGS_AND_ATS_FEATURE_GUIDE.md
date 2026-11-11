@@ -8,19 +8,57 @@ The **Career Openings & Live ATS Job Discovery Engine** transforms Resume Saathi
 
 ## 1. Core Architecture & Features 🏗️
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                          RESUME SAATHI ATS ENGINE                      │
-├───────────────────────────────┬────────────────────────────────────────┤
-│     ATS & Job Connectors      │         Intelligent Processing         │
-├───────────────────────────────┼────────────────────────────────────────┤
-│ • Greenhouse Direct ATS       │ • Inferred Roles & Tech Stacks Engine  │
-│ • Lever Direct ATS            │ • HTML Sanitization & Clean JD Parser  │
-│ • SmartRecruiters Direct ATS  │ • Live Portal Online Prober            │
-│ • TCS iON Enterprise Portal   │ • External Job Link Inspector          │
-│ • LinkedIn Verified Jobs (API)│ • Application Pipeline Tracker         │
-│ • Startup Direct Posts        │ • Gemini 3.5 Flash Lite Match Scorer   │
-└───────────────────────────────┴────────────────────────────────────────┘
+```mermaid
+flowchart TD
+  classDef ats fill:#0369a1,stroke:#0284c7,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef ai fill:#6d28d9,stroke:#8b5cf6,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef engine fill:#be185d,stroke:#fe3e91,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef store fill:#047857,stroke:#10b981,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef user fill:#1d4ed8,stroke:#3b82f6,stroke-width:2px,color:#ffffff,rx:12,ry:12
+
+  Candidate(["👤 Job Seeker / Candidate Profile"]):::user
+  
+  subgraph Discovery["🌐 Layer 1 · Direct Official ATS & Requisition Crawlers"]
+    GH["🏢 Greenhouse Direct ATS API<br/>boards-api.greenhouse.io"]:::ats
+    LV["⚡ Lever Direct ATS API<br/>api.lever.co/v0/postings"]:::ats
+    SR["💼 SmartRecruiters API<br/>api.smartrecruiters.com"]:::ats
+    ASH["🚀 Ashby Direct ATS<br/>jobs.ashbyhq.com"]:::ats
+    LI["🔗 LinkedIn Official Requisitions<br/>/company/slug/jobs"]:::ats
+    TCS["🏛️ Indian Enterprise Portals<br/>TCS iON / Infosys / Wipro"]:::ats
+  end
+
+  subgraph Processing["🧠 Layer 2 · Intelligence, Parsing & Validation Engine"]
+    Infer[["🎯 Inferred Roles & Tech Stacks<br/>Pattern Matching (MERN, Python, Java)"]]:::engine
+    Sanitizer[["🧹 HTML Sanitizer & Clean JD Parser<br/>Extract Structured Requirements"]]:::engine
+    Probe{{"🛡️ Live Portal Online Prober<br/>Real-Time HTTP Verification Check"}}:::engine
+    Checker[["🔍 Universal External Link Inspector<br/>Parse External Job Postings on Demand"]]:::engine
+  end
+
+  subgraph AI_Layer["✨ Layer 3 · Google Gemini 3.5 Flash Lite Intelligence"]
+    Scorer[["🤖 Deep ATS Fit & Compatibility Scorer<br/>Match %, Gap Analysis & Bullet Suggestions"]]:::ai
+  end
+
+  subgraph Tracking["📊 Layer 4 · Candidate Pipeline & Tracking"]
+    Tracker[("📋 Real-Time Application Tracker<br/>Applied ➔ Interview ➔ Offer")]:::store
+  end
+
+  Candidate -->|Upload Resume / Select Role| Infer
+  Infer -->|Query Targeted Openings| Discovery
+  
+  GH --> Sanitizer
+  LV --> Sanitizer
+  SR --> Sanitizer
+  ASH --> Sanitizer
+  LI --> Sanitizer
+  TCS --> Sanitizer
+
+  Sanitizer --> Probe
+  Probe -->|Verified Live| Scorer
+  Checker --> Sanitizer
+  
+  Infer --> Scorer
+  Scorer --> Tracker
+  Candidate -->|Manage Pipeline| Tracker
 ```
 
 ### Key Pillars:

@@ -6,35 +6,64 @@ A complete, end-to-end technical guide for configuring **AWS CloudFront CDN**, *
 
 ## 1. Architecture Overview
 
-```
-Global Visitors (HTTPS : 443)
-       │
-       ▼
- ┌────────────────────────────────────────────────────────────────────────┐
- │ AWS CloudFront CDN (Global Edge POPs e.g. DEL51 Delhi)                 │
- │  - Custom Domains: resumesaathi.tusharsaini.tech & www.               │
- │  - SSL / TLS: AWS Certificate Manager (ACM us-east-1, Auto-Renewing)   │
- │  - AWS WAF: Common vulnerability & DDoS rate limiting                 │
- │  - SPA Fallback: 403 & 404 errors -> /index.html (HTTP 200 OK)        │
- └──────────────┬─────────────────────────────────────────┬───────────────┘
-                │ Precedence 1: Default (*)               │ Precedence 0: /api/*
-                │ Cache Policy: CachingOptimized          │ Cache Policy: CachingDisabled
-                │ (Serves JS, CSS, Media from Edge Cache) │ (Direct Dynamic Passthrough)
-                │ HTTPS (Port 443 - TLSv1.2/1.3)          │ HTTPS (Port 443 - TLSv1.2/1.3)
-                ▼                                         ▼
- ┌────────────────────────────────────────────────────────────────────────┐
- │ AWS EC2 Origin Server (Ubuntu 22.04 / 24.04 - Port 443 SSL & Port 80) │
- │  - Origin SSL: Let's Encrypt (Certbot Auto-Renewing TLSv1.2 / TLSv1.3) │
- │  - Security Group: Restricted to CloudFront Origin Prefix List         │
- │  - Host Nginx: Listens on Port 443 (SSL) and Port 80 (ACME Challenge)  │
- └──────────────────────────────┬─────────────────────────────────────────┘
-                                │ (proxy_pass: 127.0.0.1:3000)
-                                ▼
- ┌────────────────────────────────────────────────────────────────────────┐
- │ Docker Microservice Architecture                                       │
- │  - Frontend Container: React Vite SPA (Port 127.0.0.1:3000 -> 80)     │
- │  - Backend Container:  Node.js Express REST API (Internal app-network) │
- └────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+  classDef client fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,rx:12,ry:12
+  classDef cdn fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef shield fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef origin fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef container fill:#fe3e91,stroke:#be185d,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef ext fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff,rx:10,ry:10
+
+  subgraph Tier1["🌐 Tier 1 · Global Clients & Edge Ingress"]
+    Users(["👥 Global Visitors (HTTPS : 443)"]):::client
+    Route53["🗺️ Amazon Route 53 DNS<br/>resumesaathi.tusharsaini.tech"]:::client
+  end
+
+  subgraph Tier2["⚡ Tier 2 · AWS CloudFront CDN & Perimeter Defense (us-east-1)"]
+    WAF{{"🛡️ AWS WAF (Rate Limiting & Anti-DDoS)"}}:::shield
+    ACM["🔐 AWS Certificate Manager (Auto-Renewing TLSv1.3)"]:::shield
+    
+    subgraph CF_POPs["CloudFront Global Edge POPs (e.g. DEL51 Delhi)"]
+      CF_Default["📦 Default Cache Behavior (*)<br/>Managed-CachingOptimized<br/>Serves JS, CSS, Media from Edge"]:::cdn
+      CF_API["⚡ /api/* Dynamic Passthrough<br/>Managed-CachingDisabled<br/>Immediate Origin Forwarding"]:::cdn
+      CF_Fallback["🔄 SPA Error Redirection<br/>403 & 404 ➔ /index.html (200 OK)"]:::cdn
+    end
+  end
+
+  subgraph Tier3["🏰 Tier 3 · Cloaked AWS EC2 Origin (Ubuntu 22.04 / 24.04)"]
+    SG["🔒 EC2 Security Group<br/>Restricted to CloudFront Origin Prefix List"]:::shield
+    
+    subgraph Host_Nginx["Host Nginx Reverse Proxy (Port 443 SSL)"]
+      Certbot[["🔑 Let's Encrypt Certbot SSL<br/>TLSv1.2 & TLSv1.3"]]:::shield
+      Cloak{{"🛡️ X-Origin-Verify Secret<br/>Drops direct IP scanners (HTTP 444)"}}:::shield
+      NginxRouter[["🔀 Nginx Upstream Dispatcher"]]:::origin
+    end
+  end
+
+  subgraph Tier4["📦 Tier 4 · Docker Microservices & Upstream Services"]
+    FrontendApp[["🎨 resume-frontend<br/>React Vite SPA + Nginx<br/>Port 127.0.0.1:3000 ➔ 80"]]:::container
+    BackendApp[["⚙️ resume-backend<br/>Node.js 20 Express REST API<br/>Internal app-network:5000"]]:::container
+    DB[("🍃 MongoDB Atlas<br/>Mongoose Schemas")]:::ext
+    AI[["🤖 Google Gemini 3.5 Flash Lite<br/>Resume & ATS Scorer"]]:::ext
+  end
+
+  Users -->|DNS Resolution| Route53
+  Route53 -->|HTTPS:443| WAF
+  WAF --> CF_POPs
+  ACM -.->|Auto-Provision SSL| CF_POPs
+
+  CF_Default -->|Port 443 + X-Origin-Verify| SG
+  CF_API -->|Port 443 + X-Origin-Verify| SG
+  
+  SG --> Cloak
+  Cloak -->|Authorized| NginxRouter
+  
+  NginxRouter -->|proxy_pass: 127.0.0.1:3000| FrontendApp
+  NginxRouter -->|proxy_pass: /api/ ➔ backend:5000| BackendApp
+  
+  BackendApp --> DB
+  BackendApp --> AI
 ```
 
 ---

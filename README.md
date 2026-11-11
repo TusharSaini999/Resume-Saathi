@@ -11,6 +11,47 @@ Resume Saathi is an AI-powered ATS resume analysis and live job discovery platfo
 - File services: Multer, Cloudinary
 - Cloud & DevOps: AWS (CloudFront CDN, EC2,  ACM), Docker, Nginx
 
+## Architecture Flow 📐
+
+```mermaid
+flowchart TD
+  classDef client fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,rx:12,ry:12
+  classDef cdn fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef app fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef ai fill:#be185d,stroke:#fe3e91,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef ext fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff,rx:8,ry:8
+
+  subgraph ClientLayer["🌐 Client & Edge Acceleration"]
+    User(["👥 Candidate Web App"]):::client
+    CDN[["⚡ AWS CloudFront CDN + WAF<br/>Global Edge POPs"]]:::cdn
+  end
+
+  subgraph AppTier["⚙️ Application & Microservices Topology"]
+    Nginx[["🔀 Host Nginx Reverse Proxy<br/>Port 443 HTTPS & SSL Termination"]]:::app
+    FE[["🎨 React 19 / Vite SPA Container<br/>Tailwind CSS & Redux Toolkit"]]:::app
+    BE[["⚙️ Node.js Express REST API Container<br/>JWT Auth, Multer & Controllers"]]:::app
+  end
+
+  subgraph IntelligenceTier["✨ Intelligence & Discovery Engine"]
+    Gemini[["🤖 Google Gemini 3.5 Flash Lite<br/>ATS Resume Scoring & Job Matching"]]:::ai
+    ATS[["🏢 Live ATS Engine<br/>Greenhouse, Lever, Ashby, LinkedIn"]]:::ai
+  end
+
+  subgraph PersistenceTier["💾 Cloud Persistence"]
+    DB[("🍃 MongoDB Atlas Managed Database")]:::ext
+    Cloudinary[["☁️ Cloudinary Storage CDN"]]:::ext
+  end
+
+  User -->|HTTPS : 443| CDN
+  CDN --> Nginx
+  Nginx --> FE
+  Nginx --> BE
+  BE <--> DB
+  BE <--> Cloudinary
+  BE <--> Gemini
+  BE <--> ATS
+```
+
 ## Repository Structure 🗂️
 
 ```

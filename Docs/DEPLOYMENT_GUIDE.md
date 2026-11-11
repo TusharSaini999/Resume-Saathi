@@ -8,42 +8,65 @@ Comprehensive technical documentation covering the production architecture, auto
 
 The production environment is globally accelerated and secured via **AWS CloudFront CDN** and **AWS Certificate Manager (ACM)**, fronting an **AWS EC2 (Ubuntu 22.04 / 24.04)** instance running a containerized Docker Compose micro-service topology behind a host Nginx reverse proxy.
 
-```
-Global Users (Worldwide / Web Clients - Port 443)
-       │
-       ▼
- ┌────────────────────────────────────────────────────────┐
- │ AWS CloudFront CDN (Global Edge POPs e.g. DEL51)       │
- │  - Custom Domain: resumesaathi.tusharsaini.tech        │
- │  - SSL / TLS: AWS Certificate Manager (Auto-Renewing) │
- │  - AWS WAF: Rate Limiting & Bot Protection             │
- │  - SPA Fallback: 403 / 404 -> /index.html (200 OK)     │
- │  - Custom Origin Header: X-Origin-Verify: <SECRET>     │
- └───────┬──────────────────────────────────┬─────────────┘
-         │ Default (*) - CachingOptimized   │ /api/* - CachingDisabled
-         │ (Edge Cache HIT: JS, CSS, Media) │ (Dynamic Passthrough)
-         │ HTTPS (Port 443 - TLSv1.2/1.3)   │ HTTPS (Port 443 - TLSv1.2/1.3)
-         ▼                                  ▼
- ┌────────────────────────────────────────────────────────┐
- │ AWS EC2 Host Nginx Reverse Proxy (Ports 443 & 80)      │
- │  - Origin SSL: Let's Encrypt (Certbot TLSv1.2 / 1.3)   │
- │  - Origin Cloaking: Enforces X-Origin-Verify header   │
- │  - Drops direct IP/scanners immediately (HTTP 444)     │
- └───────┬──────────────────────────────────┬─────────────┘
-         │ (proxy_pass: 127.0.0.1:3000)     │ (proxy_pass: /api/ -> 127.0.0.1:3000)
-         ▼                                  ▼
- ┌─────────────────────────────┐    ┌──────────────────────────────────┐
- │ resume-frontend-container   │    │ resume-backend-container         │
- │ (React Vite SPA / Nginx)    │    │ (Node.js 20 Express REST API)    │
- │ Port: 127.0.0.1:3000 -> 80  │    │ Port: app-network:5000 (Internal)│
- └─────────────────────────────┘    └───────┬──────────────────────────┘
-                                            │
-                                            ▼
-                           External TLS Managed Services
-                           - MongoDB Atlas (Cluster)
-                           - Cloudinary (Resume PDF storage)
-                           - Google Gemini AI (LLM Analysis)
-                           - AWS SES SMTP (Email Delivery)
+```mermaid
+flowchart TD
+  classDef client fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,rx:12,ry:12
+  classDef cdn fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef shield fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef origin fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef container fill:#fe3e91,stroke:#be185d,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef ext fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff,rx:10,ry:10
+
+  subgraph Tier1["🌐 Tier 1 · Global Ingress & Edge Acceleration"]
+    Users(["👥 Global Users (Worldwide Web Clients - Port 443)"]):::client
+    
+    subgraph CF["AWS CloudFront CDN (Global Edge POPs)"]
+      WAF{{"🛡️ AWS WAF (Rate Limiting & Bot Protection)"}}:::shield
+      ACM["🔐 ACM Auto-Renewing SSL"]:::shield
+      EdgeDefault["📦 Default (*) CachingOptimized<br/>Serves JS, CSS, Media from Edge"]:::cdn
+      EdgeAPI["⚡ /api/* CachingDisabled<br/>Direct Dynamic Passthrough"]:::cdn
+      EdgeHeader["> X-Origin-Verify: Secret Header]"]:::shield
+    end
+  end
+
+  subgraph Tier2["🏰 Tier 2 · Cloaked AWS EC2 Host (Ubuntu Linux)"]
+    subgraph HostNginx["Host Nginx Reverse Proxy (Ports 443 & 80)"]
+      HostSSL[["🔑 Let's Encrypt TLSv1.2/1.3"]]:::shield
+      CloakingCheck{{"🛡️ Verify X-Origin-Verify Header<br/>Direct IP / Scanners ➔ HTTP 444 Drop"}}:::shield
+      NginxPass[["🔀 Reverse Proxy (proxy_pass)"]]:::origin
+    end
+  end
+
+  subgraph Tier3["⚡ Tier 3 · Docker Microservices Topology"]
+    FrontendApp[["🎨 resume-frontend-container<br/>React Vite SPA (Nginx)<br/>Port 127.0.0.1:3000 ➔ 80"]]:::container
+    BackendApp[["⚙️ resume-backend-container<br/>Node.js 20 Express REST API<br/>Port: app-network:5000 (Internal)"]]:::container
+  end
+
+  subgraph Tier4["☁️ Tier 4 · Managed External Cloud Services"]
+    DB[("🍃 MongoDB Atlas Managed Database")]:::ext
+    Cloudinary[["☁️ Cloudinary (Resume Storage & CDN)"]]:::ext
+    GeminiAI[["🤖 Google Gemini 3.5 Flash Lite (AI Scoring)"]]:::ext
+    SES[["📧 AWS SES SMTP (Transactional Emails)"]]:::ext
+  end
+
+  Users -->|HTTPS: 443| WAF
+  WAF --> EdgeDefault
+  WAF --> EdgeAPI
+  ACM -.-> CF
+  EdgeDefault --> EdgeHeader
+  EdgeAPI --> EdgeHeader
+
+  EdgeHeader -->|HTTPS: 443 + Origin Secret| CloakingCheck
+  CloakingCheck -->|Valid Header| NginxPass
+  CloakingCheck -.->|Missing/Invalid| Drop[("🚫 HTTP 444 Closed")]:::shield
+
+  NginxPass -->|proxy_pass: 127.0.0.1:3000| FrontendApp
+  NginxPass -->|proxy_pass: /api/ ➔ backend:5000| BackendApp
+
+  BackendApp --> DB
+  BackendApp --> Cloudinary
+  BackendApp --> GeminiAI
+  BackendApp --> SES
 ```
 
 ---
@@ -68,19 +91,16 @@ The architecture has been benchmarked for low cost, stability, and zero-downtime
 
 When running on `t3.small` (2.0 GB RAM), system memory is utilized as follows:
 
-```
-┌────────────────────────────────────────────────────────┐
-│ Total Available RAM: 2048 MB                            │
-├────────────────────────────┬───────────────────────────┤
-│ Ubuntu 22.04 / 24.04 OS    │ ~180 MB                   │
-│ AWS SSM Agent + Systemd    │ ~60 MB                    │
-│ Host Nginx Reverse Proxy   │ ~25 MB                    │
-│ Docker Engine + containerd │ ~120 MB                   │
-│ Frontend Container (Nginx) │ ~20 MB                    │
-│ Backend API (Node.js 20)   │ ~220 MB (idle) - 450 MB   │
-│ OS File Cache & Free Head  │ ~900 MB - 1100 MB         │
-└────────────────────────────┴───────────────────────────┘
-```
+| Component | Memory Allocation | Purpose |
+| :--- | :--- | :--- |
+| **Ubuntu 22.04 / 24.04 OS** | ~180 MB | Kernel, init, system daemons |
+| **AWS SSM Agent + Systemd** | ~60 MB | Secure AWS remote management |
+| **Host Nginx Reverse Proxy** | ~25 MB | SSL termination & origin cloaking |
+| **Docker Engine + containerd** | ~120 MB | Container runtime execution |
+| **Frontend Container (Nginx)** | ~20 MB | Serves static React bundle & SPA routing |
+| **Backend API (Node.js 20)** | ~220 MB (idle) – 450 MB | Express REST API & PDF extraction |
+| **OS File Cache & Free Headroom** | ~900 MB – 1100 MB | Buffer cache & PDF parsing burst margin |
+| **Total Available RAM** | **2048 MB** | **`t3.small` Baseline** |
 
 > [!TIP]
 > **Swap File Recommendation**: On both `t3.micro` and `t3.small`, always enable a 2 GB swapfile. This guarantees that temporary memory spikes during Docker pulls or PDF parsing never trigger the Linux Out-Of-Memory (OOM) killer:
@@ -151,17 +171,22 @@ The repository includes three deployment script variants designed for different 
 
 All scripts automate the 8-step server lifecycle with built-in idempotency tracking via `~/.rs_deploy_state`:
 
-```
-┌─────────┐   ┌──────────┐   ┌─────────┐   ┌──────────────┐
-│ Step 0  │──►│  Step 1  │──►│ Step 2  │──►│    Step 3    │
-│ Cleanup │   │ Packages │   │ Docker  │   │ Docker Login │
-└─────────┘   └──────────┘   └─────────┘   └──────────────┘
-                                                  │
-┌─────────┐   ┌──────────┐   ┌─────────┐          ▼
-│ Step 7  │◄──│  Step 6  │◄──│ Step 5  │◄──┌──────────────┐
-│ Nginx & │   │ Docker   │   │ Write   │   │    Step 4    │
-│   SSL   │   │ Compose  │   │ .env    │   │  Workspace   │
-└─────────┘   └──────────┘   └─────────┘   └──────────────┘
+```mermaid
+flowchart LR
+  classDef step fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef active fill:#831843,stroke:#fe3e91,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef success fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ffffff,rx:8,ry:8
+
+  S0["🧹 Step 0<br/><b>Pre-flight Cleanup</b><br/>Purge legacy containers"]:::step
+  S1["📦 Step 1<br/><b>Core Packages</b><br/>apt-get, curl, git, ufw"]:::step
+  S2["🐳 Step 2<br/><b>Docker Engine</b><br/>containerd & compose v2"]:::step
+  S3["🔑 Step 3<br/><b>Registry Auth</b><br/>Docker Hub login"]:::step
+  S4["📁 Step 4<br/><b>Workspace Setup</b><br/>Git clone / pull repo"]:::step
+  S5["⚙️ Step 5<br/><b>Environment Secret</b><br/>Inject .env & secrets"]:::active
+  S6["🚀 Step 6<br/><b>Container Launch</b><br/>docker compose up -d"]:::active
+  S7["🔒 Step 7<br/><b>Nginx & ACM/SSL</b><br/>Certbot & HTTPS reverse proxy"]:::success
+
+  S0 --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
 ```
 
 ---
@@ -395,26 +420,34 @@ Two distinct AWS IAM configurations are required:
 1. **EC2 IAM Role (`ResumeSaathi-EC2-SSM-Role`)**: Enables the EC2 instance's background SSM Agent to register with AWS Systems Manager.
 2. **GitHub Actions IAM Identity (`ResumeSaathi-GitHubActions-Deployer`)**: Grants GitHub Actions permissions to execute `ssm:SendCommand` against the target EC2 instance.
 
-```
-┌─────────────────────────┐                        ┌───────────────────────────────┐
-│  GitHub Actions Runner  │                        │         AWS Account           │
-├─────────────────────────┤                        ├───────────────────────────────┤
-│ cd.yml                  │                        │ AWS Systems Manager (SSM)     │
-│  - Authenticates via    │─── ssm:SendCommand ───►│  - Validates instance ID      │
-│    AWS_ACCESS_KEY_ID    │                        │  - Dispatches run command     │
-│  - Targets INSTANCE_ID  │                        └───────────────┬───────────────┘
-└─────────────────────────┘                                        │
-                                                            SSM Agent Polling
-                                                                   │
-                                                                   ▼
-                                                   ┌───────────────────────────────┐
-                                                   │     AWS EC2 Ubuntu Host       │
-                                                   │  (EC2 IAM Profile: SSM-Role)  │
-                                                   ├───────────────────────────────┤
-                                                   │ - Pulls Docker images         │
-                                                   │ - docker compose up -d        │
-                                                   │ - Zero-downtime container swap│
-                                                   └───────────────────────────────┘
+```mermaid
+flowchart LR
+  classDef runner fill:#18181b,stroke:#27272a,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef aws fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef ec2 fill:#831843,stroke:#fe3e91,stroke-width:2px,color:#ffffff,rx:10,ry:10
+
+  subgraph CI["GitHub Actions Deployment Pipeline"]
+    GH[["🚀 GitHub Actions Runner<br/>(cd.yml / rollback.yml)"]]:::runner
+    IAM_GH["🔑 AWS_ACCESS_KEY_ID<br/>(ResumeSaathi-Deployer)"]:::runner
+  end
+
+  subgraph AWS_Cloud["AWS Cloud Infrastructure"]
+    SSM[["⚡ AWS Systems Manager (SSM)<br/>ssm:SendCommand Dispatcher"]]:::aws
+    IAM_EC2["🛡️ IAM Role Profile<br/>ResumeSaathi-EC2-SSM-Role"]:::aws
+  end
+
+  subgraph Host["AWS EC2 Ubuntu 22.04 / 24.04 Target"]
+    Agent[["🤖 amazon-ssm-agent<br/>Secure Inbound Polling (Port 443)"]]:::ec2
+    Docker[["🐳 Docker Compose Engine<br/>Atomic Container Rollout / Rollback"]]:::ec2
+    LiveApp[["✨ Zero-Downtime Live App<br/>(Version Swapped in < 30s)"]]:::ec2
+  end
+
+  GH -->|ssm:SendCommand| SSM
+  IAM_GH -.->|Authorize API Call| SSM
+  SSM -->|Outbound HTTPS Poll| Agent
+  IAM_EC2 -.->|Validate Instance Identity| Agent
+  Agent -->|Execute Script| Docker
+  Docker -->|Traffic Cutover| LiveApp
 ```
 
 ---
@@ -622,21 +655,28 @@ A dedicated rollback workflow is available at `.github/workflows/rollback.yml`:
 
 When a production incident occurs, follow this decision tree to pick the optimal target version:
 
-```
-Incident Occurs (e.g. on v1.0.2)
-         │
-         ▼
-Did v1.0.2 introduce a breaking Database Migration?
-  ├── YES ──► Check if DB schema rollback script is required first.
-  └── NO  ──► Proceed directly to previous version:
-                 │
-                 ▼
-          Check Git Tags / Docker Hub:
-          Current:  v1.0.2 (Unhealthy)
-          Previous: v1.0.1 (Healthy / Stable)
-                 │
-                 ▼
-          Input "v1.0.1" into Rollback Workflow ➔ 30-Second Recovery
+```mermaid
+flowchart TD
+  classDef alert fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef decision fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef action fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef success fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ffffff,rx:10,ry:10
+
+  Incident(["🚨 Production Incident Triggered<br/>(e.g. on version v1.0.2)"]):::alert
+  CheckDB{"🔍 Did v1.0.2 introduce a<br/>breaking Database Schema Migration?"}:::decision
+  
+  DBAction["⚠️ <b>Database Rollback First</b><br/>Execute Mongoose schema revert script<br/>before rolling back container image"]:::action
+  CheckTags["📋 <b>Inspect Git Tags & Docker Hub</b><br/>Current: v1.0.2 (Degraded)<br/>Previous: v1.0.1 (Verified Stable)"]:::action
+  
+  TriggerRollback[["⚡ <b>Run GitHub Actions Rollback</b><br/>Input target tag: 'v1.0.1'"]]:::action
+  Recovery(["✅ <b>Instant Recovery Achieved</b><br/>Healthy containers serving traffic in ~30s"]):::success
+
+  Incident --> CheckDB
+  CheckDB -->|YES| DBAction
+  DBAction --> CheckTags
+  CheckDB -->|NO (Pure Code/Frontend)| CheckTags
+  CheckTags --> TriggerRollback
+  TriggerRollback --> Recovery
 ```
 
 #### Evaluation Checklist:

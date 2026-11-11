@@ -4,69 +4,100 @@
 
 ```mermaid
 flowchart LR
-  U[User] --> FE[Frontend - React/Vite]
-  FE --> API[Backend API - Express]
-  API --> DB[(MongoDB)]
-  API --> AI[Gemini AI]
-  API --> CL[Cloudinary]
-  API --> EM[Email SMTP]
-  API --> GX[Google OAuth]
-  API --> LX[LinkedIn OAuth]
-  API --> IP[IP/Location Services]
+  classDef client fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,rx:12,ry:12
+  classDef fe fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef be fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef db fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef ai fill:#9333ea,stroke:#7e22ce,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef ext fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff,rx:8,ry:8
 
-  FE <-->|JSON / Cookies / Redirects| API
+  subgraph UserTier["👤 Client Tier"]
+    U(["Candidate / User"]):::client
+  end
+
+  subgraph Presentation["🎨 Presentation Layer"]
+    FE[["React 19 / Vite SPA<br/>Tailwind CSS + Redux"]]:::fe
+  end
+
+  subgraph Application["⚙️ Application Tier"]
+    API[["Express.js REST API<br/>JWT & Session Ingress"]]:::be
+  end
+
+  subgraph DataTier["💾 Persistence & Cloud Services"]
+    DB[("🍃 MongoDB Atlas<br/>Multi-Tenant Clusters")]:::db
+    AI[["🤖 Google Gemini 3.5<br/>Flash Lite Model"]]:::ai
+    CL[["☁️ Cloudinary<br/>PDF Storage CDN"]]:::ext
+    EM[["📧 SMTP Mailer<br/>Verification & Alerts"]]:::ext
+    OAuth[["🔐 OAuth Providers<br/>Google & LinkedIn"]]:::ext
+    GEO[["🌍 GeoIP Services<br/>ipify + ipapi"]]:::ext
+  end
+
+  U <-->|HTTPS / Interactive UI| FE
+  FE <-->|JSON REST / Credentials / Cookies| API
+  API <--> DB
+  API <--> AI
+  API <--> CL
+  API --> EM
+  API <--> OAuth
+  API <--> GEO
 ```
 
 ## Level 1 Core Application Flows
 
 ```mermaid
 flowchart TB
-  subgraph Frontend
-    L[Landing Page]
-    A[Auth Pages\nLogin / Signup / Verify / Forgot Password]
-    D[Dashboard Pages\nResume / Job Description / Chat / Settings]
-    S[API Client\naxios + credentials + X-Client-Public-IP]
+  classDef fe fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef be fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef proc fill:#be185d,stroke:#fe3e91,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef store fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef cloud fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff,rx:8,ry:8
+
+  subgraph Frontend["🎨 Tier 1 · Frontend UI Layer"]
+    L["🏠 Landing Page"]:::fe
+    A["🔐 Auth Pages<br/>Login / Signup / Verify"]:::fe
+    D["📊 Dashboard Pages<br/>Resume / Job / Chat / Settings"]:::fe
+    S[["⚡ API Client<br/>Axios + JWT Credentials + IP"]]:::fe
   end
 
-  subgraph Backend[Backend - Express API]
-    R1[Auth Routes\n/api/v1/users + /api/v1/auth]
-    R2[Resume Routes\n/api/v1/resumes]
-    R3[Job Routes\n/api/v1/jobs]
-    R4[Chat Routes\n/api/v1/chating]
-    R5[Session + Profile Routes\n/api/v1/users/me, /sessions]
-    M[JWT Middleware]
-    P[Passport OAuth]
+  subgraph Backend["⚙️ Tier 2 · Express API Router & Security Gateway"]
+    R1["Auth Routes<br/>/api/v1/users + /auth"]:::be
+    R2["Resume Routes<br/>/api/v1/resumes"]:::be
+    R3["Job Routes<br/>/api/v1/jobs"]:::be
+    R4["Chat Routes<br/>/api/v1/chating"]:::be
+    R5["Session & Profile Routes<br/>/users/me, /sessions"]:::be
+    M{{"🛡️ JWT Verification Middleware"}}:::be
+    P{{"🔑 Passport OAuth Handler"}}:::be
   end
 
-  subgraph Processing
-    U1[Resume Parser\nPDF text extraction]
-    U2[Job Matcher\nResume vs JD analysis]
-    U3[Chat Engine\nResume-aware AI assistant]
-    U4[Session Generator\nIP, browser, OS, location]
+  subgraph Processing["🧠 Tier 3 · Deep Business Intelligence Engine"]
+    U1[["📄 PDF Text Parser<br/>Structure & Skill Extraction"]]:::proc
+    U2[["🎯 Job Matcher<br/>Resume vs JD Analysis"]]:::proc
+    U3[["🤖 Resume-Aware AI Assistant<br/>Gemini 3.5 Context Engine"]]:::proc
+    U4[["📍 Session & Device Generator<br/>IP, Browser, OS & Geolocation"]]:::proc
   end
 
-  subgraph Storage[Data Stores]
-    M1[(Users)]
-    M2[(Sessions)]
-    M3[(ResumeAnalysis)]
-    M4[(ResumesCollection)]
-    M5[(JobDescription)]
-    M6[(ChatSession)]
-    M7[(ChatMessage)]
-    M8[(Token)]
+  subgraph Storage["💾 Tier 4 · Database Document Store"]
+    M1[("👤 Users Collection")]:::store
+    M2[("📱 Sessions Collection")]:::store
+    M3[("📈 ResumeAnalysis")]:::store
+    M4[("📁 ResumesCollection")]:::store
+    M5[("💼 JobDescription")]:::store
+    M6[("💬 ChatSession")]:::store
+    M7[("✉️ ChatMessage")]:::store
+    M8[("🔑 Verification Tokens")]:::store
   end
 
-  subgraph External[External Services]
-    G1[Gemini AI]
-    C1[Cloudinary]
-    E1[SMTP Email]
-    O1[Google OAuth]
-    O2[LinkedIn OAuth]
-    I1[ipify Public IP]
-    I2[ipapi / ipwho Location Lookup]
+  subgraph External["☁️ Tier 5 · External Cloud Infrastructure"]
+    G1[["🤖 Google Gemini 3.5 Flash Lite"]]:::cloud
+    C1[["☁️ Cloudinary Storage CDN"]]:::cloud
+    E1[["📧 SMTP Email Dispatcher"]]:::cloud
+    O1[["🔐 Google OAuth 2.0"]]:::cloud
+    O2[["💼 LinkedIn OAuth 2.0"]]:::cloud
+    I1[["🌐 ipify Public IP Resolver"]]:::cloud
+    I2[["📍 ipapi Location Service"]]:::cloud
   end
 
-  L --> FE1[Browse content]
+  L --> S
   A --> S
   D --> S
 
@@ -118,7 +149,7 @@ flowchart TB
   R5 --> M6
   R5 --> M7
 
-  M --> FE2[Response JSON / cookies / redirects]
+  M --> FE2[("📦 Response JSON / Secure Cookies")]:::store
   FE2 --> D
   FE2 --> A
 ```

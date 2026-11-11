@@ -1,36 +1,78 @@
 # ResumeSaathi User Flow Diagram
 
 ```mermaid
-flowchart LR
-  S((Start)) --> L[Landing Page]
-  L --> Q{Logged in?}
+flowchart TD
+  classDef start fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff,rx:20,ry:20
+  classDef view fill:#0369a1,stroke:#0284c7,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef decision fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef action fill:#4f46e5,stroke:#6366f1,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef ai fill:#be185d,stroke:#fe3e91,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef endnode fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ffffff,rx:20,ry:20
 
-  Q -- No --> A1[Open Auth Pages]
-  A1 --> A2[Sign Up or Log In]
-  A2 --> A3[Verify Email or Complete OAuth]
-  A3 --> D[Dashboard]
+  Start(["🚀 Start Session"]):::start
+  Landing["🏠 Landing Page<br/>Features & Portal Overview"]:::view
+  AuthCheck{"🔐 Logged In?"}:::decision
+  
+  subgraph AuthPhase["🔑 Authentication Journey"]
+    AuthPages["📄 Auth Portal<br/>Login / Signup / Reset"]:::view
+    VerifyAuth["✅ Verify Email or Complete OAuth<br/>Google / LinkedIn"]:::action
+  end
 
-  Q -- Yes --> D[Dashboard]
+  Dashboard[["📊 Unified Dashboard<br/>Core Copilot Workspace"]]:::action
 
-  D --> R1[Resume Page]
-  R1 --> R2[Upload Resume PDF]
-  R2 --> R3[Backend parses PDF and stores analysis]
-  R3 --> R4[View ATS score, weaknesses, and recommendations]
+  subgraph ResumePhase["📄 Resume Intelligence Workflow"]
+    R1["Upload PDF Resume"]:::action
+    R2[["⚡ PDF Text Extraction & Parsing"]]:::action
+    R3[["🤖 Gemini AI ATS Analysis<br/>Score & Bullet Feedback"]]:::ai
+    R4["📈 Review ATS Score & Recommendations"]:::view
+  end
 
-  D --> J1[Job Description Page]
-  J1 --> J2[Submit Job Description]
-  J2 --> J3[Compare JD with resume]
-  J3 --> J4[View match score and improvement tips]
+  subgraph JobPhase["💼 Job Description Matcher"]
+    J1["Submit Target Job Description"]:::action
+    J2[["🤖 AI Resume vs JD Comparison"]]:::ai
+    J3["🎯 Match Score & Missing Keywords"]:::view
+  end
 
-  D --> C1[Chat Page]
-  C1 --> C2[Ask resume-aware questions]
-  C2 --> C3[Read AI response and chat history]
+  subgraph CareerPhase["🌐 Career Openings & Live ATS Explorer"]
+    C0["Explore Verified Openings"]:::action
+    C1[["🏢 Direct ATS Connectors<br/>Greenhouse, Lever, Ashby, LinkedIn"]]:::action
+    C2[["🛡️ Live Requisition Verification Probe"]]:::ai
+    C3["📋 Track Application Status"]:::view
+  end
 
-  D --> S1[Settings Page]
-  S1 --> S2[Manage sessions, password, and account settings]
+  subgraph ChatPhase["💬 Resume-Aware AI Assistant"]
+    CH1["Ask Career & Resume Questions"]:::action
+    CH2[["🤖 Gemini Context-Aware Assistant"]]:::ai
+    CH3["💡 Actionable Career Coaching Answers"]:::view
+  end
 
-  D --> O[Logout]
-  O --> L
+  subgraph AccountPhase["⚙️ Security & Session Controls"]
+    S1["Manage Active Sessions & Devices"]:::action
+    Logout(["🚪 Logout Session"]):::endnode
+  end
+
+  Start --> Landing
+  Landing --> AuthCheck
+  AuthCheck -->|No| AuthPages
+  AuthPages --> VerifyAuth
+  VerifyAuth --> Dashboard
+  AuthCheck -->|Yes| Dashboard
+
+  Dashboard --> R1
+  R1 --> R2 --> R3 --> R4
+
+  Dashboard --> J1
+  J1 --> J2 --> J3
+
+  Dashboard --> C0
+  C0 --> C1 --> C2 --> C3
+
+  Dashboard --> CH1
+  CH1 --> CH2 --> CH3
+
+  Dashboard --> S1
+  S1 --> Logout
+  Logout --> Landing
 ```
 
 ## Summary
