@@ -1,21 +1,21 @@
-import { useState, useEffect } from "react";
-import { Eye, EyeOff, Lock, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { Eye, EyeOff, Lock, ShieldCheck, Loader2 } from "lucide-react";
+import { useNavigate, useParams } from "react-router";
 import { useForm } from "react-hook-form";
-import { useSearchParams, useNavigate } from "react-router";
 import PasswordRecoveryPanel from "../components/layout/PasswordRecoveryPanel";
 import FormFooter from "../components/layout/FormFooter";
-import ErrorForm from "../components/layout/ErrorForm";
 import AuthService from "../services/authService";
+import ErrorForm from "../components/layout/ErrorForm";
+import { BUTTON_ACCENT_CLASS } from "../constants/style";
 
 const VerifyToken = () => {
+  const { token } = useParams();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const token = searchParams.get("token");
 
   const {
     register,
@@ -26,20 +26,9 @@ const VerifyToken = () => {
 
   const password = watch("password");
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/error", {
-        state: {
-          status: 400,
-          statusText: "Invalid or Missing Token",
-        },
-      });
-    }
-  }, [token, navigate]);
-
   const onSubmit = async (data) => {
-    if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match");
+    if (!token) {
+      setError("Invalid or expired reset token.");
       return;
     }
 
@@ -47,14 +36,14 @@ const VerifyToken = () => {
     setError(null);
     setSuccessMessage("");
     try {
-      const response = await AuthService.resetPassword(token, data.password);
+      const response = await AuthService.verifyPasswordResetToken(token, data.password);
       if (response.success) {
-        setSuccessMessage(response.message || "Password reset successful! Redirecting to login...");
+        setSuccessMessage("Password reset successful. Redirecting to login...");
         setTimeout(() => {
           navigate("/auth/login");
-        }, 2000);
+        }, 1500);
       } else {
-        setError(response.message || "Failed to reset password");
+        setError(response.message || "Failed to reset password.");
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -63,37 +52,32 @@ const VerifyToken = () => {
     }
   };
 
-  return (
-    <div className="h-screen overflow-hidden flex items-center justify-center bg-[#FFFFFF] dark:bg-[#111827] px-4">
-      <div className="absolute inset-0 opacity-20 blur-3xl pointer-events-none">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-[#803AD1] rounded-full"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#FE3E91] rounded-full"></div>
-      </div>
+  const inputClass =
+    "w-full pl-9 pr-10 py-2 rounded-lg text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 bg-white dark:bg-zinc-900 border focus:border-[#fe3e91] focus:outline-none transition-colors";
 
-      <div
-        className="relative w-full max-w-6xl h-[90vh] rounded-3xl shadow-2xl border border-[#E5E7EB] dark:border-[#374151] overflow-hidden bg-[#FFFFFF] dark:bg-[#1F2937]"
-        style={{ boxShadow: "0 25px 50px rgba(0,0,0,0.2)" }}
-      >
+  return (
+    <div className="h-screen overflow-hidden flex items-center justify-center bg-[#fafafa] dark:bg-[#141415] px-4">
+      <div className="relative w-full max-w-5xl h-[88vh] rounded-xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden bg-white dark:bg-[#19191b] shadow-xs">
         <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
           <PasswordRecoveryPanel mode="verify" />
 
           <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-12 py-6 overflow-y-auto">
             <div className="mb-6">
-              <h1 className="text-3xl sm:text-4xl font-bold text-[#1E293B] dark:text-white">
-                Verify Token
+              <h1 className="text-2xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+                Set new password
               </h1>
-              <p className="mt-1 text-sm text-[#475569] dark:text-[#94A3B8]">
-                Set your new password to complete account recovery
+              <p className="mt-1 text-xs text-zinc-500">
+                Enter your new password to complete account recovery
               </p>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               <div>
-                <label className="text-sm font-medium text-[#1E293B] dark:text-white">
-                  New Password
+                <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  New password
                 </label>
                 <div className="relative mt-1">
-                  <Lock className="absolute left-3 top-3 w-5 h-5 text-[#64748B] dark:text-[#94A3B8]" />
+                  <Lock className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400" />
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter new password"
@@ -102,52 +86,59 @@ const VerifyToken = () => {
                       required: "Password is required",
                       minLength: {
                         value: 8,
-                        message: "Password must be at least 8 characters",
+                        message: "Minimum 8 characters",
                       },
                     })}
-                    className="w-full pl-10 pr-10 py-2.5 rounded-lg text-sm text-[#1E293B] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-[#94A3B8] bg-[#F9FAFB] dark:bg-[#374151] border border-[#E5E7EB] dark:border-[#374151] focus:ring-2 focus:ring-[#FE3E91] dark:focus:ring-[#FF5FA7] focus:border-transparent outline-none transition"
+                    className={`${inputClass} ${
+                      errors.password
+                        ? "border-red-500"
+                        : "border-zinc-200 dark:border-zinc-800"
+                    }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-[#64748B] dark:text-[#94A3B8] hover:text-[#FE3E91] dark:hover:text-[#FF5FA7] transition"
+                    className="absolute right-3 top-2.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                   >
-                    {showPassword ? <EyeOff /> : <Eye />}
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password.message}</p>}
+                {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
               </div>
 
               <div>
-                <label className="text-sm font-medium text-[#1E293B] dark:text-white">
-                  Confirm Password
+                <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  Confirm new password
                 </label>
                 <div className="relative mt-1">
-                  <Lock className="absolute left-3 top-3 w-5 h-5 text-[#64748B] dark:text-[#94A3B8]" />
+                  <Lock className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400" />
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm new password"
                     disabled={loading}
                     {...register("confirmPassword", {
                       required: "Confirm password is required",
-                      validate: (value) =>
-                        value === password || "Passwords do not match",
+                      validate: (value) => value === password || "Passwords do not match",
                     })}
-                    className="w-full pl-10 pr-10 py-2.5 rounded-lg text-sm text-[#1E293B] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-[#94A3B8] bg-[#F9FAFB] dark:bg-[#374151] border border-[#E5E7EB] dark:border-[#374151] focus:ring-2 focus:ring-[#FE3E91] dark:focus:ring-[#FF5FA7] focus:border-transparent outline-none transition"
+                    className={`${inputClass} ${
+                      errors.confirmPassword
+                        ? "border-red-500"
+                        : "border-zinc-200 dark:border-zinc-800"
+                    }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-3 text-[#64748B] dark:text-[#94A3B8] hover:text-[#FE3E91] dark:hover:text-[#FF5FA7] transition"
+                    className="absolute right-3 top-2.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                   >
-                    {showConfirmPassword ? <EyeOff /> : <Eye />}
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {errors.confirmPassword && <p className="mt-1 text-xs text-red-400">{errors.confirmPassword.message}</p>}
+                {errors.confirmPassword && <p className="mt-1 text-xs text-red-500">{errors.confirmPassword.message}</p>}
               </div>
 
               {successMessage && (
-                <p className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700 dark:border-green-500/40 dark:bg-green-500/10 dark:text-green-300">
+                <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 dark:border-emerald-800/60 dark:bg-emerald-950/30 dark:text-emerald-300">
                   {successMessage}
                 </p>
               )}
@@ -157,16 +148,17 @@ const VerifyToken = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 rounded-lg text-white font-semibold
-                bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1]
-                dark:from-[#FF5FA7] dark:via-[#D340BD] dark:to-[#9D65D5]
-                hover:opacity-90 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ boxShadow: "0 8px 20px rgba(254, 62, 145, 0.25)" }}
+                className={`w-full ${BUTTON_ACCENT_CLASS}`}
               >
-                {loading ? "Updating Password..." : (
+                {loading ? (
                   <>
-                    <ShieldCheck className="inline mr-2 w-4 h-4" />
-                    Update Password
+                    <Loader2 className="animate-spin" size={16} />
+                    <span>Updating password...</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck size={16} />
+                    <span>Update password</span>
                   </>
                 )}
               </button>

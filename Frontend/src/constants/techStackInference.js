@@ -11,7 +11,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "⚛️",
     badgeColor: "cyan",
     bgClass: "bg-cyan-50 dark:bg-cyan-950/60 text-cyan-800 dark:text-cyan-300 border-cyan-300 dark:border-cyan-800",
-    pillClass: "bg-gradient-to-r from-cyan-600 to-blue-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Frontend (React)", aliases: ["react", "react.js", "reactjs", "next.js", "nextjs"] },
       { name: "Runtime (Node.js)", aliases: ["node", "node.js", "nodejs"] },
@@ -45,7 +45,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "🅰️",
     badgeColor: "red",
     bgClass: "bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800",
-    pillClass: "bg-gradient-to-r from-rose-600 to-red-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Frontend (Angular)", aliases: ["angular", "angular.js", "angularjs"] },
       { name: "Runtime (Node.js)", aliases: ["node", "node.js", "nodejs"] },
@@ -70,7 +70,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "💚",
     badgeColor: "emerald",
     bgClass: "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800",
-    pillClass: "bg-gradient-to-r from-emerald-600 to-teal-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Frontend (Vue)", aliases: ["vue", "vue.js", "vuejs", "nuxt", "nuxt.js"] },
       { name: "Runtime (Node.js)", aliases: ["node", "node.js", "nodejs"] },
@@ -92,9 +92,9 @@ export const TECH_STACK_DEFINITIONS = [
     name: "PERN Stack",
     category: "Full Stack Web",
     icon: "🐘",
-    badgeColor: "blue",
-    bgClass: "bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-800",
-    pillClass: "bg-gradient-to-r from-blue-600 to-indigo-600 text-white",
+    badgeColor: "violet",
+    bgClass: "bg-violet-50 dark:bg-violet-950/60 text-[#5309b6] dark:text-violet-300 border-violet-300 dark:border-violet-800",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Database (PostgreSQL)", aliases: ["postgres", "postgresql", "psql"] },
       { name: "Framework (Express)", aliases: ["express", "express.js", "expressjs"] },
@@ -117,9 +117,9 @@ export const TECH_STACK_DEFINITIONS = [
     name: "Next.js Modern Full Stack",
     category: "Modern Web",
     icon: "▲",
-    badgeColor: "slate",
-    bgClass: "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700",
-    pillClass: "bg-gradient-to-r from-slate-800 to-slate-950 text-white",
+    badgeColor: "zinc",
+    bgClass: "bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Framework (Next.js)", aliases: ["next.js", "nextjs"] },
       { name: "Language (TypeScript/JS)", aliases: ["typescript", "ts", "javascript"] },
@@ -143,7 +143,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "🐍",
     badgeColor: "green",
     bgClass: "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800",
-    pillClass: "bg-gradient-to-r from-emerald-600 to-green-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Language (Python)", aliases: ["python", "python3"] },
       { name: "Framework (Django)", aliases: ["django", "django rest framework", "drf"] },
@@ -173,7 +173,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "⚡",
     badgeColor: "teal",
     bgClass: "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border-teal-300 dark:border-teal-800",
-    pillClass: "bg-gradient-to-r from-teal-600 to-cyan-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Language (Python)", aliases: ["python", "python3"] },
       { name: "API Framework", aliases: ["fastapi", "flask", "pydantic", "sqlalchemy", "celery", "asyncio"] },
@@ -197,7 +197,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "☕",
     badgeColor: "orange",
     bgClass: "bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800",
-    pillClass: "bg-gradient-to-r from-amber-600 to-orange-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Language (Java)", aliases: ["java", "core java", "j2ee"] },
       { name: "Framework (Spring Boot)", aliases: ["spring boot", "spring", "spring mvc", "hibernate", "jpa", "spring cloud"] },
@@ -226,7 +226,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "🔷",
     badgeColor: "violet",
     bgClass: "bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-800",
-    pillClass: "bg-gradient-to-r from-purple-600 to-indigo-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Language (C#)", aliases: ["c#", "csharp"] },
       { name: "Framework (.NET)", aliases: [".net", ".net core", "asp.net", "asp.net core", "entity framework"] },
@@ -250,7 +250,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "🐹",
     badgeColor: "sky",
     bgClass: "bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border-sky-300 dark:border-sky-800",
-    pillClass: "bg-gradient-to-r from-sky-600 to-blue-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Language (Golang)", aliases: ["golang", "go"] },
       { name: "Cloud/Systems", aliases: ["docker", "kubernetes", "k8s", "microservices", "grpc", "kafka", "redis", "postgres"] },
@@ -273,7 +273,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "🐘",
     badgeColor: "rose",
     bgClass: "bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800",
-    pillClass: "bg-gradient-to-r from-rose-600 to-pink-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Language (PHP)", aliases: ["php"] },
       { name: "Framework (Laravel)", aliases: ["laravel", "symfony", "codeigniter"] },
@@ -297,7 +297,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "🧠",
     badgeColor: "purple",
     bgClass: "bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-800",
-    pillClass: "bg-gradient-to-r from-purple-600 to-pink-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "AI/LLM Core", aliases: ["langchain", "llm", "generative ai", "genai", "rag", "vector database", "faiss", "openai", "huggingface", "llama"] },
       { name: "Language (Python)", aliases: ["python", "python3"] },
@@ -319,7 +319,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "🤖",
     badgeColor: "indigo",
     bgClass: "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border-indigo-300 dark:border-indigo-800",
-    pillClass: "bg-gradient-to-r from-indigo-600 to-blue-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "ML Libraries", aliases: ["pytorch", "tensorflow", "scikit-learn", "deep learning", "machine learning", "nlp", "computer vision"] },
       { name: "Data Analytics", aliases: ["pandas", "numpy", "matplotlib", "seaborn", "sql"] },
@@ -343,7 +343,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "📊",
     badgeColor: "amber",
     bgClass: "bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800",
-    pillClass: "bg-gradient-to-r from-amber-600 to-yellow-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Big Data / ETL", aliases: ["spark", "pyspark", "kafka", "airflow", "hadoop", "dbt", "etl", "snowflake"] },
       { name: "Data Stores", aliases: ["sql", "postgresql", "bigquery", "redshift", "hive"] },
@@ -365,7 +365,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "☁️",
     badgeColor: "cyan",
     bgClass: "bg-cyan-50 dark:bg-cyan-950/60 text-cyan-800 dark:text-cyan-300 border-cyan-300 dark:border-cyan-800",
-    pillClass: "bg-gradient-to-r from-cyan-600 to-blue-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Containers/K8s", aliases: ["docker", "kubernetes", "k8s"] },
       { name: "Cloud Provider", aliases: ["aws", "azure", "gcp", "cloud", "amazon web services"] },
@@ -388,7 +388,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "📱",
     badgeColor: "pink",
     bgClass: "bg-pink-50 dark:bg-pink-950/60 text-pink-800 dark:text-pink-300 border-pink-300 dark:border-pink-800",
-    pillClass: "bg-gradient-to-r from-pink-600 to-rose-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Mobile Tech", aliases: ["react native", "flutter", "dart", "swift", "kotlin", "android", "ios"] },
     ],
@@ -409,7 +409,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "🧪",
     badgeColor: "emerald",
     bgClass: "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800",
-    pillClass: "bg-gradient-to-r from-emerald-600 to-teal-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "Testing Tech", aliases: ["selenium", "cypress", "playwright", "jest", "junit", "postman", "automation testing", "test automation"] },
     ],
@@ -429,7 +429,7 @@ export const TECH_STACK_DEFINITIONS = [
     icon: "📋",
     badgeColor: "amber",
     bgClass: "bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800",
-    pillClass: "bg-gradient-to-r from-amber-600 to-orange-600 text-white",
+    pillClass: "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs",
     requiredComponents: [
       { name: "PM Skills", aliases: ["product management", "prd", "roadmapping", "roadmap", "user stories", "agile", "scrum", "jira", "a/b testing", "product strategy"] },
     ],
@@ -444,3 +444,4 @@ export const TECH_STACK_DEFINITIONS = [
     searchKeywords: ["Product Manager", "Associate Product Manager", "Technical Product Manager"],
   },
 ];
+

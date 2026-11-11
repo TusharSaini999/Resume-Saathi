@@ -66,7 +66,7 @@ export async function fetchSmartRecruitersJobs(companySlug, companyName = "") {
       };
     });
   } catch (error) {
-    console.error(`[SmartRecruiters] Error fetching jobs for ${companySlug}:`, error.message);
+    // error silenced
     return [];
   }
 }

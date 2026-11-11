@@ -55,25 +55,25 @@ export default function ChatMessages({
       {/* =========================
           Mobile Top Spacer
       ========================= */}
-      <div className="h-20 w-full bg-[#FFFFFF] dark:bg-[#0B1120]" />
+      <div className="h-20 w-full bg-white dark:bg-[#141415]" />
 
       {/* =========================
           Mobile Mini Header
       ========================= */}
-      <div className="sticky top-0 z-10 border-b border-[#E2E8F0] bg-[#FFFFFF]/95 backdrop-blur-md dark:border-[#1E293B] dark:bg-[#0B1120]/95 md:hidden">
+      <div className="sticky top-0 z-10 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-[#141415]/95 md:hidden">
         <div className="flex h-16 items-center justify-between px-4">
           <button
             onClick={() => setMobileSidebarOpen(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#E2E8F0] bg-white text-[#475569] shadow-sm transition hover:scale-105 active:scale-95 dark:border-[#334155] dark:bg-[#111827] dark:text-[#94A3B8]"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 transition-colors dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
             <Menu size={18} />
           </button>
 
           <div className="flex-1 px-3 text-left">
-            <p className="line-clamp-1 text-sm font-semibold text-[#0F172A] dark:text-white">
+            <p className="line-clamp-1 text-sm font-semibold text-zinc-900 dark:text-white">
               Resume Assistant
             </p>
-            <p className="text-[11px] text-[#64748B] dark:text-[#94A3B8]">
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
               {activeChatTitle}
             </p>
           </div>
@@ -86,32 +86,32 @@ export default function ChatMessages({
           Initial Loading Skeleton
       ========================= */}
       {isInitialLoading ? (
-        <div className="flex-1 overflow-y-auto bg-[#FFFFFF] px-3 py-4 sm:px-4 dark:bg-[#0B1120]">
+        <div className="flex-1 overflow-y-auto bg-white px-3 py-4 sm:px-4 dark:bg-[#141415]">
           <div className="w-full animate-pulse space-y-4">
             <div className="flex justify-start">
-              <div className="w-[75%] max-w-125 rounded-2xl rounded-bl-md border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 dark:border-[#1E293B] dark:bg-[#111827]">
-                <div className="mb-2 h-3 w-24 rounded bg-[#E2E8F0] dark:bg-[#1E293B]" />
-                <div className="mb-2 h-3 w-full rounded bg-[#E2E8F0] dark:bg-[#1E293B]" />
-                <div className="mb-2 h-3 w-[90%] rounded bg-[#E2E8F0] dark:bg-[#1E293B]" />
-                <div className="h-3 w-10 rounded bg-[#E2E8F0] dark:bg-[#1E293B]" />
+              <div className="w-[75%] max-w-125 rounded-2xl rounded-bl-md border border-zinc-200/80 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#19191b]">
+                <div className="mb-2 h-3 w-24 rounded bg-zinc-200 dark:bg-zinc-800" />
+                <div className="mb-2 h-3 w-full rounded bg-zinc-200 dark:bg-zinc-800" />
+                <div className="mb-2 h-3 w-[90%] rounded bg-zinc-200 dark:bg-zinc-800" />
+                <div className="h-3 w-10 rounded bg-zinc-200 dark:bg-zinc-800" />
               </div>
             </div>
 
             <div className="flex justify-end">
-              <div className="w-[65%] max-w-105 rounded-2xl rounded-br-md bg-[#F3E8FF] px-4 py-3 dark:bg-[#312E81]/30">
-                <div className="mb-2 h-3 w-full rounded bg-[#E9D5FF] dark:bg-[#4338CA]/40" />
-                <div className="mb-2 h-3 w-[80%] rounded bg-[#E9D5FF] dark:bg-[#4338CA]/40" />
-                <div className="h-3 w-10 rounded bg-[#E9D5FF] dark:bg-[#4338CA]/40" />
+              <div className="w-[65%] max-w-105 rounded-2xl rounded-br-md bg-[#fe3e91]/10 px-4 py-3 dark:bg-[#fe3e91]/20">
+                <div className="mb-2 h-3 w-full rounded bg-[#fe3e91]/20 dark:bg-[#fe3e91]/30" />
+                <div className="mb-2 h-3 w-[80%] rounded bg-[#fe3e91]/20 dark:bg-[#fe3e91]/30" />
+                <div className="h-3 w-10 rounded bg-[#fe3e91]/20 dark:bg-[#fe3e91]/30" />
               </div>
             </div>
 
             <div className="flex justify-start">
-              <div className="w-[80%] max-w-135 rounded-2xl rounded-bl-md border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 dark:border-[#1E293B] dark:bg-[#111827]">
-                <div className="mb-2 h-3 w-20 rounded bg-[#E2E8F0] dark:bg-[#1E293B]" />
-                <div className="mb-2 h-3 w-full rounded bg-[#E2E8F0] dark:bg-[#1E293B]" />
-                <div className="mb-2 h-3 w-[92%] rounded bg-[#E2E8F0] dark:bg-[#1E293B]" />
-                <div className="mb-2 h-3 w-[70%] rounded bg-[#E2E8F0] dark:bg-[#1E293B]" />
-                <div className="h-3 w-12 rounded bg-[#E2E8F0] dark:bg-[#1E293B]" />
+              <div className="w-[80%] max-w-135 rounded-2xl rounded-bl-md border border-zinc-200/80 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#19191b]">
+                <div className="mb-2 h-3 w-20 rounded bg-zinc-200 dark:bg-zinc-800" />
+                <div className="mb-2 h-3 w-full rounded bg-zinc-200 dark:bg-zinc-800" />
+                <div className="mb-2 h-3 w-[92%] rounded bg-zinc-200 dark:bg-zinc-800" />
+                <div className="mb-2 h-3 w-[70%] rounded bg-zinc-200 dark:bg-zinc-800" />
+                <div className="h-3 w-12 rounded bg-zinc-200 dark:bg-zinc-800" />
               </div>
             </div>
           </div>
@@ -120,49 +120,45 @@ export default function ChatMessages({
         /* =========================
             Empty Welcome State
         ========================= */
-        <div className="flex flex-1 items-center justify-center bg-[#FFFFFF] px-4 py-8 dark:bg-[#0B1120]">
-          <div className="w-full max-w-2xl text-center">
-            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-3xl bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] shadow-[0_12px_30px_rgba(202,37,175,0.30)] sm:mb-6 sm:h-16 sm:w-16">
-              <Sparkles className="h-7 w-7 text-white sm:h-8 sm:w-8" />
+        <div className="flex flex-1 items-center justify-center bg-[#fafafa] px-4 py-8 dark:bg-[#141415]">
+          <div className="w-full max-w-xl text-center">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              <MessageSquare size={20} />
             </div>
 
-            <h1 className="text-2xl font-bold tracking-tight text-[#0F172A] sm:text-3xl dark:text-white">
-              Welcome to{" "}
-              <span className="bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] bg-clip-text text-transparent">
-                Resume Assistant
-              </span>
+            <h1 className="text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+              Resume assistant
             </h1>
 
-            <p className="mx-auto mt-3 max-w-xl px-2 text-sm leading-6 text-[#64748B] sm:mt-4 sm:px-0 sm:text-base sm:leading-7 dark:text-[#94A3B8]">
-              Create better resumes, improve ATS score, practice AI interviews,
-              and get smart guidance to strengthen your profile.
+            <p className="mx-auto mt-2 max-w-md px-2 text-xs leading-relaxed text-zinc-600 sm:px-0 dark:text-zinc-400">
+              Ask questions about your uploaded resume, identify missing technical keywords for specific roles, or draft improved bullet points.
             </p>
 
-            <div className="mt-8 hidden grid-cols-1 gap-4 sm:grid sm:grid-cols-3">
-              <div className="rounded-3xl border border-[#E2E8F0] bg-[#F8FAFC] p-5 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-[#1E293B] dark:bg-[#111827]">
-                <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#EDE9FE] dark:bg-[#312E81]">
-                  <MessageSquare className="h-5 w-5 text-[#FE3E91]" />
+            <div className="mt-6 hidden grid-cols-1 gap-3 sm:grid sm:grid-cols-3">
+              <div className="rounded-lg border border-zinc-200/80 bg-white p-4 text-center dark:border-zinc-800 dark:bg-[#19191b]">
+                <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                  <MessageSquare size={16} />
                 </div>
-                <h3 className="text-sm font-semibold text-[#0F172A] dark:text-white">
-                  AI Interview
+                <h3 className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+                  Interview prep
                 </h3>
               </div>
 
-              <div className="rounded-3xl border border-[#E2E8F0] bg-[#F8FAFC] p-5 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-[#1E293B] dark:bg-[#111827]">
-                <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F3E8FF] dark:bg-[#2E1065]">
-                  <Briefcase className="h-5 w-5 text-[#803AD1]" />
+              <div className="rounded-lg border border-zinc-200/80 bg-white p-4 text-center dark:border-zinc-800 dark:bg-[#19191b]">
+                <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                  <Briefcase size={16} />
                 </div>
-                <h3 className="text-sm font-semibold text-[#0F172A] dark:text-white">
-                  ATS Optimization
+                <h3 className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+                  ATS alignment
                 </h3>
               </div>
 
-              <div className="rounded-3xl border border-[#E2E8F0] bg-[#F8FAFC] p-5 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-[#1E293B] dark:bg-[#111827]">
-                <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FCE7F3] dark:bg-[#3B0820]">
-                  <FileText className="h-5 w-5 text-[#CA25AF]" />
+              <div className="rounded-lg border border-zinc-200/80 bg-white p-4 text-center dark:border-zinc-800 dark:bg-[#19191b]">
+                <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                  <FileText size={16} />
                 </div>
-                <h3 className="text-sm font-semibold text-[#0F172A] dark:text-white">
-                  Resume Guidance
+                <h3 className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+                  Bullet revision
                 </h3>
               </div>
             </div>
@@ -172,16 +168,16 @@ export default function ChatMessages({
         /* =========================
             Chat Messages
         ========================= */
-        <div className="history-scroll-hidden relative flex-1 overflow-y-auto bg-[#FFFFFF] px-2 py-3 sm:px-4 dark:bg-[#0B1120]">
+        <div className="history-scroll-hidden relative flex-1 overflow-y-auto bg-[#fafafa] px-2 py-3 sm:px-4 dark:bg-[#141415]">
           {/* =========================
               Center Error Overlay
           ========================= */}
 
           {initialError && (
 
-            <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70 backdrop-blur-sm dark:bg-[#0B1120]/70">
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70 backdrop-blur-sm dark:bg-[#141415]/70">
               <div className="w-full max-w-md animate-in zoom-in-95 duration-300 px-4">
-                <div className="rounded-3xl border border-red-200/80 bg-white px-5 py-5 shadow-xl dark:border-red-500/20 dark:bg-[#111827]">
+                <div className="rounded-3xl border border-red-200/80 bg-white px-5 py-5 shadow-xl dark:border-red-500/20 dark:bg-[#19191b]">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
                       <div className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-red-100 dark:bg-red-500/10">
@@ -234,13 +230,13 @@ export default function ChatMessages({
                     className={`flex w-full items-end gap-3 ${isAI ? "justify-start" : "justify-end"}`}
                   >
                     <div
-                      className={`chat-bubble-animate w-[320px] rounded-2xl px-3 py-2 shadow-sm sm:w-105 ${isAI
-                        ? "sm:w-250 ml-0 mr-auto rounded-bl-md border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] dark:border-[#1E293B] dark:bg-[#111827] dark:text-white"
-                        : "sm:w-105 ml-auto mr-0 rounded-br-md bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] text-white shadow-[0_10px_30px_rgba(254,62,145,0.20)]"
+                      className={`chat-bubble-animate w-[320px] rounded-lg px-3.5 py-2.5 sm:w-105 ${isAI
+                        ? "sm:w-250 ml-0 mr-auto border border-zinc-200/80 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-[#19191b] dark:text-zinc-100"
+                        : "sm:w-105 ml-auto mr-0 bg-[#fe3e91] text-white"
                       }`}
                     >
                       {isAI ? (
-                        <div className="prose prose-sm max-w-full overflow-hidden wrap-break-word dark:prose-invert prose-p:my-2 prose-pre:rounded-xl prose-pre:bg-[#0F172A] prose-pre:text-white prose-code:before:content-[''] prose-code:after:content-[''] prose-li:my-1 prose-ul:my-2 prose-ol:my-2 prose-headings:my-3">
+                        <div className="prose prose-sm max-w-full overflow-hidden wrap-break-word dark:prose-invert prose-p:my-2 prose-pre:rounded-xl prose-pre:bg-zinc-900 prose-pre:text-white dark:prose-pre:bg-[#141415] prose-code:before:content-[''] prose-code:after:content-[''] prose-li:my-1 prose-ul:my-2 prose-ol:my-2 prose-headings:my-3">
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
@@ -273,28 +269,28 @@ export default function ChatMessages({
                                 return inline ? (
                                   <code className="break-all rounded-md bg-black/5 px-1.5 py-0.5 text-[11px] dark:bg-white/10">{children}</code>
                                 ) : (
-                                  <code className="block w-full overflow-x-auto whitespace-pre rounded-xl bg-[#0F172A] p-3 text-[12px] text-white">{children}</code>
+                                  <code className="block w-full overflow-x-auto whitespace-pre rounded-xl bg-zinc-900 dark:bg-[#141415] p-3 text-[12px] text-white">{children}</code>
                                 );
                               },
                               pre: ({ children }) => (
-                                <pre className="my-3 w-full max-w-full overflow-x-auto rounded-xl bg-[#0F172A] p-0">{children}</pre>
+                                <pre className="my-3 w-full max-w-full overflow-x-auto rounded-xl bg-zinc-900 dark:bg-[#141415] p-0">{children}</pre>
                               ),
                               blockquote: ({ children }) => (
-                                <blockquote className="border-l-4 border-[#CA25AF] pl-4 italic wrap-break-word text-[#475569] dark:text-[#CBD5E1]">{children}</blockquote>
+                                <blockquote className="border-l-2 border-[#fe3e91] pl-3 italic wrap-break-word text-zinc-600 dark:text-zinc-400">{children}</blockquote>
                               ),
                               a: ({ href, children }) => (
-                                <a href={href} target="_blank" rel="noopener noreferrer" className="break-all font-medium text-[#CA25AF] underline underline-offset-2">{children}</a>
+                                <a href={href} target="_blank" rel="noopener noreferrer" className="break-all font-medium text-[#fe3e91] underline underline-offset-2">{children}</a>
                               ),
                               table: ({ children }) => (
-                                <div className="my-3 w-full max-w-full overflow-x-auto rounded-xl border border-[#E2E8F0] dark:border-[#334155]">
+                                <div className="my-3 w-full max-w-full overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
                                   <table className="w-max min-w-full border-collapse text-xs sm:text-sm">{children}</table>
                                 </div>
                               ),
                               th: ({ children }) => (
-                                <th className="border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-left whitespace-nowrap dark:border-[#334155] dark:bg-[#1E293B]">{children}</th>
+                                <th className="border border-zinc-200 bg-zinc-50 px-3 py-2 text-left whitespace-nowrap dark:border-zinc-800 dark:bg-[#19191b]">{children}</th>
                               ),
                               td: ({ children }) => (
-                                <td className="border border-[#E2E8F0] px-3 py-2 align-top whitespace-nowrap dark:border-[#334155]">{children}</td>
+                                <td className="border border-zinc-200 px-3 py-2 align-top whitespace-nowrap dark:border-zinc-800">{children}</td>
                               ),
                             }}
                           >
@@ -304,7 +300,7 @@ export default function ChatMessages({
                       ) : (
                         <p className="whitespace-pre-wrap wrap-break-word text-xs leading-6 sm:text-sm">{messageText}</p>
                       )}
-                      <p className={`mt-2 text-[10px] ${isAI ? "text-[#64748B] dark:text-[#94A3B8]" : "text-white/75"}`}>
+                      <p className={`mt-2 text-[10px] ${isAI ? "text-zinc-500 dark:text-zinc-400" : "text-white/75"}`}>
                         {createdAt}
                       </p>
                     </div>
@@ -315,23 +311,23 @@ export default function ChatMessages({
               {/* AI Typing Bubble */}
               {isTyping && (
                 <div className="flex w-full items-end justify-start gap-3">
-                  <div className="ml-0 mr-auto w-fit max-w-[85%] rounded-2xl rounded-bl-md border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 shadow-sm dark:border-[#1E293B] dark:bg-[#111827]">
-                    <div className="mb-2 flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 animate-pulse text-[#CA25AF]" />
-                      <span className="text-xs font-medium text-[#475569] dark:text-[#CBD5E1]">
+                  <div className="ml-0 mr-auto w-fit max-w-[85%] rounded-lg border border-zinc-200/80 bg-white px-3.5 py-2.5 dark:border-zinc-800 dark:bg-[#19191b]">
+                    <div className="mb-1.5 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#fe3e91]"></span>
+                      <span className="text-xs font-mono font-medium text-zinc-500">
                         Resume Assistant
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-[#64748B] transition-all duration-300 dark:text-[#94A3B8]">
+                      <span className="text-xs text-zinc-600 dark:text-zinc-400">
                         {loadingTexts[loadingIndex]}
                       </span>
 
                       <div className="flex items-center gap-1">
-                        <span className="h-2 w-2 animate-bounce rounded-full bg-[#CA25AF] [animation-delay:0ms]" />
-                        <span className="h-2 w-2 animate-bounce rounded-full bg-[#CA25AF] [animation-delay:150ms]" />
-                        <span className="h-2 w-2 animate-bounce rounded-full bg-[#CA25AF] [animation-delay:300ms]" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#fe3e91] animate-pulse [animation-delay:0ms]" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#fe3e91] animate-pulse [animation-delay:150ms]" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#fe3e91] animate-pulse [animation-delay:300ms]" />
                       </div>
                     </div>
                   </div>

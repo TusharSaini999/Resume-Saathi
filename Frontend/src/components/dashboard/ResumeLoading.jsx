@@ -1,53 +1,48 @@
 import { Loader2 } from "lucide-react";
+
 function ResumeLoading({ loadingStage }) {
-    const loadingTitle =
-        loadingStage === "processing"
-            ? "Processing your resume..."
-            : loadingStage === "finalizing"
-                ? "Finalizing your report..."
-                : "Uploading your resume...";
-    const loadingDescription =
-        loadingStage === "processing"
-            ? "We are analyzing sections, keywords, ATS compatibility, and formatting. Do not leave this page."
-            : loadingStage === "finalizing"
-                ? "Almost done. Preparing your final results for display. Do not leave this page."
-                : "Your PDF is being uploaded securely. This usually takes a few seconds. Do not leave this page.";
-    const loadingStepText =
-        loadingStage === "processing"
-            ? "Step 2 of 3: Processing"
-            : loadingStage === "finalizing"
-                ? "Step 3 of 3: Finalizing"
-                : "Step 1 of 3: Uploading";
+  const loadingTitle =
+    loadingStage === "processing"
+      ? "Analyzing resume structure and ATS compliance"
+      : loadingStage === "finalizing"
+        ? "Generating diagnostic metrics"
+        : "Uploading document";
 
-    return (
-        <>
-            <div className="w-full max-w-3xl mx-auto">
-                <div
-                    className={"relative overflow-hidden rounded-3xl border p-8 md:p-10 shadow-2xl dark:border-[#334155] dark:bg-[#0f172a] border-[#e2e8f0] bg-white"}
-                >
-                    <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-[#fe3e91]/10 blur-3xl" />
-                    <div className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-[#803ad1]/10 blur-3xl" />
+  const loadingDescription =
+    loadingStage === "processing"
+      ? "Auditing section hierarchy, extracting target skills, and calculating ATS match criteria."
+      : loadingStage === "finalizing"
+        ? "Aggregating parser findings and inferred stack matching."
+        : "Securely receiving document into session buffer.";
 
-                    <div className="relative z-10 flex flex-col items-center text-center">
-                        <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-r from-[#fe3e91]/20 via-[#ca25af]/20 to-[#803ad1]/20">
-                            <Loader2 size={36} className="animate-spin text-[#fe3e91]" />
-                        </div>
+  const loadingStepText =
+    loadingStage === "processing"
+      ? "Step 2 of 3 · Parser evaluation"
+      : loadingStage === "finalizing"
+        ? "Step 3 of 3 · Finalizing report"
+        : "Step 1 of 3 · Ingestion";
 
-                        <h3 className={"text-2xl md:text-3xl font-black tracking-tight dark:text-white text-[#1E293B]"}>
-                            {loadingTitle}
-                        </h3>
-                        <p className={"mt-3 max-w-xl text-sm md:text-base dark:text-[#cbd5e1] text-[#64748b]"}>
-                            {loadingDescription}
-                        </p>
+  return (
+    <div className="w-full max-w-xl mx-auto">
+      <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#19191b] p-8 text-center shadow-xs">
+        <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800 text-[#fe3e91]">
+          <Loader2 size={24} className="animate-spin" />
+        </div>
 
-                        <div className={"mt-6 rounded-full px-4 py-2 text-xs font-bold dark:bg-[#1e293b] dark:text-[#cbd5e1] bg-[#f8fafc] text-[#475569]"}>
-                            {loadingStepText}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
-    )
+        <h3 className="text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+          {loadingTitle}
+        </h3>
+        
+        <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 max-w-md mx-auto">
+          {loadingDescription}
+        </p>
+
+        <div className="mt-6 inline-flex rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 px-3 py-1 text-xs font-mono text-zinc-600 dark:text-zinc-400">
+          {loadingStepText}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default ResumeLoading;

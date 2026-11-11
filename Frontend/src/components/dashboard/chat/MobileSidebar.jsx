@@ -104,18 +104,18 @@ export default function MobileSidebar({
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-75 transform border-r border-[#E2E8F0] bg-[#F8FAFC] transition-transform duration-300 dark:border-[#1E293B] dark:bg-[#020617] md:hidden ${
+        className={`fixed left-0 top-0 z-50 h-screen w-75 transform border-r border-zinc-200/80 bg-zinc-50 transition-transform duration-300 dark:border-zinc-800 dark:bg-[#141415] md:hidden ${
           mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-[#E2E8F0] px-4 py-4 dark:border-[#1E293B]">
+          <div className="flex items-center justify-between border-b border-zinc-200/80 px-4 py-4 dark:border-zinc-800">
             <div>
-              <h2 className="text-sm font-semibold text-[#0F172A] dark:text-white">
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">
                 Chats
               </h2>
-              <p className="text-[11px] text-[#64748B] dark:text-[#94A3B8]">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                 ResumeSaathi AI
               </p>
             </div>
@@ -123,7 +123,7 @@ export default function MobileSidebar({
             <button
               type="button"
               onClick={() => setMobileSidebarOpen(false)}
-              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#E2E8F0] bg-white text-[#475569] shadow-sm transition hover:scale-105 active:scale-95 dark:border-[#334155] dark:bg-[#0F172A] dark:text-[#94A3B8]"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 transition-colors dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
             >
               <X size={18} />
             </button>
@@ -133,27 +133,27 @@ export default function MobileSidebar({
           <div className="px-4 pb-3 pt-4">
             <button
               type="button"
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] px-4 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(254,62,145,0.25)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] px-4 py-2.5 text-xs font-medium text-white shadow-xs dark:shadow-[0_0_12px_rgba(254,62,145,0.25)] transition-all duration-150 active:scale-[0.98]"
               onClick={handleNewChat}
             >
-              <Plus size={18} />
-              New Chat
+              <Plus size={16} />
+              New chat
             </button>
           </div>
 
           {/* Search */}
           <div className="px-4 pb-3">
-            <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 shadow-sm dark:border-[#334155] dark:bg-[#0F172A]">
+            <div className="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-white px-4 py-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
               <Search
                 size={16}
-                className="text-[#64748B] dark:text-[#94A3B8]"
+                className="text-zinc-400 dark:text-zinc-500"
               />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search chats..."
-                className="w-full bg-transparent text-sm text-[#0F172A] outline-none placeholder:text-[#64748B] dark:text-white dark:placeholder:text-[#94A3B8]"
+                className="w-full bg-transparent text-sm text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-white dark:placeholder:text-zinc-500"
               />
             </div>
           </div>
@@ -202,17 +202,17 @@ export default function MobileSidebar({
                         handleSelectChat(chat._id);
                       }
                     }}
-                    className={`group relative w-full cursor-pointer rounded-2xl border px-4 py-3 text-left transition-all duration-200 ${
+                    className={`group relative w-full cursor-pointer rounded-lg border px-3.5 py-2.5 text-left transition-colors duration-150 ${
                       activeChat === chat._id
-                        ? "border-[#FBCFE8] bg-linear-to-r from-[#FE3E91]/10 via-[#CA25AF]/10 to-[#803AD1]/10 shadow-sm dark:border-[#7C2D92]/30"
-                        : "border-transparent hover:bg-white dark:hover:bg-[#0F172A]"
+                        ? "border-zinc-200/90 bg-zinc-100 text-zinc-900 dark:border-zinc-700/80 dark:bg-[#232325] dark:text-zinc-100"
+                        : "border-transparent text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-[#19191b]"
                     }`}
                   >
                     <div className="pr-10">
-                      <p className="line-clamp-1 text-sm font-medium text-[#0F172A] dark:text-white">
+                      <p className="line-clamp-1 text-sm font-medium text-zinc-900 dark:text-white">
                         {chat.session_title || "Untitled Chat"}
                       </p>
-                      <p className="mt-1 text-xs text-[#64748B] dark:text-[#94A3B8]">
+                      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                         {new Date(chat.createdAt).toLocaleString("en-IN", {
                           day: "numeric",
                           month: "short",
@@ -229,7 +229,7 @@ export default function MobileSidebar({
                       type="button"
                       onClick={(e) => openDeleteConfirm(e, chat._id)}
                       disabled={deleteLoading && deletingChatId === chat._id}
-                      className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center justify-center rounded-lg p-2 text-[#94A3B8] transition hover:bg-red-50 hover:text-red-500 disabled:opacity-50 dark:hover:bg-red-500/10"
+                      className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center justify-center rounded-lg p-2 text-zinc-400 transition hover:bg-red-50 hover:text-red-500 disabled:opacity-50 dark:hover:bg-red-500/10"
                       aria-label="Delete chat"
                     >
                       {deleteLoading && deletingChatId === chat._id ? (
@@ -242,29 +242,29 @@ export default function MobileSidebar({
                 ))}
               </div>
             ) : (
-              <div className="flex h-full items-center justify-center px-2">
+              <div className="flex h-full items-center justify-center px-2 py-8">
                 <div className="w-full max-w-xs text-center">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] shadow-[0_12px_30px_rgba(202,37,175,0.25)]">
-                    <MessageSquare className="h-6 w-6 text-white" />
+                  <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                    <MessageSquare size={18} />
                   </div>
 
-                  <h3 className="text-sm font-semibold text-[#0F172A] dark:text-white">
+                  <h3 className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
                     {searchTerm ? "No matching chats" : "No chats yet"}
                   </h3>
 
-                  <p className="mt-2 text-xs leading-6 text-[#64748B] dark:text-[#94A3B8]">
+                  <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
                     {searchTerm
                       ? "Try searching with another keyword."
-                      : "Start a new conversation and your chat history will appear here."}
+                      : "Start a conversation to see past sessions here."}
                   </p>
 
                   {!searchTerm && (
                     <button
                       onClick={handleNewChat}
-                      className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] px-4 py-2 text-sm font-medium text-white shadow-[0_10px_30px_rgba(254,62,145,0.18)] transition hover:scale-[1.02]"
+                      className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] px-3 py-1.5 text-xs font-medium text-white shadow-xs dark:shadow-[0_0_12px_rgba(254,62,145,0.25)] transition-all"
                     >
-                      <Plus size={15} />
-                      New Chat
+                      <Plus size={14} />
+                      New chat
                     </button>
                   )}
                 </div>
@@ -277,11 +277,11 @@ export default function MobileSidebar({
       {/* Confirm Delete Modal */}
       {confirmDelete && (
         <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl dark:bg-[#0F172A]">
-            <h3 className="text-lg font-semibold text-[#0F172A] dark:text-white">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl dark:bg-[#19191b] border border-zinc-200/80 dark:border-zinc-800">
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Delete Chat?
             </h3>
-            <p className="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
+            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
               Are you sure you want to delete this chat? This action cannot be
               undone.
             </p>
@@ -291,7 +291,7 @@ export default function MobileSidebar({
                 type="button"
                 onClick={() => setConfirmDelete(null)}
                 disabled={deleteLoading}
-                className="rounded-xl border border-[#E2E8F0] px-4 py-2 text-sm font-medium text-[#475569] transition hover:bg-[#F8FAFC] dark:border-[#334155] dark:text-[#CBD5E1] dark:hover:bg-[#1E293B]"
+                className="rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
               >
                 Cancel
               </button>

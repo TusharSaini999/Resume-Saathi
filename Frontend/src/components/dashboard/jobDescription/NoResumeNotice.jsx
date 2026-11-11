@@ -1,18 +1,29 @@
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowRight } from "lucide-react";
+import { Link } from "react-router";
+import { BUTTON_CLASS } from "../../../constants/style";
 
 function NoResumeNotice() {
   return (
-    <div className="flex min-h-[56vh] w-full items-center justify-center rounded-3xl border border-amber-200 bg-amber-50/90 p-5 shadow-lg dark:border-amber-500/40 dark:bg-amber-500/10 sm:p-6 md:min-h-[60vh] md:p-8">
-      <div className="mx-auto w-full max-w-2xl text-center">
-        <p className="mx-auto inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-amber-700 dark:bg-amber-500/20 dark:text-amber-300">
-          <AlertCircle size={12} /> Action Required
-        </p>
-        <h3 className="mt-3 text-xl font-black text-[#1e293b] dark:text-white sm:text-2xl md:text-3xl">
-          First Upload The Resume
+    <div className="flex min-h-[48vh] w-full items-center justify-center p-6">
+      <div className="w-full max-w-md rounded-xl border border-zinc-200/80 bg-white p-6 sm:p-8 text-center shadow-xs dark:border-zinc-800 dark:bg-[#19191b]">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+          <AlertCircle size={22} />
+        </div>
+
+        <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
+          Resume required for comparison
         </h3>
-        <p className="mt-2 text-sm leading-relaxed text-[#475569] dark:text-[#cbd5e1] md:text-base">
-          You need an uploaded resume before analyzing any job description. Please upload your resume in the Resume tab, then come back here.
+        
+        <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+          To calculate keyword density, hard skill gaps, and ATS fit scores for target job listings, upload your resume first.
         </p>
+
+        <div className="mt-6 flex justify-center">
+          <Link to="/dashboard" className={BUTTON_CLASS}>
+            <span>Go to resume upload</span>
+            <ArrowRight size={14} />
+          </Link>
+        </div>
       </div>
     </div>
   );

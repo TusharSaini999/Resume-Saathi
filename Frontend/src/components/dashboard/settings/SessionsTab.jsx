@@ -84,8 +84,8 @@ const SessionsTab = ({
     <>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Session Management</h2>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+          <h2 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white">Session Management</h2>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
             Review and control your active sessions.
           </p>
         </div>
@@ -99,12 +99,12 @@ const SessionsTab = ({
       </div>
 
       {isSessionsLoading ? (
-        <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+        <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300">
           <Loader2 size={18} className="animate-spin" />
           Loading sessions...
         </div>
       ) : !hasSessions ? (
-        <p className="text-sm text-slate-600 dark:text-slate-300">No sessions found.</p>
+        <p className="text-sm text-zinc-600 dark:text-zinc-300">No sessions found.</p>
       ) : (
         <div className="relative">
           <div
@@ -117,7 +117,7 @@ const SessionsTab = ({
               const DeviceIcon = deviceMeta.Icon;
 
               return (
-                <div key={sessionKey} className="rounded-xl border border-slate-200/80 bg-white/80 p-4 dark:border-slate-700/80 dark:bg-slate-800/45">
+                <div key={sessionKey} className="rounded-xl border border-zinc-200/80 bg-white/80 p-4 dark:border-zinc-700/80 dark:bg-zinc-800/45">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-start gap-3">
                       <span
@@ -127,16 +127,16 @@ const SessionsTab = ({
                         <DeviceIcon size={16} className={deviceMeta.iconClass} />
                       </span>
                       <div>
-                        <p className="font-semibold text-slate-900 dark:text-white">
+                        <p className="font-semibold text-zinc-900 dark:text-white">
                           {session?.browser || "Unknown Browser"} on {session?.os || "Unknown OS"}
                         </p>
-                        <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                           {deviceMeta.label} device
                         </p>
-                        <p className="text-sm text-slate-600 dark:text-slate-300">
+                        <p className="text-sm text-zinc-600 dark:text-zinc-300">
                           {session?.location || "Unknown location"} | {session?.ip_address || "Unknown IP"}
                         </p>
-                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                        <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
                           Created: {session?.createdAt ? new Date(session.createdAt).toLocaleString() : "Unknown"}
                         </p>
                       </div>
@@ -147,13 +147,13 @@ const SessionsTab = ({
                         className={`rounded-full px-2 py-1 text-xs font-semibold ${
                           session?.is_active
                             ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"
-                            : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200"
+                            : "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"
                         }`}
                       >
                         {session?.is_active ? "Active" : "Inactive"}
                       </span>
                       {session?.isCurrent && (
-                        <span className="rounded-full bg-pink-100 px-2 py-1 text-xs font-semibold text-pink-700 dark:bg-pink-500/20 dark:text-pink-300">
+                        <span className="rounded-md bg-[#fe3e91]/10 px-2 py-0.5 text-[10px] font-mono font-medium text-[#fe3e91] border border-[#fe3e91]/25">
                           Current
                         </span>
                       )}
@@ -165,9 +165,9 @@ const SessionsTab = ({
                       <button
                         onClick={() => onKillSession(session?._id, session?.isCurrent)}
                         disabled={killingSessionId === session?._id}
-                        className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+                        className="rounded-md border border-zinc-200 dark:border-zinc-800 px-2.5 py-1 text-xs font-medium text-zinc-700 dark:text-zinc-300 transition hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        {killingSessionId === session?._id ? "Removing..." : "Logout Session"}
+                        {killingSessionId === session?._id ? "Removing..." : "Logout session"}
                       </button>
                     )}
                   </div>
@@ -178,9 +178,9 @@ const SessionsTab = ({
 
           {showScrollHint && (
             <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center">
-              <div className="inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500 shadow-sm dark:bg-slate-900/90 dark:text-slate-300">
+              <div className="inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-mono uppercase text-zinc-500 shadow-xs dark:bg-zinc-900/90 dark:text-zinc-400">
                 Scroll
-                <ChevronDown size={12} className="animate-bounce" />
+                <ChevronDown size={12} />
               </div>
             </div>
           )}
@@ -191,7 +191,7 @@ const SessionsTab = ({
         <button
           type="button"
           onClick={onRefresh}
-          className="rounded-md border border-slate-300 px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+          className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-700"
         >
           Refresh Sessions
         </button>

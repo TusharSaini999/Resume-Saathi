@@ -11,13 +11,13 @@ import {
   Check,
   Copy,
   GraduationCap,
-  Calendar,
-  Globe,
   ShieldCheck,
   RefreshCw,
   Zap,
   FileText,
   Target,
+  Globe,
+  Linkedin,
 } from "lucide-react";
 import careerService from "../../services/careerService";
 import { stripHtml, cleanListItems } from "../../utils/textSanitizer";
@@ -33,7 +33,7 @@ export default function JobDetailsModal({
   GRADIENT_PRIMARY,
 }) {
   const [currentJob, setCurrentJob] = useState(job);
-  const [viewTab, setViewTab] = useState("structured"); // "structured" | "full" | "criteria"
+  const [viewTab, setViewTab] = useState("structured"); // "structured" | "full"
   const [copiedJd, setCopiedJd] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [isCapturingFullJD, setIsCapturingFullJD] = useState(false);
@@ -108,12 +108,12 @@ export default function JobDetailsModal({
   const companyInitial = (currentJob.company || "C").charAt(0).toUpperCase();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-3xl max-h-[92vh] flex flex-col rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="relative w-full max-w-3xl max-h-[90vh] flex flex-col rounded-xl bg-white dark:bg-[#19191b] border border-zinc-200/80 dark:border-zinc-800 shadow-xl overflow-hidden">
         {/* Modal Header */}
-        <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4 bg-slate-50/50 dark:bg-slate-900/50">
-          <div className="flex items-start gap-3 min-w-0">
-            <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 flex items-center justify-center shrink-0 shadow-2xs">
+        <div className="p-5 border-b border-zinc-100 dark:border-zinc-800 flex items-start justify-between gap-4 bg-zinc-50/50 dark:bg-zinc-900/50">
+          <div className="flex items-start gap-3.5 min-w-0">
+            <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-750 p-2 flex items-center justify-center shrink-0">
               {currentJob.companyLogo && !imgError ? (
                 <img
                   src={currentJob.companyLogo}
@@ -122,7 +122,7 @@ export default function JobDetailsModal({
                   onError={() => setImgError(true)}
                 />
               ) : (
-                <div className="w-full h-full rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-black text-base">
+                <div className="w-full h-full rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono font-bold flex items-center justify-center text-sm">
                   {companyInitial}
                 </div>
               )}
@@ -130,48 +130,42 @@ export default function JobDetailsModal({
 
             <div className="min-w-0 space-y-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+                <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
                   {currentJob.company}
                 </span>
 
                 <button
                   onClick={() => onOpenCompanyProfile(currentJob.companySlug || currentJob.company)}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 hover:bg-purple-200 text-purple-800 dark:bg-purple-950/80 dark:hover:bg-purple-900 dark:text-purple-300 border border-purple-200 dark:border-purple-800 transition-colors"
+                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                 >
                   <Building2 className="w-2.5 h-2.5" />
                   <span>Profile</span>
                 </button>
 
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    currentJob.stream?.track === "management"
-                      ? "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
-                      : "bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
-                  }`}
-                >
-                  {currentJob.stream?.track === "management" ? "👔 Management" : "💻 Tech"}
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
+                  {currentJob.stream?.track === "management" ? "Management" : "Tech"}
                 </span>
 
                 {currentJob.isRealOpening !== false && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Verified Requisition</span>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>Verified</span>
                   </span>
                 )}
 
                 {currentJob.hasFullJD && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300 border border-purple-300 dark:border-purple-700">
-                    <FileText className="w-2.5 h-2.5 text-purple-600 dark:text-purple-400" />
-                    <span>Full JD Available</span>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                    <FileText className="w-2.5 h-2.5" />
+                    <span>Full JD</span>
                   </span>
                 )}
               </div>
 
-              <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white leading-snug">
+              <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100 leading-snug">
                 {currentJob.title}
               </h2>
 
-              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400">
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5" /> {currentJob.location || "India"}
                 </span>
@@ -179,8 +173,8 @@ export default function JobDetailsModal({
                   <Briefcase className="w-3.5 h-3.5" /> {currentJob.experienceLevel || "Full-time"}
                 </span>
                 {currentJob.structuredJD?.workMode && (
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                    Work Mode: {currentJob.structuredJD.workMode}
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    {currentJob.structuredJD.workMode}
                   </span>
                 )}
               </div>
@@ -189,20 +183,82 @@ export default function JobDetailsModal({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
             title="Close modal"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-4 sm:p-6 overflow-y-auto space-y-5">
+        <div className="p-5 overflow-y-auto space-y-4">
+          {/* Official Company, Career & LinkedIn Channels */}
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+              Official Channels &amp; Application Paths
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {/* 1. Official Company Website */}
+              {(currentJob.companyPageUrl || currentJob.website) && (
+                <a
+                  href={currentJob.companyPageUrl || currentJob.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 hover:border-[#fe3e91]/40 hover:bg-white dark:hover:bg-zinc-900 transition-all flex items-center justify-between text-xs group"
+                >
+                  <div className="flex items-center gap-1.5 font-medium text-zinc-800 dark:text-zinc-200 group-hover:text-[#fe3e91] min-w-0">
+                    <Globe className="w-3.5 h-3.5 text-[#fe3e91] shrink-0" />
+                    <span className="truncate">Company Website</span>
+                  </div>
+                  <ExternalLink className="w-3 h-3 text-zinc-400 group-hover:text-[#fe3e91] shrink-0 ml-1" />
+                </a>
+              )}
+
+              {/* 2. Official Careers Portal */}
+              {(currentJob.careerPageUrl || currentJob.officialPortalUrl) && (
+                <a
+                  href={currentJob.careerPageUrl || currentJob.officialPortalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 hover:border-[#fe3e91]/40 hover:bg-white dark:hover:bg-zinc-900 transition-all flex items-center justify-between text-xs group"
+                >
+                  <div className="flex items-center gap-1.5 font-medium text-zinc-800 dark:text-zinc-200 group-hover:text-[#fe3e91] min-w-0">
+                    <Briefcase className="w-3.5 h-3.5 text-[#fe3e91] shrink-0" />
+                    <span className="truncate">Careers Portal</span>
+                  </div>
+                  <ExternalLink className="w-3 h-3 text-zinc-400 group-hover:text-[#fe3e91] shrink-0 ml-1" />
+                </a>
+              )}
+
+              {/* 3. Official LinkedIn Jobs */}
+              <a
+                href={
+                  currentJob.linkedInJobsUrl ||
+                  currentJob.linkedInUrl ||
+                  (currentJob.companySlug
+                    ? `https://www.linkedin.com/company/${currentJob.companySlug}/jobs/`
+                    : currentJob.company
+                    ? `https://www.linkedin.com/company/${currentJob.company.toLowerCase().replace(/[^a-z0-9]/g, "")}/jobs/`
+                    : "https://www.linkedin.com/jobs")
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 hover:border-[#fe3e91]/40 hover:bg-white dark:hover:bg-zinc-900 transition-all flex items-center justify-between text-xs group"
+                title="Official LinkedIn Company Jobs"
+              >
+                <div className="flex items-center gap-1.5 font-medium text-zinc-800 dark:text-zinc-200 group-hover:text-[#fe3e91] min-w-0">
+                  <Linkedin className="w-3.5 h-3.5 text-[#0A66C2] shrink-0" />
+                  <span className="truncate">Official LinkedIn Jobs</span>
+                </div>
+                <ExternalLink className="w-3 h-3 text-zinc-400 group-hover:text-[#fe3e91] shrink-0 ml-1" />
+              </a>
+            </div>
+          </div>
           {/* Live Full JD Extraction Status / Action Banner */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800">
             <div className="flex items-center gap-2 min-w-0">
               {isCapturingFullJD ? (
-                <RefreshCw className="w-4 h-4 text-purple-500 animate-spin shrink-0" />
+                <RefreshCw className="w-4 h-4 text-[#fe3e91] animate-spin shrink-0" />
               ) : currentJob.hasFullJD ? (
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
               ) : (
@@ -210,15 +266,15 @@ export default function JobDetailsModal({
               )}
               <div className="min-w-0 text-xs">
                 {isCapturingFullJD ? (
-                  <span className="font-bold text-purple-700 dark:text-purple-300">
-                    ⚡ Capturing full official job description from live portal...
+                  <span className="text-zinc-700 dark:text-zinc-300">
+                    Capturing official job description from live portal...
                   </span>
                 ) : currentJob.hasFullJD ? (
-                  <span className="font-bold text-emerald-700 dark:text-emerald-300">
-                    ✓ 100% Full Official JD Captured ({currentJob.fullDescription?.length || currentJob.description?.length || 0} characters)
+                  <span className="text-zinc-700 dark:text-zinc-300">
+                    Authoritative JD captured ({currentJob.fullDescription?.length || currentJob.description?.length || 0} characters)
                   </span>
                 ) : (
-                  <span className="font-medium text-slate-600 dark:text-slate-400">
+                  <span className="text-zinc-500 dark:text-zinc-400">
                     Partial description displayed. Capture authoritative job description.
                   </span>
                 )}
@@ -228,81 +284,80 @@ export default function JobDetailsModal({
             <button
               onClick={() => handleCaptureFullJD()}
               disabled={isCapturingFullJD}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/80 transition-all shrink-0 ml-2"
+              className="px-2.5 py-1 rounded-md text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors shrink-0 ml-2"
             >
-              {isCapturingFullJD ? "Capturing..." : currentJob.hasFullJD ? "Re-sync Full JD" : "⚡ Capture Full JD"}
+              {isCapturingFullJD ? "Capturing..." : currentJob.hasFullJD ? "Re-sync JD" : "Capture full JD"}
             </button>
           </div>
 
-          {/* Criteria Badges (Seniority, Employment Type, Industry) */}
+          {/* Criteria Badges */}
           {currentJob.criteria && Object.keys(currentJob.criteria).length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 shrink-0">
-                Official Criteria:
+            <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 shrink-0">
+                Criteria:
               </span>
               {Object.entries(currentJob.criteria).map(([k, v]) => (
                 <span
                   key={k}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"
                 >
-                  <span className="capitalize text-slate-400">{k}:</span>
-                  <span className="font-bold text-slate-900 dark:text-white">{v}</span>
+                  <span className="capitalize text-zinc-400">{k}:</span>
+                  <span className="font-medium text-zinc-900 dark:text-zinc-100">{v}</span>
                 </span>
               ))}
             </div>
           )}
 
-          {/* AI Match Overview Banner */}
-          <div className="p-4 rounded-2xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 space-y-2">
+          {/* Diagnostic Match Overview */}
+          <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-purple-700 dark:text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#fe3e91]" />
                 Resume Compatibility Score
               </span>
-              <span className="text-lg font-black text-purple-600 dark:text-purple-400">
+              <span className="text-sm font-mono font-medium text-zinc-900 dark:text-zinc-100">
                 {currentJob.matchScore || 65}% Match
               </span>
             </div>
 
             {currentJob.aiMatch?.fitReason && (
-              <p className="text-xs text-purple-900 dark:text-purple-200 leading-relaxed">
+              <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
                 {currentJob.aiMatch.fitReason}
               </p>
             )}
 
             {currentJob.recommendation && (
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed italic pt-1 border-t border-purple-200/50 dark:border-purple-800/40">
-                💡 {currentJob.recommendation}
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed pt-1 border-t border-zinc-200/60 dark:border-zinc-800">
+                {currentJob.recommendation}
               </p>
             )}
           </div>
 
-          {/* Matched from Resume Section (Direct User Feature) */}
+          {/* Matched from Resume Section */}
           {((currentJob.matchedResumeKeywords && currentJob.matchedResumeKeywords.length > 0) || (currentJob.matchedResumeRoles && currentJob.matchedResumeRoles.length > 0)) && (
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-indigo-500/10 border border-purple-200/90 dark:border-purple-800/80 space-y-3">
+            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800 space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-purple-700 dark:text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Target className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                  Keywords Matched from Your Resume
+                <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <Target className="w-3.5 h-3.5 text-zinc-400" />
+                  Keywords Matched from Resume
                 </span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white shadow-2xs">
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
                   {currentJob.keywordMatchCount || currentJob.matchedResumeKeywords?.length || 0} matched
                 </span>
               </div>
 
-              {/* Matched Roles, Inferred Stacks & Skills Chips */}
               <div className="flex flex-wrap items-center gap-1.5">
                 {currentJob.inferredStackMatched && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-black bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-2xs">
-                    <span>⚡ Inferred Stack: {currentJob.inferredStackMatched}</span>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-mono bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-2xs">
+                    <span>Stack: {currentJob.inferredStackMatched}</span>
                   </span>
                 )}
                 {currentJob.matchedResumeRoles && currentJob.matchedResumeRoles.map((role) => (
                   <span
                     key={role}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-extrabold bg-purple-600 text-white shadow-2xs"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700"
                   >
-                    <Check className="w-3 h-3" />
+                    <Check className="w-3 h-3 text-emerald-500" />
                     <span>Role: {role}</span>
                   </span>
                 ))}
@@ -315,7 +370,7 @@ export default function JobDetailsModal({
                   .map((kw) => (
                   <span
                     key={kw}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-900 text-purple-900 dark:text-purple-200 border border-purple-200 dark:border-purple-800 shadow-2xs"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700"
                   >
                     <Check className="w-3 h-3 text-emerald-500" />
                     <span>{kw}</span>
@@ -324,85 +379,68 @@ export default function JobDetailsModal({
               </div>
 
               {currentJob.resumeMatchReason && (
-                <p className="text-xs font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic pt-1 border-t border-purple-200/50 dark:border-purple-800/40">
-                  🎯 {currentJob.resumeMatchReason}
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed pt-1 border-t border-zinc-200/60 dark:border-zinc-800">
+                  {currentJob.resumeMatchReason}
                 </p>
               )}
             </div>
           )}
 
           {/* Eligibility & Experience Verdict */}
-          <div
-            className={`p-4 rounded-2xl border ${
-              currentJob.isFresherFriendly
-                ? "bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/60"
-                : "bg-indigo-50/80 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800/60"
-            }`}
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-              <span
-                className={`px-2.5 py-1 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1.5 ${
-                  currentJob.isFresherFriendly
-                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300"
-                    : "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-300"
-                }`}
-              >
-                <span>{currentJob.isFresherFriendly ? "🌱" : "💼"}</span>
-                <span>
-                  {currentJob.isFresherFriendly
-                    ? "Fresher Friendly Opening"
-                    : currentJob.candidateType || "Professional Opening"}
-                </span>
+          <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-1.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                {currentJob.isFresherFriendly
+                  ? "Fresher Friendly"
+                  : currentJob.candidateType || "Professional Opening"}
               </span>
 
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                Experience:{" "}
+              <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
+                Exp:{" "}
                 {currentJob.isFresherFriendly
-                  ? "0 - 1 Years (Freshers Welcome)"
-                  : `${currentJob.minExperienceYears || 1}+ Years Commercial Experience`}
+                  ? "0 - 1 Years"
+                  : `${currentJob.minExperienceYears || 1}+ Years`}
               </span>
             </div>
 
-            <p className="text-xs leading-relaxed text-slate-700 dark:text-slate-300">
-              <span className="font-bold text-slate-900 dark:text-white">
-                Eligibility Verdict & Reasoning:{" "}
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                Eligibility:{" "}
               </span>
               {currentJob.fresherEligibilityReason ||
                 currentJob.structuredJD?.experienceRequirement?.fresherEligibilityReason ||
                 (currentJob.isFresherFriendly
-                  ? "Open to freshers, campus graduates, and entry-level candidates with hands-on projects or coursework."
-                  : `Requires minimum ${currentJob.minExperienceYears || 1}+ years of production industry experience.`)}
+                  ? "Open to freshers, campus graduates, and entry-level candidates with hands-on projects."
+                  : `Requires minimum ${currentJob.minExperienceYears || 1}+ years of industry experience.`)}
             </p>
           </div>
 
           {/* JD Switcher Tabs */}
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
+            <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setViewTab("structured")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
                   viewTab === "structured"
-                    ? "bg-purple-600 text-white shadow-xs"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    ? "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-xs"
+                    : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 }`}
               >
-                📋 Structured Breakdown
+                Structured Breakdown
               </button>
               <button
                 onClick={() => setViewTab("full")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all inline-flex items-center gap-1.5 ${
+                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors inline-flex items-center gap-1.5 ${
                   viewTab === "full"
-                    ? "bg-purple-600 text-white shadow-xs"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    ? "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-xs"
+                    : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 }`}
               >
-                <span>📄 Full Description</span>
+                <span>Full Description</span>
                 {isCapturingFullJD ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-purple-200/60 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200">
-                    <RefreshCw className="w-2.5 h-2.5 animate-spin" /> Fetching
-                  </span>
+                  <RefreshCw className="w-2.5 h-2.5 animate-spin" />
                 ) : (currentJob.fullDescription?.length || currentJob.structuredJD?.fullText?.length || (currentJob.description?.length > 200 ? currentJob.description.length : 0)) ? (
-                  <span className="text-[10px] opacity-80">
+                  <span className="text-[10px] font-mono opacity-80">
                     ({(currentJob.fullDescription?.length || currentJob.structuredJD?.fullText?.length || currentJob.description?.length)} chars)
                   </span>
                 ) : null}
@@ -412,37 +450,37 @@ export default function JobDetailsModal({
             {viewTab === "full" && (
               <button
                 onClick={handleCopyJD}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors"
               >
                 {copiedJd ? (
                   <Check className="w-3.5 h-3.5 text-emerald-500" />
                 ) : (
                   <Copy className="w-3.5 h-3.5" />
                 )}
-                <span>{copiedJd ? "Copied!" : "Copy JD"}</span>
+                <span>{copiedJd ? "Copied" : "Copy"}</span>
               </button>
             )}
           </div>
 
           {/* Tab Content: Structured vs Full */}
           {viewTab === "structured" ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* Summary */}
               {currentJob.structuredJD?.summary && (
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-                  <span className="font-bold text-slate-900 dark:text-white block mb-1">
-                    Role Summary:
+                <div className="p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                  <span className="font-medium text-zinc-900 dark:text-zinc-100 block mb-1">
+                    Role Summary
                   </span>
                   {stripHtml(currentJob.structuredJD.summary)}
                 </div>
               )}
 
               {/* Responsibilities */}
-              <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2.5">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+              <div className="p-4 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-2">
+                <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
                   <Briefcase className="w-3.5 h-3.5" /> Key Responsibilities
                 </h4>
-                <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
+                <ul className="space-y-1.5 text-xs text-zinc-700 dark:text-zinc-300">
                   {cleanListItems(
                     currentJob.structuredJD?.keyResponsibilities,
                     [
@@ -452,9 +490,9 @@ export default function JobDetailsModal({
                       "Optimize application throughput, reliability, and security.",
                     ]
                   ).map((resp, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
-                      <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black">
-                        {idx + 1}
+                    <li key={idx} className="flex items-start gap-2 leading-relaxed">
+                      <span className="font-mono text-[10px] text-zinc-400 mt-0.5">
+                        {String(idx + 1).padStart(2, "0")}
                       </span>
                       <span>{resp}</span>
                     </li>
@@ -462,13 +500,13 @@ export default function JobDetailsModal({
                 </ul>
               </div>
 
-              {/* Requirements & Education Grid */}
+              {/* Qualifications & Education Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Qualifications & Requirements
+                <div className="p-3.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-2">
+                  <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Qualifications
                   </h4>
-                  <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
+                  <ul className="space-y-1.5 text-xs text-zinc-700 dark:text-zinc-300">
                     {cleanListItems(
                       currentJob.structuredJD?.requiredQualifications,
                       [
@@ -478,7 +516,7 @@ export default function JobDetailsModal({
                         }.`,
                         currentJob.isFresherFriendly
                           ? "0-1 years experience or practical academic projects."
-                          : `Minimum ${currentJob.minExperienceYears || 1}+ years commercial experience.`,
+                          : `Minimum ${currentJob.minExperienceYears || 1}+ years industry experience.`,
                       ]
                     ).map((qual, idx) => (
                       <li key={idx} className="flex items-start gap-2 leading-relaxed">
@@ -489,21 +527,21 @@ export default function JobDetailsModal({
                   </ul>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
-                    <GraduationCap className="w-3.5 h-3.5" /> Education Criteria
+                <div className="p-3.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-2">
+                  <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                    <GraduationCap className="w-3.5 h-3.5" /> Education
                   </h4>
-                  <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
+                  <ul className="space-y-1.5 text-xs text-zinc-700 dark:text-zinc-300">
                     {cleanListItems(
                       (currentJob.structuredJD?.educationRequirements || []).filter(
                         (edu) => !edu.toLowerCase().includes("responsibility, not tasks")
                       ),
                       [
-                        "B.Tech / B.E. / MCA / Computer Science or equivalent practical degree.",
+                        "B.Tech / B.E. / MCA / Computer Science or equivalent practical background.",
                       ]
                     ).map((edu, idx) => (
                       <li key={idx} className="flex items-start gap-2 leading-relaxed">
-                        <GraduationCap className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />
+                        <GraduationCap className="w-3.5 h-3.5 text-zinc-400 shrink-0 mt-0.5" />
                         <span>{edu}</span>
                       </li>
                     ))}
@@ -515,9 +553,9 @@ export default function JobDetailsModal({
               {((currentJob.requiredSkills && currentJob.requiredSkills.length > 0) ||
                 (currentJob.skills && currentJob.skills.length > 0) ||
                 (currentJob.structuredJD?.techStack && currentJob.structuredJD.techStack.length > 0)) && (
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
-                    Required Tech Stack & Skills:
+                <div className="p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 space-y-2">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 block">
+                    Required Tech Stack &amp; Skills
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {Array.from(
@@ -533,7 +571,7 @@ export default function JobDetailsModal({
                       .map((s) => (
                         <span
                           key={s}
-                          className="px-2.5 py-1 rounded-lg text-xs font-medium bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                          className="px-2 py-0.5 rounded text-xs bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700"
                         >
                           {s}
                         </span>
@@ -543,24 +581,17 @@ export default function JobDetailsModal({
               )}
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {isCapturingFullJD && !currentJob.fullDescription && (!currentJob.description || currentJob.description.length < 200) ? (
-                <div className="p-8 rounded-2xl bg-purple-500/5 dark:bg-purple-950/20 border border-purple-500/20 flex flex-col items-center justify-center text-center space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-sm">
-                    <RefreshCw className="w-5 h-5 animate-spin" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-bold text-slate-900 dark:text-white">
-                      Capturing Authoritative Full Job Description...
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md">
-                      Extracting full requirements, team expectations, compensation, and qualifications directly from {currentJob.sourcePortal || "employer portal"}.
-                    </p>
-                  </div>
+                <div className="p-8 rounded-lg bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center space-y-2">
+                  <RefreshCw className="w-5 h-5 text-zinc-500 animate-spin" />
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                    Capturing full requisition text from {currentJob.sourcePortal || "employer portal"}...
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed font-sans max-h-[500px] overflow-y-auto select-text shadow-inner">
+                  <div className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 whitespace-pre-line leading-relaxed font-sans max-h-[460px] overflow-y-auto select-text">
                     {stripHtml(
                       currentJob.fullDescription ||
                       currentJob.structuredJD?.fullText ||
@@ -572,16 +603,16 @@ export default function JobDetailsModal({
                   </div>
 
                   {(!currentJob.hasFullJD || (currentJob.description && currentJob.description.length < 300)) && !isCapturingFullJD && (
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs">
-                      <span className="text-slate-600 dark:text-slate-400">
-                        Need the complete live requisition text?
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs">
+                      <span className="text-zinc-500 dark:text-zinc-400">
+                        Need complete live requisition text?
                       </span>
                       <button
                         onClick={() => handleCaptureFullJD(currentJob)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/80 hover:bg-purple-100 dark:hover:bg-purple-900 border border-purple-200 dark:border-purple-800 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors"
                       >
                         <RefreshCw className="w-3 h-3" />
-                        <span>Fetch Full Text</span>
+                        <span>Fetch full text</span>
                       </button>
                     </div>
                   )}
@@ -592,14 +623,14 @@ export default function JobDetailsModal({
         </div>
 
         {/* Modal Action Footer */}
-        <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="p-4 sm:p-5 border-t border-zinc-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-3 bg-zinc-50/50 dark:bg-zinc-900/50">
           <div className="flex items-center gap-2">
             <button
               onClick={() => onSave(currentJob)}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 saved
-                  ? "bg-purple-100 text-purple-700 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
-                  : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                  ? "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-xs"
+                  : "bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700"
               }`}
             >
               <Bookmark className={`w-3.5 h-3.5 ${saved ? "fill-current" : ""}`} />
@@ -608,9 +639,9 @@ export default function JobDetailsModal({
 
             <button
               onClick={(e) => onCheckOnline(currentJob, e)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-purple-400"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-750 transition-colors"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-purple-500" />
+              <ShieldCheck className="w-3.5 h-3.5 text-zinc-500" />
               <span>Verify Live</span>
             </button>
           </div>
@@ -619,7 +650,7 @@ export default function JobDetailsModal({
             {onTailorResume && (
               <button
                 onClick={() => onTailorResume(currentJob)}
-                className="hidden sm:inline-flex px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 border border-slate-200 dark:border-slate-700 hover:border-purple-400 transition-all"
+                className="hidden sm:inline-flex px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 transition-colors"
               >
                 Tailor Resume
               </button>
@@ -629,9 +660,9 @@ export default function JobDetailsModal({
               href={currentJob.applyUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold text-white ${GRADIENT_PRIMARY} shadow-md shadow-purple-500/20 hover:scale-105 active:scale-95 transition-all`}
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium text-white ${GRADIENT_PRIMARY || "bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac]"} shadow-xs dark:shadow-[0_0_12px_rgba(254,62,145,0.25)] transition-all`}
             >
-              <span>Apply on Official Portal</span>
+              <span>Apply on portal</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>

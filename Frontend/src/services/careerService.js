@@ -134,6 +134,33 @@ class CareerService extends API {
       }
     }
   }
+  async spiderIndiaTech(params = {}) {
+    try {
+      const response = await this.api.post("/careers/spider-india-tech", params);
+      return response.data;
+    } catch (error) {
+      return (
+        error.response?.data || {
+          success: false,
+          message: "Failed to spider India tech companies",
+        }
+      );
+    }
+  }
+
+  async getSpiderStatus() {
+    try {
+      const response = await this.api.get("/careers/spider-india-tech/status");
+      return response.data;
+    } catch (error) {
+      return (
+        error.response?.data || {
+          success: false,
+          message: "Failed to get spider status",
+        }
+      );
+    }
+  }
 }
 
 export default new CareerService();

@@ -17,19 +17,36 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Resume Saathi</title>
+  <title>Resume Saathi — ATS Diagnostic & Job Finder</title>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
     html,
     body,
     #root {
       min-height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    code, kbd, samp, pre, .font-mono {
+      font-family: 'JetBrains Mono', monospace;
     }
 
     html,
     body {
       margin: 0;
-      background-color: #f8fafc;
+      background-color: #fafafa;
+      color: #171717;
+    }
+
+    html.dark,
+    html.dark body {
+      background-color: #141415;
+      color: #ededed;
     }
   </style>
   <script>
@@ -45,7 +62,7 @@
         useDark = true;
       }
 
-      const initialBg = useDark ? "#030712" : "#f8fafc";
+      const initialBg = useDark ? "#141415" : "#fafafa";
       document.documentElement.style.backgroundColor = initialBg;
       if (document.body) {
         document.body.style.backgroundColor = initialBg;

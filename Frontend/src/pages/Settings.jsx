@@ -146,11 +146,11 @@ const Settings = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-linear-to-br from-[#f8fafc] via-[#f5f3ff] to-[#eef2ff] px-4 pb-14 pt-24 sm:px-6 lg:px-8 dark:from-[#111827] dark:via-[#0f172a] dark:to-[#1f2937]">
-      <div className="relative mx-auto grid w-full max-w-7xl items-stretch gap-6 xl:gap-8 lg:h-[calc(100vh-8.5rem)] lg:grid-cols-[320px_1fr]">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#fafafa] px-4 pb-14 pt-20 sm:px-6 lg:px-8 dark:bg-[#141415]">
+      <div className="relative mx-auto grid w-full max-w-7xl items-stretch gap-6 xl:gap-8 lg:h-[calc(100vh-7.5rem)] lg:grid-cols-[280px_1fr]">
         <SettingsSidebar tabItems={tabItems} activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <section className="rounded-3xl border border-slate-200/70 bg-white/85 shadow-[0_20px_70px_-30px_rgba(128,58,209,0.45)] backdrop-blur-md lg:h-full lg:overflow-x-hidden lg:overflow-y-auto dark:border-slate-700/80 dark:bg-slate-900/85">
+        <section className="rounded-xl border border-zinc-200/80 bg-white shadow-xs lg:h-full lg:overflow-x-hidden lg:overflow-y-auto dark:border-zinc-800 dark:bg-[#19191b]">
           <div className="h-full overflow-y-auto p-5 [scrollbar-width:none] sm:p-7 lg:p-8 [&::-webkit-scrollbar]:hidden">
             {activeTab === "profile" && <ProfileTab user={user} />}
 

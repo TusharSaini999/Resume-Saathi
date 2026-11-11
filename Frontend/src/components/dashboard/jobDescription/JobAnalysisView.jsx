@@ -19,11 +19,11 @@ function JobAnalysisView({ selectedJob }) {
 
   if (!selectedJob) {
     return (
-      <div className="rounded-3xl border border-white/70 bg-white/85 p-5 shadow-lg backdrop-blur-sm dark:border-[#334155] dark:bg-[#0f172a]/85 md:p-6">
-        <div className="rounded-2xl border border-dashed border-[#cbd5e1] p-8 text-center dark:border-[#475569]">
-          <p className="text-lg font-black text-[#1e293b] dark:text-white">No analysis selected</p>
-          <p className="mt-2 text-sm text-[#64748b] dark:text-[#94a3b8]">
-            Choose an item from history or submit a new JD to view analysis.
+      <div className="rounded-xl border border-zinc-200/80 bg-white p-6 shadow-xs dark:border-zinc-800 dark:bg-[#19191b]">
+        <div className="rounded-lg border border-dashed border-zinc-200 p-8 text-center dark:border-zinc-800">
+          <p className="text-base font-medium text-zinc-900 dark:text-zinc-100">No analysis selected</p>
+          <p className="mt-1 text-xs text-zinc-500">
+            Choose an item from history or submit a new JD to view diagnostics.
           </p>
         </div>
       </div>
@@ -31,141 +31,151 @@ function JobAnalysisView({ selectedJob }) {
   }
 
   return (
-    <div className="rounded-3xl border border-white/70 bg-white/85 p-5 shadow-lg backdrop-blur-sm dark:border-[#334155] dark:bg-[#0f172a]/85 md:p-6">
+    <div className="rounded-xl border border-zinc-200/80 bg-white p-5 sm:p-6 shadow-xs dark:border-zinc-800 dark:bg-[#19191b]">
       <div className="space-y-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 className="text-2xl font-black text-[#1e293b] dark:text-white">{selectedJob?.title || "Job Analysis"}</h3>
-            <p className="mt-1 flex flex-wrap items-center gap-3 text-sm text-[#64748b] dark:text-[#94a3b8]">
+            <h3 className="text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+              {selectedJob?.title || "Job Analysis"}
+            </h3>
+            <p className="mt-1 flex flex-wrap items-center gap-3 text-xs text-zinc-500">
               <span className="inline-flex items-center gap-1.5">
-                <Building2 size={14} /> {selectedJob?.company_name || "Unknown company"}
+                <Building2 size={13} /> {selectedJob?.company_name || "Company not specified"}
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <CalendarDays size={14} /> {formatDate(selectedJob?.createdAt)}
+                <CalendarDays size={13} /> {formatDate(selectedJob?.createdAt)}
               </span>
             </p>
           </div>
-          <span className={`rounded-full px-3 py-1.5 text-sm font-black ${getScoreTone(jdAnalysis?.match_score)}`}>
-            {jdAnalysis?.match_score ?? 0}% Match
+          <span className={`rounded-md px-2.5 py-1 text-xs font-mono font-medium ${getScoreTone(jdAnalysis?.match_score)}`}>
+            {jdAnalysis?.match_score ?? 0}% match
           </span>
         </div>
 
-        <div className="h-2 w-full rounded-full bg-[#e2e8f0] dark:bg-[#1e293b]">
+        <div className="h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800">
           <div
-            className="h-2 rounded-full bg-[linear-gradient(90deg,#f43f5e_0%,#fb7185_45%,#a855f7_100%)] transition-all"
+            className="h-1.5 rounded-full bg-[#fe3e91] transition-all"
             style={{ width: `${Math.max(0, Math.min(100, Number(jdAnalysis?.match_score) || 0))}%` }}
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-4 dark:border-[#334155] dark:bg-[#111827]">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#64748b] dark:text-[#94a3b8]">Required Experience</p>
-            <p className="mt-2 text-sm font-semibold text-[#1e293b] dark:text-white">
+        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
+          <div className="rounded-lg border border-zinc-200/80 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-900/40">
+            <p className="text-xs font-mono uppercase text-zinc-500">Required experience</p>
+            <p className="mt-1.5 text-xs font-medium text-zinc-900 dark:text-zinc-100">
               {jdAnalysis?.experience?.required_experience || "Not specified"}
             </p>
           </div>
-          <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-4 dark:border-[#334155] dark:bg-[#111827]">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#64748b] dark:text-[#94a3b8]">Candidate Experience</p>
-            <p className="mt-2 text-sm font-semibold text-[#1e293b] dark:text-white">
+          <div className="rounded-lg border border-zinc-200/80 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-900/40">
+            <p className="text-xs font-mono uppercase text-zinc-500">Candidate experience</p>
+            <p className="mt-1.5 text-xs font-medium text-zinc-900 dark:text-zinc-100">
               {jdAnalysis?.experience?.candidate_experience || "Not available"}
             </p>
           </div>
-          <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-4 dark:border-[#334155] dark:bg-[#111827]">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#64748b] dark:text-[#94a3b8]">Experience Fit</p>
-            <p className="mt-2 inline-flex items-center gap-2 text-sm font-black">
+          <div className="rounded-lg border border-zinc-200/80 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-900/40">
+            <p className="text-xs font-mono uppercase text-zinc-500">Experience fit</p>
+            <p className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium">
               {jdAnalysis?.experience?.experience_match ? (
                 <>
-                  <CheckCircle2 size={16} className="text-emerald-500" />
-                  <span className="text-emerald-600 dark:text-emerald-300">Matched</span>
+                  <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-emerald-700 dark:text-emerald-300">Matched</span>
                 </>
               ) : (
                 <>
-                  <CircleAlert size={16} className="text-amber-500" />
-                  <span className="text-amber-600 dark:text-amber-300">Needs Improvement</span>
+                  <CircleAlert size={14} className="text-amber-600 dark:text-amber-400" />
+                  <span className="text-amber-700 dark:text-amber-300">Experience gap</span>
                 </>
               )}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-4 dark:border-[#334155] dark:bg-[#111827]">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#64748b] dark:text-[#94a3b8]">Education Match</p>
-            <p className="mt-2 text-sm font-semibold text-[#1e293b] dark:text-white">
+        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
+          <div className="rounded-lg border border-zinc-200/80 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-900/40">
+            <p className="text-xs font-mono uppercase text-zinc-500">Education criteria</p>
+            <p className="mt-1.5 text-xs text-zinc-700 dark:text-zinc-300">
               Required: {jdAnalysis?.education?.required_education || "Not specified"}
             </p>
-            <p className="mt-1 text-sm font-semibold text-[#1e293b] dark:text-white">
+            <p className="mt-0.5 text-xs text-zinc-700 dark:text-zinc-300">
               Candidate: {jdAnalysis?.education?.candidate_education || "Not available"}
             </p>
-            <p className="mt-2 inline-flex rounded-full bg-[#0ea5e9] px-2.5 py-1 text-xs font-bold text-white">
-              {jdAnalysis?.education?.education_match ? "Education Matched" : "Education Gap"}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-4 dark:border-[#334155] dark:bg-[#111827]">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#64748b] dark:text-[#94a3b8]">Keyword Match</p>
-            <div className="mt-2 flex items-center justify-between text-sm font-semibold text-[#1e293b] dark:text-white">
-              <span>Matched Keywords</span>
-              <span>
-                {jdAnalysis?.keyword_match?.matched_keywords ?? 0}/{jdAnalysis?.keyword_match?.total_keywords ?? 0}
+            <div className="mt-2">
+              <span className={`inline-flex rounded px-2 py-0.5 text-[11px] font-mono font-medium ${
+                jdAnalysis?.education?.education_match
+                  ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60"
+                  : "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60"
+              }`}>
+                {jdAnalysis?.education?.education_match ? "Education matched" : "Education gap"}
               </span>
             </div>
-            <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-sky-100 px-2.5 py-1 text-xs font-bold text-sky-700 dark:bg-sky-500/20 dark:text-sky-300">
-              <TrendingUp size={13} /> {jdAnalysis?.keyword_match?.percentage ?? 0}% coverage
-            </p>
+          </div>
+
+          <div className="rounded-lg border border-zinc-200/80 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-900/40">
+            <p className="text-xs font-mono uppercase text-zinc-500">Keyword density</p>
+            <div className="mt-1.5 flex items-center justify-between text-xs font-mono text-zinc-900 dark:text-zinc-100">
+              <span>Matched terms</span>
+              <span>
+                {jdAnalysis?.keyword_match?.matched_keywords ?? 0} / {jdAnalysis?.keyword_match?.total_keywords ?? 0}
+              </span>
+            </div>
+            <div className="mt-2">
+              <span className="inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[11px] font-mono font-medium bg-rose-50 text-[#fe3e91] dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/60">
+                <TrendingUp size={12} /> {jdAnalysis?.keyword_match?.percentage ?? 0}% coverage
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-          <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-4 dark:border-[#334155] dark:bg-[#111827]">
-            <p className="mb-2 inline-flex items-center gap-2 text-sm font-black text-emerald-600 dark:text-emerald-300">
-              <Target size={15} /> Matched Skills
+        <div className="grid grid-cols-1 gap-3.5 xl:grid-cols-3">
+          <div className="rounded-lg border border-zinc-200/80 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-900/40">
+            <p className="mb-2 inline-flex items-center gap-1.5 text-xs font-mono font-medium text-emerald-700 dark:text-emerald-300">
+              <Target size={14} /> Matched skills
             </p>
-            <ul className="space-y-2 text-sm text-[#475569] dark:text-[#cbd5e1]">
+            <ul className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
               {matchedSkills.length ? (
-                matchedSkills.map((skill, idx) => <li key={`${skill}-${idx}`}>- {skill}</li>)
+                matchedSkills.map((skill, idx) => <li key={`${skill}-${idx}`}>&middot; {skill}</li>)
               ) : (
-                <li>No matched skills found.</li>
+                <li>No matched skills detected.</li>
               )}
             </ul>
           </div>
 
-          <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-4 dark:border-[#334155] dark:bg-[#111827]">
-            <p className="mb-2 inline-flex items-center gap-2 text-sm font-black text-rose-600 dark:text-rose-300">
-              <CircleAlert size={15} /> Missing Skills
+          <div className="rounded-lg border border-zinc-200/80 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-900/40">
+            <p className="mb-2 inline-flex items-center gap-1.5 text-xs font-mono font-medium text-red-600 dark:text-red-400">
+              <CircleAlert size={14} /> Missing skills
             </p>
-            <ul className="space-y-2 text-sm text-[#475569] dark:text-[#cbd5e1]">
+            <ul className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
               {missingSkills.length ? (
-                missingSkills.map((skill, idx) => <li key={`${skill}-${idx}`}>- {skill}</li>)
+                missingSkills.map((skill, idx) => <li key={`${skill}-${idx}`}>&middot; {skill}</li>)
               ) : (
-                <li>No major missing skills detected.</li>
+                <li>No missing core skills detected.</li>
               )}
             </ul>
           </div>
 
-          <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-4 dark:border-[#334155] dark:bg-[#111827]">
-            <p className="mb-2 inline-flex items-center gap-2 text-sm font-black text-indigo-600 dark:text-indigo-300">
-              <Briefcase size={15} /> Extra Skills
+          <div className="rounded-lg border border-zinc-200/80 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-900/40">
+            <p className="mb-2 inline-flex items-center gap-1.5 text-xs font-mono font-medium text-zinc-700 dark:text-zinc-300">
+              <Briefcase size={14} /> Additional skills
             </p>
-            <ul className="space-y-2 text-sm text-[#475569] dark:text-[#cbd5e1]">
+            <ul className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
               {extraSkills.length ? (
-                extraSkills.map((skill, idx) => <li key={`${skill}-${idx}`}>- {skill}</li>)
+                extraSkills.map((skill, idx) => <li key={`${skill}-${idx}`}>&middot; {skill}</li>)
               ) : (
-                <li>No additional skills listed.</li>
+                <li>No extra candidate skills reported.</li>
               )}
             </ul>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-4 dark:border-[#334155] dark:bg-[#111827]">
-          <p className="mb-2 inline-flex items-center gap-2 text-sm font-black text-[#7c3aed] dark:text-[#c4b5fd]">
-            <Lightbulb size={15} /> Suggestions
+        <div className="rounded-lg border border-zinc-200/80 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-900/40">
+          <p className="mb-2 inline-flex items-center gap-1.5 text-xs font-mono font-medium text-[#fe3e91]">
+            <Lightbulb size={14} /> Recommendations
           </p>
-          <ul className="space-y-2 text-sm text-[#475569] dark:text-[#cbd5e1]">
+          <ul className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
             {suggestions.length ? (
-              suggestions.map((item, idx) => <li key={`${item}-${idx}`}>- {item}</li>)
+              suggestions.map((item, idx) => <li key={`${item}-${idx}`}>&middot; {item}</li>)
             ) : (
-              <li>No suggestions generated yet.</li>
+              <li>No specific suggestions generated.</li>
             )}
           </ul>
         </div>

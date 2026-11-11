@@ -76,7 +76,7 @@ export async function fetchGreenhouseJobs(companySlug, companyName = "") {
       };
     });
   } catch (error) {
-    console.error(`[Greenhouse] Error fetching jobs for ${companySlug}:`, error.message);
+    // error silenced
     return [];
   }
 }
@@ -102,7 +102,7 @@ export async function fetchSingleGreenhouseJob(companySlug, jobId) {
       absoluteUrl: data.absolute_url,
     };
   } catch (err) {
-    console.warn(`[Greenhouse] Error fetching single job ${jobId}:`, err.message);
+    // error silenced
     return null;
   }
 }

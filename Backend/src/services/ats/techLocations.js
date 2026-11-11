@@ -466,18 +466,38 @@ export function getCountryData(countryId = "India") {
 export function matchesCountry(jobLocation = "", countryId = "All") {
   if (!countryId || countryId === "All" || countryId.toLowerCase() === "all") return true;
 
-  const loc = (jobLocation || "").toLowerCase();
-  const cLower = countryId.toLowerCase();
+  const loc = (jobLocation || "").toLowerCase().trim();
+  const cLower = countryId.toLowerCase().trim();
 
   if (cLower === "remote") {
     return loc.includes("remote") || loc.includes("wfh") || loc.includes("anywhere") || loc.includes("virtual");
   }
 
+  // Targeted regions for India to ensure all major states and tech cities match reliably
+  if (cLower === "india" || cLower === "in") {
+    if (loc.includes("india")) return true;
+    const indianLocations = [
+      "karnataka", "maharashtra", "tamil nadu", "telangana", "uttar pradesh",
+      "haryana", "rajasthan", "gujarat", "kerala", "andhra pradesh",
+      "west bengal", "punjab", "delhi", "madhya pradesh", "bihar", "odisha",
+      "assam", "goa", "chandigarh", "uttarakhand", "bengaluru", "bangalore",
+      "hyderabad", "pune", "mumbai", "navi mumbai", "noida", "greater noida",
+      "gurgaon", "gurugram", "chennai", "kolkata", "ahmedabad", "gandhinagar",
+      "kochi", "cochin", "trivandrum", "thiruvananthapuram", "jaipur", "lucknow",
+      "coimbatore", "indore", "bhopal", "vadodara", "surat", "patna", "vizag",
+      "visakhapatnam", "mohali"
+    ];
+    if (indianLocations.some((place) => loc.includes(place))) {
+      return true;
+    }
+  }
+
   const country = TECH_COUNTRIES.find((c) => c.id.toLowerCase() === cLower || c.name.toLowerCase() === cLower);
   if (!country) return loc.includes(cLower);
 
-  // Check country name, code, and keywords from all its tech hubs
-  if (loc.includes(country.name.toLowerCase()) || loc.includes(country.code.toLowerCase())) {
+  // Check country name or exact word-bounded country code (avoid false positives on Springfield, Berlin, Finland, etc.)
+  const codeRegex = new RegExp(`\\b${country.code}\\b`, "i");
+  if (loc.includes(country.name.toLowerCase()) || codeRegex.test(loc)) {
     return true;
   }
 

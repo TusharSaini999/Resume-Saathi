@@ -2,16 +2,18 @@ import { findCompanyByIdOrSlug, COMPANIES_REGISTRY } from "./companyRegistry.js"
 import { fetchGreenhouseJobs } from "./greenhouse.service.js";
 import { fetchLeverJobs } from "./lever.service.js";
 import { fetchSmartRecruitersJobs } from "./smartrecruiters.service.js";
+import { fetchAshbyJobs } from "./ashby.service.js";
 import aiSearchService from "./aiSearch.service.js";
 import { matchesSmartRoleQuery } from "./curatedOfficialJobs.js";
 import linkedInJobSearchService from "./linkedinJobSearch.service.js";
+import { resolveCompanyLinks, normalizeCompanySlug } from "./companyDiscovery.service.js";
 
 /**
- * Top verified live ATS companies with 100% active, official Greenhouse/Lever/SmartRecruiters boards.
- * These endpoints return thousands of real, live job postings directly from company career APIs.
+ * Verified Live ATS Companies (Greenhouse, Lever, SmartRecruiters, Ashby)
+ * Sourced directly from official company ATS API boards with 100% genuine active requisitions.
  */
 export const VERIFIED_LIVE_ATS_COMPANIES = [
-  // Top Indian Startups & Unicorns with Active Live ATS Boards
+  // Top Indian Tech Companies & Unicorns with Active Live ATS Boards
   { id: "razorpay", slug: "razorpaysoftwareprivatelimited", name: "Razorpay", provider: "greenhouse" },
   { id: "swiggy", slug: "swiggy", name: "Swiggy", provider: "smartrecruiters" },
   { id: "slice", slug: "slice", name: "Slice", provider: "greenhouse" },
@@ -21,6 +23,16 @@ export const VERIFIED_LIVE_ATS_COMPANIES = [
   { id: "pocketfm", slug: "pocketfm", name: "Pocket FM", provider: "lever" },
   { id: "cred", slug: "cred", name: "CRED", provider: "lever" },
   { id: "devrev", slug: "devrev", name: "DevRev", provider: "greenhouse" },
+  { id: "signoz", slug: "signoz", name: "SigNoz", provider: "ashby" },
+  { id: "plane", slug: "plane", name: "Plane", provider: "ashby" },
+  { id: "urbancompany", slug: "urbancompany", name: "Urban Company", provider: "greenhouse" },
+  { id: "zeta", slug: "zeta", name: "Zeta", provider: "lever" },
+  { id: "paytm", slug: "paytm", name: "Paytm", provider: "lever" },
+  { id: "freshworks", slug: "freshworks", name: "Freshworks", provider: "smartrecruiters" },
+  { id: "rebelfoods", slug: "rebelfoods", name: "Rebel Foods", provider: "smartrecruiters" },
+  { id: "thoughtworks", slug: "thoughtworks", name: "Thoughtworks", provider: "greenhouse" },
+  { id: "snowflake", slug: "snowflake", name: "Snowflake", provider: "ashby" },
+  { id: "porter", slug: "porter", name: "Porter", provider: "greenhouse" },
 
   // Top Global & MNC Tech Innovators with Active Live ATS Boards
   { id: "stripe", slug: "stripe", name: "Stripe", provider: "greenhouse" },
@@ -44,6 +56,10 @@ export const VERIFIED_LIVE_ATS_COMPANIES = [
   { id: "brex", slug: "brex", name: "Brex", provider: "greenhouse" },
   { id: "scaleai", slug: "scaleai", name: "Scale AI", provider: "greenhouse" },
   { id: "vercel", slug: "vercel", name: "Vercel", provider: "greenhouse" },
+  { id: "linear", slug: "linear", name: "Linear", provider: "ashby" },
+  { id: "postman", slug: "postman", name: "Postman", provider: "greenhouse" },
+  { id: "sentry", slug: "sentry", name: "Sentry", provider: "greenhouse" },
+  { id: "supabase", slug: "supabase", name: "Supabase", provider: "greenhouse" },
 ];
 
 /**
@@ -78,7 +94,17 @@ export function isRealOpeningUrl(urlString = "") {
       return false;
     }
 
-    // 2. Definite Direct ATS Requisitions (Greenhouse, Lever, SmartRecruiters, Workday, Wellfound)
+    // 2. Discard dummy / demo / template job URLs
+    if (
+      pathname.includes("sample-job") ||
+      pathname.includes("job-template") ||
+      pathname.includes("dummy") ||
+      pathname.includes("placeholder")
+    ) {
+      return false;
+    }
+
+    // 3. Definite Direct ATS Requisitions (Greenhouse, Lever, SmartRecruiters, Ashby, Workday, Wellfound, LinkedIn)
     if (host.includes("greenhouse.io") || host.includes("grnh.se")) {
       return pathname.includes("/jobs/") || search.includes("gh_jid=") || search.includes("token=");
     }
@@ -87,6 +113,10 @@ export function isRealOpeningUrl(urlString = "") {
       return parts.length >= 2;
     }
     if (host.includes("smartrecruiters.com")) {
+      const parts = pathname.split("/").filter(Boolean);
+      return parts.length >= 2;
+    }
+    if (host.includes("ashbyhq.com")) {
       const parts = pathname.split("/").filter(Boolean);
       return parts.length >= 2;
     }
@@ -100,13 +130,23 @@ export function isRealOpeningUrl(urlString = "") {
       return pathname.includes("/jobs/view/");
     }
 
-    // 3. Reject root/homepage generic paths and search result pages
+    // 4. Reject root/homepage generic paths and search result pages
     const cleanPath = pathname.replace(/\/+$/, "");
     const genericRoots = [
       "",
       "/",
       "/careers",
+      "/careers/",
       "/jobs",
+      "/jobs/",
+      "/about/careers",
+      "/about/careers/",
+      "/en/careers",
+      "/en/careers/",
+      "/work-with-us",
+      "/work-with-us/",
+      "/join-us",
+      "/join-us/",
       "/ibegin",
       "/careers-home",
       "/jobs/results",
@@ -115,18 +155,19 @@ export function isRealOpeningUrl(urlString = "") {
       "/careers-home/jobs",
       "/jobs/search",
     ];
-    if (genericRoots.includes(cleanPath)) {
+    if (genericRoots.includes(cleanPath) && !search) {
       return false;
     }
 
-    // 4. Require specific requisition ID in path or search query
+    // 5. Require valid specific job requisition tokens
     const segments = cleanPath.split("/").filter(Boolean);
     const hasJobParam =
       search.includes("id=") ||
       search.includes("jid=") ||
       search.includes("requisition=") ||
       search.includes("job_id=") ||
-      search.includes("gh_jid=");
+      search.includes("gh_jid=") ||
+      search.includes("currentjobid");
 
     if (segments.length >= 2 || hasJobParam) {
       return true;
@@ -139,25 +180,98 @@ export function isRealOpeningUrl(urlString = "") {
 }
 
 /**
- * Fetch jobs for a specific company identifier
+ * Searches and crawls an ATS board (Greenhouse, Lever, SmartRecruiters, Ashby)
+ * as the authoritative primary source for finding live jobs.
+ */
+export async function searchAtsBoard(provider, slug, companyName = "") {
+  if (!slug) return [];
+  const cleanProv = (provider || "").toLowerCase().trim();
+
+  try {
+    if (cleanProv === "greenhouse") {
+      return await fetchGreenhouseJobs(slug, companyName);
+    }
+    if (cleanProv === "lever") {
+      return await fetchLeverJobs(slug, companyName);
+    }
+    if (cleanProv === "smartrecruiters") {
+      return await fetchSmartRecruitersJobs(slug, companyName);
+    }
+    if (cleanProv === "ashby") {
+      return await fetchAshbyJobs(slug, companyName);
+    }
+  } catch {
+    return [];
+  }
+  return [];
+}
+
+/**
+ * Dynamic probe across all major ATS providers (Greenhouse, Lever, SmartRecruiters, Ashby)
+ * to automatically discover if a company operates a live ATS board and extract its jobs.
+ */
+export async function probeAllAtsProviders(slugs = [], companyName = "") {
+  for (const slug of slugs) {
+    if (!slug) continue;
+    const clean = slug.toLowerCase().replace(/[^a-z0-9_-]/g, "");
+
+    const [ghRes, lvRes, srRes, ashRes] = await Promise.allSettled([
+      fetchGreenhouseJobs(clean, companyName),
+      fetchLeverJobs(clean, companyName),
+      fetchSmartRecruitersJobs(clean, companyName),
+      fetchAshbyJobs(clean, companyName),
+    ]);
+
+    if (ghRes.status === "fulfilled" && ghRes.value?.length > 0) {
+      return ghRes.value.filter((j) => isRealOpeningUrl(j.applyUrl));
+    }
+    if (lvRes.status === "fulfilled" && lvRes.value?.length > 0) {
+      return lvRes.value.filter((j) => isRealOpeningUrl(j.applyUrl));
+    }
+    if (srRes.status === "fulfilled" && srRes.value?.length > 0) {
+      return srRes.value.filter((j) => isRealOpeningUrl(j.applyUrl));
+    }
+    if (ashRes.status === "fulfilled" && ashRes.value?.length > 0) {
+      return ashRes.value.filter((j) => isRealOpeningUrl(j.applyUrl));
+    }
+  }
+  return [];
+}
+
+/**
+ * Fetch jobs for a specific company identifier using its underlying ATS board
+ * (Greenhouse, Lever, SmartRecruiters, Ashby) as the primary job-finding source!
  */
 export async function fetchJobsForCompany(companyIdentifier, roleQuery = "", location = "India") {
+  const normId = (companyIdentifier || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  const verifiedAts = VERIFIED_LIVE_ATS_COMPANIES.find((c) => {
+    const cId = (c.id || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const cName = (c.name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const cSlug = (c.slug || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    return cId === normId || cName === normId || cSlug === normId || (normId.length >= 4 && (cId.includes(normId) || normId.includes(cId)));
+  });
+
   const registered = findCompanyByIdOrSlug(companyIdentifier);
-  const companyName = registered?.name || companyIdentifier;
+  const companyName = verifiedAts?.name || registered?.name || companyIdentifier;
+  const links = resolveCompanyLinks(companyIdentifier);
 
   const candidateJobs = [];
 
-  // 1. Fetch from verified ATS if registered
-  if (registered) {
-    if (registered.provider === "greenhouse") {
-      const gh = await fetchGreenhouseJobs(registered.slug, registered.name);
-      candidateJobs.push(...gh);
-    } else if (registered.provider === "lever") {
-      const lv = await fetchLeverJobs(registered.slug, registered.name);
-      candidateJobs.push(...lv);
-    } else if (registered.provider === "smartrecruiters") {
-      const sr = await fetchSmartRecruitersJobs(registered.slug, registered.name);
-      candidateJobs.push(...sr);
+  // 1. Fetch directly from verified ATS board (Greenhouse, Lever, SmartRecruiters, Ashby)
+  if (verifiedAts) {
+    const atsJobs = await searchAtsBoard(verifiedAts.provider, verifiedAts.slug, verifiedAts.name);
+    if (atsJobs && atsJobs.length > 0) {
+      candidateJobs.push(...atsJobs);
+    }
+  } else if (registered) {
+    const prov = (registered.provider || "").toLowerCase();
+    const targetSlug = registered.slug || registered.id;
+
+    if (["greenhouse", "lever", "smartrecruiters", "ashby"].includes(prov)) {
+      const atsJobs = await searchAtsBoard(prov, targetSlug, companyName);
+      if (atsJobs && atsJobs.length > 0) {
+        candidateJobs.push(...atsJobs);
+      }
     } else if (registered.provider === "ai_search") {
       try {
         const liveJobs = await aiSearchService.searchOfficialCareerPortal(
@@ -166,8 +280,8 @@ export async function fetchJobsForCompany(companyIdentifier, roleQuery = "", loc
           location
         );
         if (liveJobs && liveJobs.length > 0) candidateJobs.push(...liveJobs);
-      } catch (err) {
-        console.warn(`[AtsDetector] Live AI search note for ${registered.name}: ${err.message}`);
+      } catch {
+        // AI search fallback silent
       }
     }
   }
@@ -190,38 +304,51 @@ export async function fetchJobsForCompany(companyIdentifier, roleQuery = "", loc
         }
       }
     }
-  } catch (liErr) {
-    console.warn(`[AtsDetector] LinkedIn search note for ${companyName}:`, liErr.message);
+  } catch {
+    // LinkedIn search silent
   }
 
-  if (candidateJobs.length > 0) {
-    return candidateJobs.filter((j) => isRealOpeningUrl(j.applyUrl));
+  // 3. If ATS had no jobs yet, dynamically probe Greenhouse, Lever, SmartRecruiters, Ashby
+  if (candidateJobs.length === 0) {
+    const cleanSlug = companyIdentifier.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+    const possibleSlugs = [
+      registered?.slug,
+      cleanSlug,
+      normalizeCompanySlug(companyName),
+      companyIdentifier.toLowerCase().replace(/\s+/g, ""),
+    ].filter(Boolean);
+
+    const probedJobs = await probeAllAtsProviders(possibleSlugs, companyName);
+    if (probedJobs.length > 0) {
+      candidateJobs.push(...probedJobs);
+    }
   }
 
-  // 3. Fast parallel ATS check on clean slug
-  const cleanSlug = companyIdentifier.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (cleanSlug) {
-    const [ghRes, lvRes, srRes] = await Promise.allSettled([
-      fetchGreenhouseJobs(cleanSlug, companyIdentifier),
-      fetchLeverJobs(cleanSlug, companyIdentifier),
-      fetchSmartRecruitersJobs(cleanSlug, companyIdentifier),
-    ]);
-
-    if (ghRes.status === "fulfilled" && ghRes.value?.length > 0) return ghRes.value.filter((j) => isRealOpeningUrl(j.applyUrl));
-    if (lvRes.status === "fulfilled" && lvRes.value?.length > 0) return lvRes.value.filter((j) => isRealOpeningUrl(j.applyUrl));
-    if (srRes.status === "fulfilled" && srRes.value?.length > 0) return srRes.value.filter((j) => isRealOpeningUrl(j.applyUrl));
-  }
-
-  return [];
+  // 4. Enrich every job with verified official company links
+  const validJobs = candidateJobs.filter((j) => isRealOpeningUrl(j.applyUrl));
+  return validJobs.map((j) => ({
+    ...j,
+    company: companyName,
+    companySlug: normalizeCompanySlug(companyName),
+    companyPageUrl: links.companyPageUrl,
+    website: links.companyPageUrl,
+    careerPageUrl: links.careerPageUrl,
+    officialPortalUrl: links.careerPageUrl,
+    linkedInUrl: links.linkedInUrl,
+    linkedInJobsUrl: links.linkedInJobsUrl,
+    sourcePortal: "Official Career Portal",
+    portalLabel: "Official Career Portal",
+    isRealOpening: true,
+  }));
 }
 
 /**
  * Fetch curated jobs across all verified live ATS boards in parallel.
- * Returns only real, live, currently open requisitions with zero timeouts.
+ * Queries Greenhouse, Lever, SmartRecruiters, and Ashby as the core source of jobs.
  */
 export async function fetchAllCuratedJobs(limitPerCompany = 30, roleQuery = "", candidateKeywords = []) {
   const searchKeywords = Array.isArray(candidateKeywords) ? candidateKeywords.map((k) => k.toLowerCase()) : [];
-  const primaryRole = roleQuery || (searchKeywords.length > 0 ? searchKeywords[0] : "");
+  const primaryRole = (roleQuery || (searchKeywords.length > 0 ? searchKeywords[0] : "")).trim();
 
   // Query verified live ATS boards in parallel
   const promises = VERIFIED_LIVE_ATS_COMPANIES.map(async (company) => {
@@ -233,15 +360,32 @@ export async function fetchAllCuratedJobs(limitPerCompany = 30, roleQuery = "", 
         jobs = await fetchLeverJobs(company.slug, company.name);
       } else if (company.provider === "smartrecruiters") {
         jobs = await fetchSmartRecruitersJobs(company.slug, company.name);
+      } else if (company.provider === "ashby") {
+        jobs = await fetchAshbyJobs(company.slug, company.name);
       }
 
-      let list = jobs.filter((j) => isRealOpeningUrl(j.applyUrl));
+      let list = (jobs || []).filter((j) => isRealOpeningUrl(j.applyUrl));
 
-      if (primaryRole && primaryRole.trim()) {
+      if (primaryRole) {
         list = list.filter((j) => matchesSmartRoleQuery(j, primaryRole));
       }
 
-      return list.slice(0, limitPerCompany);
+      const links = resolveCompanyLinks(company.slug || company.name);
+
+      return list.slice(0, limitPerCompany).map((j) => ({
+        ...j,
+        company: company.name,
+        companySlug: normalizeCompanySlug(company.name),
+        companyPageUrl: links.companyPageUrl,
+        website: links.companyPageUrl,
+        careerPageUrl: links.careerPageUrl,
+        officialPortalUrl: links.careerPageUrl,
+        linkedInUrl: links.linkedInUrl,
+        linkedInJobsUrl: links.linkedInJobsUrl,
+        sourcePortal: "Official Career Portal",
+        portalLabel: "Official Career Portal",
+        isRealOpening: true,
+      }));
     } catch {
       return [];
     }

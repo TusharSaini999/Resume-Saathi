@@ -1,6 +1,7 @@
 import { fetchJobsForCompany, fetchAllCuratedJobs, isRealOpeningUrl } from "./ats/atsDetector.service.js";
 import { matchesSmartRoleQuery } from "./ats/curatedOfficialJobs.js";
 import { COMPANIES_REGISTRY, findCompanyByIdOrSlug, COMPANY_CATEGORIES } from "./ats/companyRegistry.js";
+import { resolveCompanyLinks } from "./ats/companyDiscovery.service.js";
 import { matchesCountry, matchesTechHub, TECH_COUNTRIES } from "./ats/techLocations.js";
 import { inferTechStacksAndRoles } from "./ats/techStackInference.service.js";
 import {
@@ -32,7 +33,7 @@ export async function clearCareerCache() {
   jobsCache.clear();
   aiJobMatcherService.clearAiCache();
   try {
-    await DiscoveredCareerJob.deleteMany({});
+    // DiscoveredCareerJob preserved in database; cache maps purged
   } catch (e) {
     console.warn("[CareerService] Clear cache warning:", e.message);
   }
@@ -66,32 +67,10 @@ export function classifyPortalSource(job) {
     };
   }
 
-  // 2. Third-Party Portals / Aggregators / Web Search / Startup Direct Posts
-  if (
-    s === "third_party" ||
-    s === "startup_direct_post" ||
-    s === "ai_search" ||
-    s === "external" ||
-    s === "aggregator" ||
-    u.includes("cutshort") ||
-    u.includes("naukri") ||
-    u.includes("wellfound") ||
-    u.includes("angel.co") ||
-    u.includes("indeed") ||
-    u.includes("instahyre") ||
-    u.includes("hirist") ||
-    u.includes("foundit")
-  ) {
-    return {
-      portalType: "third_party",
-      portalTypeLabel: "Third-Party Job Portal",
-    };
-  }
-
-  // 3. Official Career ATS & Direct Company Portals (Greenhouse, Lever, SmartRecruiters, TCS, Workday, etc.)
+  // 2. Official Company Career Portals
   return {
     portalType: "official",
-    portalTypeLabel: "Official Career ATS",
+    portalTypeLabel: "Official Career Portal",
   };
 }
 
@@ -546,10 +525,19 @@ export function computeJobMatch(job, candidateProfile, resumeText = "") {
       }
     } else {
       // Tech candidate applying to Tech role
+      const hasGenuineMatch =
+        fullMatchedFromResume.length > 0 ||
+        isDerivedRoleTitleMatched ||
+        matched.length > 0;
+      const keywordBonus = Math.min(25, fullMatchedFromResume.length * 5);
+
       if (isFresher) {
-        if (isFresherRole) {
-          const baseScore = Math.round(skillCoverageRatio * 50) + 30 + titleBonus + streamBonus;
-          finalScore = Math.min(98, Math.max(74, baseScore));
+        if (!hasGenuineMatch) {
+          finalScore = Math.min(48, Math.max(25, Math.round(skillCoverageRatio * 30) + 15));
+          recommendation = `Entry-level role, but limited overlap with your resume skills. Highlight relevant projects or skills in ${job.title}.`;
+        } else if (isFresherRole) {
+          const baseScore = Math.round(skillCoverageRatio * 40) + 20 + titleBonus + streamBonus + keywordBonus;
+          finalScore = Math.min(98, Math.max(72, baseScore));
           const matchedList = matched.slice(0, 3).join(", ") || "core fundamentals";
           if (isDerivedRoleTitleMatched && primaryInferredStack) {
             recommendation = `🎯 High Tech Stack Alignment! Your skills in ${primaryInferredStack.matchedComponents.join(", ")} qualify you as a ${primaryInferredStack.name} & Full Stack engineer for this ${job.title} opening.`;
@@ -562,17 +550,20 @@ export function computeJobMatch(job, candidateProfile, resumeText = "") {
           finalScore = Math.min(50, Math.max(30, Math.round(skillCoverageRatio * 35) + 10));
           recommendation = `⚠️ Senior Role (${job.experienceLevel}). Requires 5+ years of enterprise experience. As a fresher, prioritize SDE-1 or Internship openings for higher callback rates.`;
         } else {
-          finalScore = Math.min(68, Math.max(45, Math.round(skillCoverageRatio * 40) + 18 + streamBonus));
+          finalScore = Math.min(70, Math.max(48, Math.round(skillCoverageRatio * 40) + 18 + streamBonus + keywordBonus));
           recommendation = `⚡ Stretch Role (${job.experienceLevel}). Apply if you have exceptional portfolio projects demonstrating ${matched.slice(0, 2).join(" & ") || "required skills"}.`;
         }
       } else {
         // Experienced tech candidate
-        if (job.experienceLevel === "Senior (5+ yrs)" && experienceYears < 4) {
-          finalScore = Math.min(72, Math.max(45, Math.round(skillCoverageRatio * 45) + titleBonus + streamBonus));
+        if (!hasGenuineMatch) {
+          finalScore = Math.min(46, Math.max(25, Math.round(skillCoverageRatio * 30) + 10));
+          recommendation = `Role requires distinct skills not currently emphasized on your resume. Tailor your resume or highlight adjacent experience in ${job.title}.`;
+        } else if (job.experienceLevel === "Senior (5+ yrs)" && experienceYears < 4) {
+          finalScore = Math.min(74, Math.max(48, Math.round(skillCoverageRatio * 40) + titleBonus + streamBonus + keywordBonus));
           recommendation = `Good skill overlap, but requires ${job.experienceLevel}. Highlight large-scale architectural achievements.`;
         } else {
-          const base = Math.round(skillCoverageRatio * 55) + titleBonus + streamBonus + 20;
-          finalScore = Math.min(98, Math.max(45, base));
+          const base = Math.round(skillCoverageRatio * 45) + titleBonus + streamBonus + 20 + keywordBonus;
+          finalScore = Math.min(98, Math.max(68, base));
           if (isDerivedRoleTitleMatched && primaryInferredStack) {
             recommendation = `🎯 Strong Tech Stack Match! Your experience in ${primaryInferredStack.matchedComponents.join(", ")} directly aligns with this ${job.title} (${primaryInferredStack.name}) role.`;
           } else if (isStreamMatch) {
@@ -710,8 +701,25 @@ export async function getJobsForCandidate(userId, options = {}) {
     if (companySlug) {
       rawJobs = await fetchJobsForCompany(companySlug, roleQuery, location);
     } else {
-      rawJobs = await fetchAllCuratedJobs(25, roleQuery, candidateProfile.skills || []);
+      {
+      const liveDiscovered = await fetchAllCuratedJobs(30, roleQuery);
+      // Merge live discovered jobs with existing stored jobs in database
+      const poolMap = new Map();
+      for (const j of rawJobs) {
+        const k = j.applyUrl || `${j.companySlug || j.company}_${j.externalId || j.id || j.title}`;
+        if (k) poolMap.set(k, j);
+      }
+      for (const j of liveDiscovered) {
+        const k = j.applyUrl || `${j.companySlug || j.company}_${j.externalId || j.id || j.title}`;
+        if (k) poolMap.set(k, j);
+      }
+      rawJobs = Array.from(poolMap.values());
+      if (rawJobs.length === 0) rawJobs = liveDiscovered;
     }
+    }
+
+    // Filter strictly to ensure 100% genuine live requisitions
+    rawJobs = (rawJobs || []).filter((j) => isRealOpeningUrl(j.applyUrl));
 
     // Filter strictly to ensure 100% genuine live requisitions
     rawJobs = (rawJobs || []).filter((j) => isRealOpeningUrl(j.applyUrl));
@@ -810,7 +818,7 @@ export async function getJobsForCandidate(userId, options = {}) {
           }
         }
       } catch (err) {
-        console.warn("[CareerService] All-inferred crawler note:", err.message);
+        // note silenced
       }
     }
   } else if (roleQuery && roleQuery.trim()) {
@@ -819,7 +827,7 @@ export async function getJobsForCandidate(userId, options = {}) {
     // If local cache had very few matches for this role, execute live ATS discovery for this query
     if (filteredJobs.length < 3) {
       try {
-        const liveDiscovered = await fetchAllCuratedJobs(25, roleQuery, candidateProfile.skills || []);
+        const liveDiscovered = await fetchAllCuratedJobs(25, roleQuery);
         if (liveDiscovered.length > 0) {
           const existingIds = new Set(filteredJobs.map((j) => j.externalId || j.id || j.applyUrl));
           for (const newJob of liveDiscovered) {
@@ -831,7 +839,7 @@ export async function getJobsForCandidate(userId, options = {}) {
           }
         }
       } catch (err) {
-        console.warn("[CareerService] Live role discovery note:", err.message);
+        // note silenced
       }
     }
 
@@ -854,31 +862,71 @@ export async function getJobsForCandidate(userId, options = {}) {
         }
       }
     } catch (liErr) {
-      console.warn("[CareerService] Live LinkedIn role discovery note:", liErr.message);
+      // note silenced
     }
-  } else if (!roleQuery && candidateProfile.skills?.length > 0 && isLiveScan) {
-    // If user has a resume but didn't type a specific query, dynamically crawl live LinkedIn jobs for candidate's actual resume technologies AND derived roles
-    try {
-      const topRoleQuery = candidateProfile.derivedRoleTitles?.[0] || "";
-      const resumeDiscovered = await linkedInJobSearchService.crawlCandidateJobs(
-        candidateProfile.skills,
-        topRoleQuery,
-        location,
-        5,
-        candidateProfile.derivedRoleTitles || []
+  } else if (!roleQuery && (candidateProfile.skills?.length > 0 || candidateProfile.derivedRoleTitles?.length > 0)) {
+    // When candidate has an uploaded resume and no specific role query is typed,
+    // automatically find real jobs matching resume skills, keywords, and derived roles
+    const candidateTerms = Array.from(
+      new Set([
+        ...(candidateProfile.derivedRoleTitles || []),
+        ...(candidateProfile.inferredStacks || []).map((s) => s.name),
+        ...(candidateProfile.derivedSearchKeywords || []),
+        ...(candidateProfile.skills || []).slice(0, 10),
+      ])
+    );
+
+    const resumeMatchedJobs = rawJobs.filter((j) => {
+      const titleLower = (j.title || "").toLowerCase();
+      const descLower = (j.description || "").toLowerCase();
+      const skillsLower = (j.requiredSkills || []).map((s) => s.toLowerCase());
+
+      return (
+        candidateTerms.some((term) => {
+          const tLower = term.toLowerCase();
+          return (
+            titleLower.includes(tLower) ||
+            descLower.includes(tLower) ||
+            skillsLower.some((s) => s.includes(tLower) || tLower.includes(s))
+          );
+        }) ||
+        j.inferredStackMatched ||
+        j.isDerivedRoleMatched ||
+        (j.matchedResumeRoles && j.matchedResumeRoles.length > 0) ||
+        (j.matchedResumeKeywords && j.matchedResumeKeywords.length > 0)
       );
-      if (resumeDiscovered && resumeDiscovered.length > 0) {
-        const existingIds = new Set(filteredJobs.map((j) => j.externalId || j.id || j.applyUrl));
-        for (const newJob of resumeDiscovered) {
-          const id = newJob.externalId || newJob.id || newJob.applyUrl;
-          if (!existingIds.has(id)) {
-            filteredJobs.push(newJob);
-            existingIds.add(id);
+    });
+
+    // If matching pool is small, trigger targeted discovery for candidate's top derived role & skills
+    if (resumeMatchedJobs.length < 8) {
+      try {
+        const topRoleQuery = candidateProfile.derivedRoleTitles?.[0] || candidateProfile.skills?.slice(0, 3).join(" ") || "Software Engineer";
+        const resumeDiscovered = await linkedInJobSearchService.crawlCandidateJobs(
+          candidateProfile.skills || [],
+          topRoleQuery,
+          location,
+          8,
+          candidateProfile.derivedRoleTitles || []
+        );
+        if (resumeDiscovered && resumeDiscovered.length > 0) {
+          const existingIds = new Set(resumeMatchedJobs.map((j) => j.externalId || j.id || j.applyUrl));
+          for (const newJob of resumeDiscovered) {
+            const id = newJob.externalId || newJob.id || newJob.applyUrl;
+            if (!existingIds.has(id)) {
+              resumeMatchedJobs.push(newJob);
+              existingIds.add(id);
+            }
           }
         }
+      } catch (crawlErr) {
+        // note silenced
       }
-    } catch (crawlErr) {
-      console.warn("[CareerService] Dynamic resume crawl note:", crawlErr.message);
+    }
+
+    if (resumeMatchedJobs.length > 0) {
+      const matchedIds = new Set(resumeMatchedJobs.map((j) => j.externalId || j.id || j.applyUrl));
+      const remainingJobs = rawJobs.filter((j) => !matchedIds.has(j.externalId || j.id || j.applyUrl));
+      filteredJobs = [...resumeMatchedJobs, ...remainingJobs];
     }
   }
 
@@ -906,7 +954,7 @@ export async function getJobsForCandidate(userId, options = {}) {
           }
         }
       } catch (locCrawlErr) {
-        console.warn("[CareerService] Location crawl note:", locCrawlErr.message);
+        // note silenced
       }
     }
   }
@@ -1125,6 +1173,7 @@ export async function getJobsForCandidate(userId, options = {}) {
   // 8. Compute Base Match Scores for each job & enrich with Official Portal Metadata & Structured JD
   const scoredJobs = uniqueFilteredJobs.map((job) => {
     const regCompany = findCompanyByIdOrSlug(job.companySlug || job.company);
+    const companyLinks = resolveCompanyLinks(job.companySlug || job.company);
     const rawDesc = job.fullDescription || (job.description && job.description.length > 200 ? job.description : "");
     const fullDescText = cleanHtmlToText(rawDesc);
     const isFullJdReady = Boolean(job.hasFullJD || (fullDescText && fullDescText.length > 400));
@@ -1162,11 +1211,17 @@ export async function getJobsForCandidate(userId, options = {}) {
       hasFullJD: isFullJdReady,
       companyCategory: regCompany?.category || job.companyCategory || (isSmall ? "Small Startups & Emerging Tech" : "Tech & Innovation Leader"),
       companyLogo:
+        companyLinks.logo ||
         regCompany?.logo ||
         job.logo ||
         `https://${(job.companySlug || "company").replace(/[^a-z0-9]/g, "")}.com/favicon.ico`,
-      officialPortalUrl: regCompany?.officialPortalUrl || regCompany?.website || job.applyUrl,
-      sourcePortal: regCompany?.officialPortalUrl
+      companyPageUrl: companyLinks.companyPageUrl,
+      website: companyLinks.companyPageUrl,
+      careerPageUrl: companyLinks.careerPageUrl,
+      officialPortalUrl: companyLinks.careerPageUrl || job.applyUrl,
+      linkedInUrl: companyLinks.linkedInUrl,
+      linkedInJobsUrl: companyLinks.linkedInJobsUrl,
+      sourcePortal: companyLinks.careerPageUrl
         ? "Official Career Portal"
         : job.portalLabel || (job.applyUrl?.includes("linkedin.com") ? "LinkedIn Job Profile" : "Direct ATS Portal"),
       isRealOpening: isDirectReal,
@@ -1223,17 +1278,19 @@ export async function getJobsForCandidate(userId, options = {}) {
 
   // 10. Precision Sort: Prioritize role query matches, direct track match, AI score, then base ATS score
   finalJobs.sort((a, b) => {
-    // 0. Direct Role Query Match
-    if (isAllInferredQuery) {
+    // 0. Direct Role Query Match or Resume-derived role match
+    if (isAllInferredQuery || (!roleQuery && hasUserResume)) {
       const aInferred = Boolean(
         a.inferredStackMatched ||
         a.isDerivedRoleMatched ||
-        (a.matchedResumeRoles && a.matchedResumeRoles.length > 0)
+        (a.matchedResumeRoles && a.matchedResumeRoles.length > 0) ||
+        (a.matchedResumeKeywords && a.matchedResumeKeywords.length > 0)
       );
       const bInferred = Boolean(
         b.inferredStackMatched ||
         b.isDerivedRoleMatched ||
-        (b.matchedResumeRoles && b.matchedResumeRoles.length > 0)
+        (b.matchedResumeRoles && b.matchedResumeRoles.length > 0) ||
+        (b.matchedResumeKeywords && b.matchedResumeKeywords.length > 0)
       );
       if (aInferred && !bInferred) return -1;
       if (!aInferred && bInferred) return 1;
@@ -1276,7 +1333,7 @@ export async function getJobsForCandidate(userId, options = {}) {
     strictAiOnlyActive: isStrict,
     scanTelemetry: {
       scannedPortals: companySlug ? 1 : 14,
-      providers: ["Greenhouse", "Lever", "SmartRecruiters"],
+      providers: ["Official Company Portals", "Direct Careers Pages", "LinkedIn Verified"],
       totalJobsDiscovered: rawJobs.length,
       filteredJobsCount: finalJobs.length,
       scanDurationMs,
@@ -1354,17 +1411,23 @@ export async function scanCompanyOriginalPortal(companyIdentifier, roleQuery = "
   const candidateProfile = analyzeCandidateProfile(resumeText, resumeAnalysis);
 
   // 2. Scan directly from official portal / ATS
-  const rawJobs = await fetchJobsForCompany(company.slug || company.id || company.name, roleQuery, location);
+  const companyLinks = resolveCompanyLinks(company.slug || company.id || company.name);
+  const rawJobs = await fetchJobsForCompany(companyLinks.slug || companyLinks.id || companyLinks.name, roleQuery, location);
 
   // 3. Enrich & score
   const scoredJobs = rawJobs.map((job) => {
     const enriched = {
       ...job,
-      company: company.name,
-      companySlug: company.slug,
-      companyCategory: company.category,
-      companyLogo: company.logo,
-      officialPortalUrl: company.officialPortalUrl || job.applyUrl,
+      company: companyLinks.name,
+      companySlug: companyLinks.slug,
+      companyCategory: companyLinks.category,
+      companyLogo: companyLinks.logo,
+      companyPageUrl: companyLinks.companyPageUrl,
+      website: companyLinks.companyPageUrl,
+      careerPageUrl: companyLinks.careerPageUrl,
+      officialPortalUrl: companyLinks.careerPageUrl || job.applyUrl,
+      linkedInUrl: companyLinks.linkedInUrl,
+      linkedInJobsUrl: companyLinks.linkedInJobsUrl,
       sourcePortal: "Official Company Career Portal",
     };
     const matchAnalysis = computeJobMatch(enriched, candidateProfile, resumeText);
@@ -1398,9 +1461,13 @@ export async function scanCompanyOriginalPortal(companyIdentifier, roleQuery = "
   }
 
   return {
-    company,
-    officialPortalUrl: company.officialPortalUrl,
-    portalLabel: `${company.name} Official Careers Portal`,
+    company: companyLinks,
+    companyPageUrl: companyLinks.companyPageUrl,
+    careerPageUrl: companyLinks.careerPageUrl,
+    linkedInUrl: companyLinks.linkedInUrl,
+    linkedInJobsUrl: companyLinks.linkedInJobsUrl,
+    officialPortalUrl: companyLinks.careerPageUrl,
+    portalLabel: `${companyLinks.name} Official Careers Portal`,
     totalJobs: scoredJobs.length,
     scannedAt: new Date().toISOString(),
     jobs: scoredJobs,
@@ -1485,7 +1552,7 @@ export async function postStartupJobProfile(jobPayload = {}, userId = null) {
     stream: streamInfo.primaryStream,
     track: streamInfo.track,
     departments: ["Engineering / Product"],
-    applyUrl: applyUrl || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(resolvedCompany + " " + resolvedTitle)}`,
+    applyUrl: applyUrl || `https://www.linkedin.com/company/${resolvedSlug.replace(/[^a-z0-9]/g, "")}/jobs/`,
     isRealOpening: Boolean(applyUrl ? isRealOpeningUrl(applyUrl) : true),
     isSmallStartup: true,
     description: resolvedDesc,

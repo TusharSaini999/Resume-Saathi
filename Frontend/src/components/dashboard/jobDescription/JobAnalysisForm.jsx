@@ -1,7 +1,5 @@
 import { FileSearch } from "lucide-react";
-
-const GRADIENT_SHARED = "bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5]";
-const BUTTON_CLASS = `w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-bold text-white rounded-xl ${GRADIENT_SHARED} hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25 transition-all`;
+import { BUTTON_CLASS } from "../../../constants/style";
 
 function JobAnalysisForm({
   onSubmit,
@@ -16,12 +14,12 @@ function JobAnalysisForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="rounded-3xl border border-white/70 bg-white/85 p-5 shadow-lg backdrop-blur-sm dark:border-[#334155] dark:bg-[#0f172a]/85 md:p-6"
+      className="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-[#19191b] md:p-6"
     >
-      <h2 className="text-lg font-black text-[#1e293b] dark:text-white">Analyze New Job Description</h2>
+      <h2 className="text-lg font-medium text-zinc-900 dark:text-white">Analyze New Job Description</h2>
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         <label className="block">
-          <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-[#64748b] dark:text-[#94a3b8]">
+          <span className="mb-1.5 block text-xs font-mono uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
             Company Name
           </span>
           <input
@@ -29,20 +27,20 @@ function JobAnalysisForm({
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
             placeholder="Ex: Acme Technologies"
-            className="w-full rounded-xl border border-[#cbd5e1] bg-white px-3 py-2.5 text-sm text-[#1e293b] outline-none transition focus:border-[#f43f5e] focus:ring-2 focus:ring-[#f43f5e]/20 dark:border-[#334155] dark:bg-[#111827] dark:text-white"
+            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 outline-none transition focus:border-[#fe3e91] focus:ring-1 focus:ring-[#fe3e91]/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
           />
         </label>
 
-        <div className="rounded-xl border border-dashed border-[#dbe2ea] bg-[#f8fafc] px-3 py-2.5 dark:border-[#334155] dark:bg-[#111827]">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#64748b] dark:text-[#94a3b8]">Quick Tip</p>
-          <p className="mt-1 text-sm text-[#475569] dark:text-[#cbd5e1]">
+        <div className="rounded-xl border border-dashed border-[#fe3e91]/30 bg-[#fe3e91]/5 px-3.5 py-2.5">
+          <p className="text-xs font-mono uppercase tracking-wide text-[#fe3e91]">Quick Tip</p>
+          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
             Paste the complete JD including required skills, responsibilities, and qualifications for best accuracy.
           </p>
         </div>
       </div>
 
       <label className="mt-4 block">
-        <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-[#64748b] dark:text-[#94a3b8]">
+        <span className="mb-1.5 block text-xs font-mono uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
           Job Description
         </span>
         <textarea
@@ -50,7 +48,7 @@ function JobAnalysisForm({
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Paste job description here..."
           rows={7}
-          className="w-full resize-y rounded-xl border border-[#cbd5e1] bg-white px-3 py-2.5 text-sm text-[#1e293b] outline-none transition focus:border-[#f43f5e] focus:ring-2 focus:ring-[#f43f5e]/20 dark:border-[#334155] dark:bg-[#111827] dark:text-white"
+          className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 outline-none transition focus:border-[#fe3e91] focus:ring-1 focus:ring-[#fe3e91]/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
         />
       </label>
 

@@ -96,26 +96,26 @@ export default function ChatSidebar({
   return (
     <>
       <aside
-              className={`sidebar-animated ${sidebarOpen ? "sidebar-open" : "sidebar-closed"} hidden h-full flex-col border-r border-[#E2E8F0] bg-[#FFFFFF] dark:border-[#1E293B] dark:bg-[#0B1120] md:flex`}
+              className={`sidebar-animated ${sidebarOpen ? "sidebar-open" : "sidebar-closed"} hidden h-full flex-col border-r border-zinc-200/80 bg-white dark:border-zinc-800 dark:bg-[#19191b] md:flex`}
         style={{ minWidth: 0 }}
       >
         {/* Top Spacer */}
-        <div className="h-20 w-full bg-[#FFFFFF] dark:bg-[#0B1120]" />
+        <div className="h-20 w-full bg-white dark:bg-[#19191b]" />
 
         {/* Header */}
-        <div className="sticky top-0 z-10 border-b border-[#E2E8F0] bg-[#FFFFFF]/95 px-3 py-3 backdrop-blur-md dark:border-[#1E293B] dark:bg-[#0B1120]/95">
+        <div className="sticky top-0 z-10 border-b border-zinc-200/80 bg-white/95 px-3 py-3 backdrop-blur-md dark:border-zinc-800 dark:bg-[#19191b]/95">
           <div className="flex items-center justify-between">
             {sidebarOpen ? (
               <div>
-                <h2 className="text-sm font-semibold text-[#0F172A] dark:text-white">
+                <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">
                   Chats
                 </h2>
-                <p className="text-[11px] text-[#64748B] dark:text-[#94A3B8]">
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                   ResumeSaathi AI
                 </p>
               </div>
             ) : (
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] shadow-[0_8px_24px_rgba(202,37,175,0.25)] mt-10">
+              <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-b from-[#fe3e91] to-[#5309b6] shadow-xs mt-10">
                 <Sparkles size={18} className="text-white" />
               </div>
             )}
@@ -123,19 +123,19 @@ export default function ChatSidebar({
             {sidebarOpen && (
               <button
                 onClick={() => setSidebarOpen((prev) => !prev)}
-                className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#E2E8F0] bg-white text-[#475569] shadow-sm transition hover:scale-105 active:scale-95 dark:border-[#334155] dark:bg-[#111827] dark:text-[#94A3B8]"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 transition-colors dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
               >
-                <PanelLeftClose size={18} />
+                <PanelLeftClose size={16} />
               </button>
             )}
 
             {!sidebarOpen && (
               <button
                 onClick={() => setSidebarOpen((prev) => !prev)}
-                className="absolute top-0 left-1/2 hidden -translate-x-1/2 rounded-2xl border border-[#E2E8F0] bg-white p-2 text-[#475569] shadow-sm transition hover:scale-105 dark:border-[#334155] dark:bg-[#111827] dark:text-[#94A3B8] xl:flex"
+                className="absolute top-0 left-1/2 hidden -translate-x-1/2 rounded-lg border border-zinc-200 bg-white p-2 text-zinc-600 hover:bg-zinc-100 transition-colors dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 xl:flex"
                 style={{ zIndex: 20 }}
               >
-                <PanelLeftOpen size={18} />
+                <PanelLeftOpen size={16} />
               </button>
             )}
           </div>
@@ -144,11 +144,11 @@ export default function ChatSidebar({
           {sidebarOpen && (
             <div className="mt-3">
               <button
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] px-4 py-2.5 text-sm font-medium text-white shadow-[0_10px_30px_rgba(254,62,145,0.20)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] px-3 py-2 text-xs font-medium text-white shadow-xs dark:shadow-[0_0_12px_rgba(254,62,145,0.25)] transition-all duration-150 active:scale-[0.98]"
                 onClick={handleNewChat}
               >
-                <Plus size={16} />
-                New Chat
+                <Plus size={14} />
+                New chat
               </button>
             </div>
           )}
@@ -156,17 +156,17 @@ export default function ChatSidebar({
           {/* Search */}
           {sidebarOpen && (
             <div className="mt-3">
-              <div className="flex items-center gap-2 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2.5 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
+              <div className="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-zinc-50 px-3 py-2.5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                 <Search
                   size={15}
-                  className="text-[#64748B] dark:text-[#94A3B8]"
+                  className="text-zinc-400 dark:text-zinc-500"
                 />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search chats..."
-                  className="w-full bg-transparent text-sm text-[#0F172A] outline-none placeholder:text-[#64748B] dark:text-white dark:placeholder:text-[#94A3B8]"
+                  className="w-full bg-transparent text-sm text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-white dark:placeholder:text-zinc-500"
                 />
               </div>
             </div>
@@ -217,27 +217,27 @@ export default function ChatSidebar({
                       handleSelectChat(chat._id);
                     }
                   }}
-                  className={`group relative w-full cursor-pointer rounded-2xl border px-3 py-3 text-left transition-all duration-300 ${
+                  className={`group relative w-full cursor-pointer rounded-lg border px-3 py-2 text-left transition-colors duration-150 ${
                     activeChat === chat._id
-                      ? "border-[#FBCFE8] bg-linear-to-r from-[#FE3E91]/10 via-[#CA25AF]/10 to-[#803AD1]/10 shadow-sm dark:border-[#7C2D92]/30"
-                      : "border-transparent hover:-translate-y-px hover:bg-[#F8FAFC] hover:shadow-sm dark:hover:bg-[#111827]"
+                      ? "border-zinc-200/90 bg-zinc-100 text-zinc-900 dark:border-zinc-700/80 dark:bg-[#232325] dark:text-zinc-100"
+                      : "border-transparent text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-[#19191b]"
                   }`}
                 >
                   {sidebarOpen ? (
                     <div className="pr-9">
                       <div className="flex items-start gap-2">
                         <div
-                          className={`mt-1 h-2.5 w-2.5 rounded-full ${
+                          className={`mt-1.5 h-1.5 w-1.5 rounded-full ${
                             activeChat === chat._id
-                              ? "bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1]"
-                              : "bg-[#CBD5E1] dark:bg-[#475569]"
+                              ? "bg-[#fe3e91]"
+                              : "bg-zinc-300 dark:bg-zinc-600"
                           }`}
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="line-clamp-1 text-sm font-medium text-[#0F172A] dark:text-white">
+                          <p className="line-clamp-1 text-sm font-medium text-zinc-900 dark:text-white">
                             {chat.session_title || "Untitled Chat"}
                           </p>
-                          <p className="mt-1 text-[11px] text-[#64748B] dark:text-[#94A3B8]">
+                          <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
                             {new Date(chat.createdAt).toLocaleString("en-IN", {
                               day: "numeric",
                               month: "short",
@@ -254,7 +254,7 @@ export default function ChatSidebar({
                         type="button"
                         onClick={(e) => openDeleteConfirm(e, chat._id)}
                         disabled={deleteLoading && deletingChatId === chat._id}
-                        className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-xl p-2 text-[#94A3B8] transition hover:bg-red-50 hover:text-red-500 disabled:opacity-50 group-hover:flex dark:hover:bg-red-500/10"
+                        className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-xl p-2 text-zinc-400 transition hover:bg-red-50 hover:text-red-500 disabled:opacity-50 group-hover:flex dark:hover:bg-red-500/10"
                         aria-label="Delete chat"
                       >
                         {deleteLoading && deletingChatId === chat._id ? (
@@ -267,10 +267,10 @@ export default function ChatSidebar({
                   ) : (
                     <div className="flex justify-center">
                       <div
-                        className={`h-3 w-3 rounded-full ${
+                        className={`h-2 w-2 rounded-full ${
                           activeChat === chat._id
-                            ? "bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1]"
-                            : "bg-[#CBD5E1] dark:bg-[#475569]"
+                            ? "bg-[#fe3e91]"
+                            : "bg-zinc-300 dark:bg-zinc-600"
                         }`}
                       />
                     </div>
@@ -281,36 +281,36 @@ export default function ChatSidebar({
           ) : (
             <div className="flex h-full items-center justify-center px-2">
               {sidebarOpen ? (
-                <div className="w-full max-w-xs text-center">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] shadow-[0_12px_30px_rgba(202,37,175,0.25)]">
-                    <MessageSquare className="h-6 w-6 text-white" />
+                <div className="w-full max-w-xs text-center py-6">
+                  <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                    <MessageSquare size={18} />
                   </div>
 
-                  <h3 className="text-sm font-semibold text-[#0F172A] dark:text-white">
-                    {searchTerm ? "No chats found" : "No chats yet"}
+                  <h3 className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+                    {searchTerm ? "No chats found" : "No conversation history"}
                   </h3>
-                  <p className="mt-2 text-xs leading-6 text-[#64748B] dark:text-[#94A3B8]">
+                  <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
                     {searchTerm
-                      ? "Try searching with a different title."
-                      : "Start a new conversation and your chat history will appear here."}
+                      ? "Try searching with a different term."
+                      : "Start a conversation to see past sessions here."}
                   </p>
 
                   {!searchTerm && (
                     <button
                       onClick={handleNewChat}
-                      className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] px-4 py-2 text-sm font-medium text-white shadow-[0_10px_30px_rgba(254,62,145,0.18)] transition hover:scale-[1.02]"
+                      className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] px-3 py-1.5 text-xs font-medium text-white shadow-xs dark:shadow-[0_0_12px_rgba(254,62,145,0.25)] transition-all"
                     >
-                      <Plus size={15} />
-                      New Chat
+                      <Plus size={14} />
+                      New chat
                     </button>
                   )}
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F1F5F9] dark:bg-[#111827]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
                     <MessageSquare
                       size={18}
-                      className="text-[#94A3B8]"
+                      className="text-zinc-400"
                     />
                   </div>
                 </div>
@@ -323,15 +323,15 @@ export default function ChatSidebar({
       {/* Confirm Delete Modal */}
       {confirmDelete && (
         <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-2xl dark:border-[#1E293B] dark:bg-[#111827]">
+          <div className="w-full max-w-sm rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-2xl dark:border-zinc-800 dark:bg-[#19191b]">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 dark:bg-red-500/10">
               <Trash2 className="h-5 w-5 text-red-500" />
             </div>
 
-            <h3 className="text-lg font-semibold text-[#0F172A] dark:text-white">
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Delete Chat?
             </h3>
-            <p className="mt-2 text-sm leading-6 text-[#64748B] dark:text-[#94A3B8]">
+            <p className="mt-2 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
               Are you sure you want to delete this chat? This action cannot be undone.
             </p>
 
@@ -340,7 +340,7 @@ export default function ChatSidebar({
                 type="button"
                 onClick={() => setConfirmDelete(null)}
                 disabled={deleteLoading}
-                className="rounded-2xl border border-[#E2E8F0] px-4 py-2.5 text-sm font-medium text-[#475569] transition hover:bg-[#F8FAFC] dark:border-[#334155] dark:text-[#CBD5E1] dark:hover:bg-[#1E293B]"
+                className="rounded-2xl border border-zinc-200 px-4 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
               >
                 Cancel
               </button>

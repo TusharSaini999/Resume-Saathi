@@ -57,7 +57,7 @@ const classifyError = (message) => {
 const toneClassMap = {
   red: "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300",
   amber: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
-  blue: "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
+  blue: "bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300",
   violet: "bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300",
   rose: "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300",
 };
@@ -89,32 +89,32 @@ const AnalysisError = ({ error, onReupload }) => {
         <div className="flex w-full flex-col gap-2 md:w-auto">
           <button
             onClick={onReupload}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5] px-5 py-3 font-bold text-white transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-purple-500/25 md:w-auto"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium rounded-lg bg-[#fe3e91] text-white hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] active:scale-[0.98] transition-all duration-150 shadow-xs"
           >
-            <RotateCcw size={18} />
-            Try Again
+            <RotateCcw size={14} />
+            Try again
           </button>
         </div>
       </div>
 
-      <div className="mt-5 rounded-xl border border-red-200 bg-white/70 p-4 dark:border-red-500/30 dark:bg-[#1e293b]/70">
-        <p className="text-sm text-[#7f1d1d] dark:text-[#e2e8f0]">
+      <div className="mt-5 rounded-xl border border-red-200 bg-white/70 p-4 dark:border-red-500/30 dark:bg-[#19191b]/70">
+        <p className="text-sm text-[#7f1d1d] dark:text-zinc-200">
           {errorMessage}
         </p>
-        <div className="mt-3 flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-500/30 dark:bg-blue-500/10">
-          <Info size={16} className="mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
-          <p className="text-xs text-[#475569] dark:text-[#cbd5e1]">
+        <div className="mt-3 flex items-start gap-2 rounded-lg border border-violet-200 bg-violet-50 p-3 dark:border-violet-500/30 dark:bg-violet-500/10">
+          <Info size={16} className="mt-0.5 shrink-0 text-violet-600 dark:text-violet-400" />
+          <p className="text-xs text-zinc-600 dark:text-zinc-300">
             Recommended next step: {errorMeta.suggestion}
           </p>
         </div>
       </div>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-red-200 bg-white p-4 dark:border-red-500/30 dark:bg-[#1e293b]">
+        <div className="rounded-xl border border-red-200 bg-white p-4 dark:border-red-500/30 dark:bg-[#19191b]">
           <h4 className="mb-3 text-sm font-extrabold uppercase tracking-wide text-red-600 dark:text-red-400">
             Possible Issues
           </h4>
-          <ul className="space-y-2 text-sm text-[#64748b] dark:text-[#cbd5e1]">
+          <ul className="space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
             <li>• File is corrupted or not readable</li>
             <li>• Resume format is not supported</li>
             <li>• File size exceeds the limit (5MB)</li>
@@ -122,11 +122,11 @@ const AnalysisError = ({ error, onReupload }) => {
           </ul>
         </div>
 
-        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
-          <h4 className="mb-3 text-sm font-extrabold uppercase tracking-wide text-blue-600 dark:text-blue-400">
+        <div className="rounded-xl border border-violet-200 bg-violet-50 p-4 dark:border-violet-500/30 dark:bg-violet-500/10">
+          <h4 className="mb-3 text-sm font-extrabold uppercase tracking-wide text-violet-600 dark:text-violet-400">
             Quick Fixes
           </h4>
-          <ul className="space-y-2 text-sm text-[#64748b] dark:text-[#cbd5e1]">
+          <ul className="space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
             <li>• Upload a different PDF or Word document</li>
             <li>• Ensure file format is .pdf or .docx</li>
             <li>• Keep file size below 10MB</li>

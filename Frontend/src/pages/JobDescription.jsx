@@ -151,19 +151,19 @@ function JobDescription() {
         : "Submitting your JD";
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,#ffe4f2_0%,#f8fafc_42%,#e2e8f0_100%)] px-4 pb-10 pt-24 dark:bg-[radial-gradient(circle_at_top_left,#26142f_0%,#111827_45%,#0b1220_100%)]">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#141415] px-4 pb-12 pt-20">
       <div className="mx-auto w-full max-w-7xl">
         {hasResumeContext && (
-          <div className="mb-6 rounded-3xl border border-white/70 bg-white/80 p-5 shadow-lg backdrop-blur-sm dark:border-[#334155] dark:bg-[#0f172a]/80 md:p-7">
-            <p className="inline-flex items-center gap-2 rounded-full bg-[#fce7f3] px-3 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-[#be185d] dark:bg-[#4a1538] dark:text-[#f9a8d4]">
-              <Sparkles size={12} /> Job Description Studio
+          <div className="mb-6 rounded-xl border border-zinc-200/80 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-[#19191b] md:p-6">
+            <p className="inline-flex items-center gap-1.5 rounded-md bg-rose-50 px-2.5 py-0.5 text-xs font-mono font-medium text-[#fe3e91] dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#fe3e91]"></span>
+              Job Description Diagnostic
             </p>
-            <h1 className="mt-3 bg-[linear-gradient(120deg,#ff5f9b_0%,#f43f5e_35%,#9f3cff_100%)] bg-clip-text text-3xl font-black tracking-[-0.02em] text-transparent md:text-4xl">
-              Compare Job Description With Your Resume
+            <h1 className="mt-2 text-2xl sm:text-3xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+              Compare job description with your resume
             </h1>
-            <p className="mt-2 max-w-3xl text-sm text-[#475569] dark:text-[#cbd5e1] md:text-base">
-              Select any previous JD from history, or submit a new one to instantly see match score, missing skills,
-              experience fit, education fit, and improvement tips.
+            <p className="mt-1 max-w-3xl text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+              Select any previous JD from history or submit a new listing to audit match score, missing skills, and experience alignment.
             </p>
           </div>
         )}

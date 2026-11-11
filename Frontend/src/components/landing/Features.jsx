@@ -1,43 +1,43 @@
 import { createElement } from "react";
-import { Gauge, FileSearch, Brain, ShieldCheck, Building2, Sparkles } from "lucide-react";
+import { Gauge, FileSearch, MessageSquare, ShieldCheck, Building2, Binary } from "lucide-react";
 import ScrollReveal from "../ScrollReveal";
 
 const features = [
   {
     icon: Building2,
-    title: "Live ATS Job Discovery & Verification",
+    title: "Official ATS portal discovery",
     description:
-      "Explore real-time job openings scanned directly from official company ATS portals (Greenhouse, Lever, SmartRecruiters, TCS iON) and verified LinkedIn requisitions with live online probing.",
+      "Direct indexing of live requisitions from Greenhouse, Lever, SmartRecruiters, and company career boards with live URL verification.",
   },
   {
-    icon: Sparkles,
-    title: "Inferred Roles & Tech Stacks Matching",
+    icon: Binary,
+    title: "Inferred roles and tech stack extraction",
     description:
-      "Our AI derives your true industry roles (e.g. SDE, Full Stack, Product Manager) and complete tech stacks (e.g. MERN, Python/Django) to surface relevant openings even without exact title matches.",
+      "Automated extraction of candidate frameworks, databases, and core stacks to match jobs beyond simple keyword queries.",
   },
   {
     icon: Gauge,
-    title: "Beat the ATS Filters",
+    title: "Format and parser diagnostics",
     description:
-      "Stop getting rejected by bots. Our AI uncovers hidden formatting traps, fixes spacing inconsistencies, and polishes your grammar instantly.",
+      "Identifies multi-column structures, problematic glyphs, header/footer traps, and spacing anomalies that trip automated parsers.",
   },
   {
     icon: FileSearch,
-    title: "Hyper-Targeted Matching",
+    title: "Job description comparative scoring",
     description:
-      "Instantly discover missing keywords and skill gaps by comparing your resume directly against your dream job's exact description.",
+      "Side-by-side gap analysis mapping required hard skills, qualifications, and domain terms directly against your resume text.",
   },
   {
-    icon: Brain,
-    title: "Your 24/7 AI Career Assistant",
+    icon: MessageSquare,
+    title: "Context-aware resume assistant",
     description:
-      "Chat directly with an AI that knows your resume inside and out. Get instant feedback, rewrite bullet points, and prepare for interviews.",
+      "Interactive assistant loaded with your parsed resume context to rewrite bullet points with quantifiable metrics and active verbs.",
   },
   {
     icon: ShieldCheck,
-    title: "Bank-Grade Privacy",
+    title: "Private session control",
     description:
-      "Your career data belongs to you. Enjoy seamless logins and total control over your active sessions across all devices.",
+      "Client-focused session management with full auditability and the option to clear uploaded document states at any time.",
   },
 ];
 
@@ -45,48 +45,41 @@ const Features = () => {
   return (
     <section
       id="features"
-      className="scroll-mt-28 relative bg-white dark:bg-[#111827] py-20"
+      className="scroll-mt-28 relative bg-[#fafafa] dark:bg-[#141415] py-20 border-t border-zinc-200/80 dark:border-zinc-800/80"
     >
       <div className="max-w-7xl mx-auto px-6">
         <ScrollReveal>
-          <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-widest text-[#803AD1]">
-              Features
+          <div className="max-w-2xl">
+            <p className="text-xs font-mono font-medium text-[#fe3e91]">
+              Capabilities
             </p>
 
-            <h2 className="mt-3 text-3xl md:text-4xl font-black text-[#1E293B] dark:text-white">
-              Everything You Need to
-              <span className="bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] bg-clip-text text-transparent">
-                {" "}
-                Get Hired Faster
-              </span>
+            <h2 className="mt-2 text-3xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+              Diagnostic tools built for technical and professional applications
             </h2>
 
-            <p className="mt-4 text-[#64748B] dark:text-[#94A3B8]">
-              Stop guessing what recruiters want. Our powerful suite of tools ensures your application stands out from the competition.
+            <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+              Accurate ATS parsing audits, direct employer portal syncing, and real-time resume revision.
             </p>
           </div>
         </ScrollReveal>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2 items-stretch">
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {features.map(({ icon: Icon, title, description }, index) => (
-            <ScrollReveal key={title} delay={index * 110}>
-              <article className="group h-full flex flex-col justify-center rounded-2xl border border-[#E5E7EB] dark:border-[#374151] p-6 bg-[#F8FAFC] dark:bg-[#1F2937] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#FE3E91]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
-                
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex rounded-xl p-2.5 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] transition-colors duration-300 group-hover:bg-[#FFF1F8] dark:group-hover:bg-[#2A1F38]">
-                    {createElement(Icon, { className: "w-5 h-5 text-[#FE3E91] transition-transform duration-300 group-hover:scale-110" })}
-                  </span>
-
-                  <h3 className="text-lg font-bold text-[#1E293B] dark:text-white">
-                    {title}
-                  </h3>
+            <ScrollReveal key={title} delay={index * 60}>
+              <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#19191b] p-5 h-full flex flex-col">
+                <div className="inline-flex rounded-lg p-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 w-fit mb-4">
+                  {createElement(Icon, { size: 18 })}
                 </div>
 
-                <p className="mt-3 text-sm leading-6 text-[#64748B] dark:text-[#94A3B8]">
+                <h3 className="text-base font-medium text-zinc-900 dark:text-zinc-100">
+                  {title}
+                </h3>
+
+                <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 flex-1">
                   {description}
                 </p>
-              </article>
+              </div>
             </ScrollReveal>
           ))}
         </div>

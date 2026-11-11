@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Upload, File, FileText, X } from "lucide-react";
+import { BUTTON_CLASS, BUTTON_ACCENT_CLASS } from "../../constants/style";
 
 const ResumeUpload = ({ onUpload, loading }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -70,83 +71,84 @@ const ResumeUpload = ({ onUpload, loading }) => {
     }
   };
 
-  const handleUpload = () => {
-    if (selectedFile) {
-      onUpload(selectedFile);
-    }
-  };
-
   const handleRemoveFile = () => {
     setSelectedFile(null);
     setFileError(null);
   };
 
-  const formatFileSize = (sizeInBytes) => {
-    const sizeInMB = sizeInBytes / (1024 * 1024);
-    if (sizeInMB >= 1) return `${sizeInMB.toFixed(2)} MB`;
-    return `${(sizeInBytes / 1024).toFixed(2)} KB`;
+  const handleUpload = () => {
+    if (!selectedFile) {
+      setFileError("Please select a file to upload");
+      return;
+    }
+    onUpload(selectedFile);
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
   const getFileBadge = (filename) => {
-    const ext = (filename || "").split(".").pop().toUpperCase();
-    if (ext === "DOCX" || ext === "DOC") {
+    const ext = (filename || "").split(".").pop().toLowerCase();
+    if (ext === "docx" || ext === "doc") {
       return {
         label: "DOCX",
-        bg: "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 border-blue-500/20",
+        bg: "bg-rose-50 text-[#fe3e91] dark:bg-rose-950/40 dark:text-rose-300 border-rose-200/60 dark:border-rose-900/60",
       };
     }
     return {
       label: "PDF",
-      bg: "bg-[#fe3e91]/10 text-[#fe3e91] dark:bg-[#fe3e91]/20 dark:text-[#ff5fa7] border-[#fe3e91]/20",
+      bg: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700",
     };
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="rounded-3xl border border-[#e2e8f0] bg-white p-5 shadow-xl sm:p-7 md:p-8 dark:border-[#334155] dark:bg-[#0f172a]">
+    <div className="w-full max-w-3xl mx-auto">
+      <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#19191b] p-6 sm:p-8 shadow-xs">
         <div className="text-center">
-          <p className="inline-flex items-center rounded-full bg-[#fce7f3] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#be185d] dark:bg-[#3b0a2a] dark:text-[#f9a8d4]">
-            AI Resume Analyzer
+          <p className="inline-flex items-center rounded-md bg-rose-50 dark:bg-rose-950/40 px-2.5 py-0.5 text-xs font-mono font-medium text-[#fe3e91] dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/60">
+            ATS Diagnostic Engine
           </p>
-          <h3 className="mt-3 bg-[linear-gradient(120deg,#ff7ab8_0%,#fe3e91_28%,#ca25af_62%,#7a4cff_100%)] bg-clip-text text-3xl font-black tracking-[-0.01em] text-transparent md:text-4xl dark:bg-[linear-gradient(120deg,#ffd1e7_0%,#ff84bf_30%,#e879f9_65%,#a5b4fc_100%)]">
-            Upload Your Resume
-          </h3>
-          <div className="mx-auto mt-2 h-1.5 w-28 rounded-full bg-[linear-gradient(90deg,rgba(254,62,145,0.25)_0%,rgba(202,37,175,0.95)_45%,rgba(122,76,255,0.85)_100%)] dark:bg-[linear-gradient(90deg,rgba(255,132,191,0.35)_0%,rgba(232,121,249,0.95)_50%,rgba(165,180,252,0.9)_100%)]" />
-          <p className="mt-3 text-sm text-[#64748b] dark:text-[#cbd5e1]">
-            Drag and drop your PDF or DOCX file, or click browse. Full multi-agent AI analysis across all sections.
+          <h2 className="mt-3 text-2xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+            Upload your resume
+          </h2>
+          <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
+            Accepts PDF or Word documents (.pdf, .docx) up to 10MB.
           </p>
         </div>
 
         <div
-          className={`mt-6 rounded-2xl border-2 border-dashed p-6 sm:p-8 text-center transition-all ${
+          className={`mt-6 rounded-lg border-2 border-dashed p-6 sm:p-8 text-center transition-colors ${
             dragActive
-              ? "scale-[1.01] border-[#fe3e91] bg-[#fef2f8] dark:bg-[#1e293b]"
-              : "border-[#cbd5e1] bg-[#f8fafc] dark:border-[#475569] dark:bg-[#111827]/70"
+              ? "border-[#fe3e91] bg-rose-50/20 dark:bg-rose-950/20"
+              : "border-zinc-300 bg-zinc-50/50 dark:border-zinc-700 dark:bg-zinc-900/40"
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
         >
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-[#fe3e91]/40">
-            <Upload size={30} className="text-[#fe3e91]" />
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+            <Upload size={22} />
           </div>
 
-          <p className="text-base font-bold text-[#1E293B] sm:text-lg dark:text-white">
-            {selectedFile ? "File selected" : "Drop your PDF or DOCX here"}
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+            {selectedFile ? selectedFile.name : "Drop your resume file here"}
           </p>
-          <p className="mt-1 text-sm text-[#64748b] dark:text-[#94a3b8]">
+          <p className="mt-1 text-xs text-zinc-500">
             {selectedFile
-              ? "You can change it any time before clicking analyze."
-              : "or click Browse File below"}
+              ? formatFileSize(selectedFile.size)
+              : "Drag and drop, or choose from your files"}
           </p>
 
-          <div className="mt-5">
+          <div className="mt-4">
             <label
               htmlFor="resume-input"
-              className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5] px-6 py-3 text-sm font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25"
+              className={BUTTON_CLASS}
             >
-              {selectedFile && !fileError ? "Choose Another File" : "Browse PDF / DOCX"}
+              {selectedFile && !fileError ? "Choose another file" : "Browse files"}
             </label>
             <input
               id="resume-input"
@@ -158,48 +160,44 @@ const ResumeUpload = ({ onUpload, loading }) => {
             />
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs">
-            <span className="rounded-full bg-white px-3 py-1 font-semibold text-[#475569] shadow-xs dark:bg-[#1e293b] dark:text-[#cbd5e1]">
-              PDF &amp; DOCX
-            </span>
-            <span className="rounded-full bg-white px-3 py-1 font-semibold text-[#475569] shadow-xs dark:bg-[#1e293b] dark:text-[#cbd5e1]">
-              Max 10MB
-            </span>
-            <span className="rounded-full bg-white px-3 py-1 font-semibold text-[#475569] shadow-xs dark:bg-[#1e293b] dark:text-[#cbd5e1]">
-              Deep AI scan
-            </span>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[11px] font-mono text-zinc-500">
+            <span>PDF, DOCX</span>
+            <span>&middot;</span>
+            <span>Max 10MB</span>
+            <span>&middot;</span>
+            <span>Client-side session</span>
           </div>
         </div>
 
         {fileError && (
-          <div className="mt-4 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3">
-            <p className="text-sm font-medium text-red-500">{fileError}</p>
+          <div className="mt-4 rounded-lg border border-red-200 dark:border-red-800/60 bg-red-50 dark:bg-red-950/30 px-3.5 py-2.5">
+            <p className="text-xs font-medium text-red-600 dark:text-red-400">{fileError}</p>
           </div>
         )}
 
         {selectedFile && !fileError && (
-          <div className="mt-4 rounded-2xl border border-[#dbe2ea] bg-[#f8fafc] p-4 dark:border-[#475569] dark:bg-[#111827]/70">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-3">
+          <div className="mt-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 p-3.5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2.5">
                 {selectedFile.name.toLowerCase().endsWith(".docx") || selectedFile.name.toLowerCase().endsWith(".doc") ? (
-                  <FileText size={22} className="shrink-0 text-blue-500" />
+                  <FileText size={18} className="shrink-0 text-[#fe3e91]" />
                 ) : (
-                  <File size={22} className="shrink-0 text-[#fe3e91]" />
+                  <File size={18} className="shrink-0 text-zinc-600 dark:text-zinc-400" />
                 )}
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="truncate text-sm font-semibold text-[#1E293B] dark:text-white">
+                    <p className="truncate text-xs font-medium text-zinc-900 dark:text-zinc-100">
                       {selectedFile.name}
                     </p>
                     <span
-                      className={`inline-block shrink-0 rounded border px-1.5 py-0.5 text-[10px] font-bold ${
+                      className={`inline-block shrink-0 rounded px-1.5 py-0.2 text-[10px] font-mono border ${
                         getFileBadge(selectedFile.name).bg
                       }`}
                     >
                       {getFileBadge(selectedFile.name).label}
                     </span>
                   </div>
-                  <p className="text-xs text-[#64748b] dark:text-[#94a3b8]">
+                  <p className="text-[11px] font-mono text-zinc-500">
                     {formatFileSize(selectedFile.size)}
                   </p>
                 </div>
@@ -207,10 +205,10 @@ const ResumeUpload = ({ onUpload, loading }) => {
               {!loading && (
                 <button
                   onClick={handleRemoveFile}
-                  className="rounded-lg p-2 transition hover:scale-110 active:scale-95 text-[#fe3e91] dark:text-[#ff5fa7]"
+                  className="rounded-md p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
                   aria-label="Remove selected file"
                 >
-                  <X size={16} className="text-[#fe3e91] dark:text-[#ff5fa7]" />
+                  <X size={16} />
                 </button>
               )}
             </div>
@@ -218,13 +216,9 @@ const ResumeUpload = ({ onUpload, loading }) => {
             <button
               onClick={handleUpload}
               disabled={loading}
-              className={`mt-4 w-full rounded-xl py-3 font-bold text-white transition-all ${
-                loading
-                  ? "cursor-not-allowed bg-[#fe3e91]/50"
-                  : "bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5] hover:scale-[1.01] active:scale-95 shadow-lg shadow-purple-500/25"
-              }`}
+              className={`mt-3.5 w-full ${BUTTON_ACCENT_CLASS}`}
             >
-              {loading ? "Analyzing Resume..." : "Analyze Resume"}
+              {loading ? "Analyzing resume..." : "Start ATS diagnostic"}
             </button>
           </div>
         )}

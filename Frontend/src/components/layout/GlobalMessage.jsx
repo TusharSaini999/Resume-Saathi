@@ -1,6 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { clearError } from "../../context/messageSlice.js";
 import { useEffect } from "react";
+import { AlertCircle, CheckCircle, AlertTriangle } from "lucide-react";
 
 function GlobalMessage() {
   const { message, type } = useSelector((state) => state.message);
@@ -20,26 +21,29 @@ function GlobalMessage() {
 
   const typeStyles = {
     error:
-      "bg-[#EF4444] text-white dark:bg-red-500 dark:text-white",
+      "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/80 dark:text-red-300 dark:border-red-800/80",
     success:
-      "bg-[#22C55E] text-white dark:bg-green-500 dark:text-white",
+      "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-800/80",
     warning:
-      "bg-[#F59E0B] text-white dark:bg-yellow-500 dark:text-black",
+      "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-800/80",
   };
 
+  const Icon =
+    type === "error"
+      ? AlertCircle
+      : type === "success"
+        ? CheckCircle
+        : AlertTriangle;
+
   return (
-    <div className="fixed z-50 bottom-10 sm:bottom-15 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-auto max-w-md">
+    <div className="fixed z-50 bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] sm:w-auto max-w-md">
       <div
-        className={`
-          px-3 sm:px-4 py-2 rounded-xl shadow-lg text-xs sm:text-sm font-medium
-          flex items-center gap-2 w-full sm:w-auto
-          wrap-break-word
-          backdrop-blur-md
-          border border-white/20 dark:border-white/10
-          ${typeStyles[type] || "bg-gray-800 text-white dark:bg-gray-700"}
-        `}
+        className={`px-3.5 py-2.5 rounded-lg border text-xs font-medium flex items-center gap-2.5 shadow-xs wrap-break-word ${
+          typeStyles[type] || "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-700"
+        }`}
       >
-        {message}
+        <Icon size={15} className="shrink-0" />
+        <span>{message}</span>
       </div>
     </div>
   );
