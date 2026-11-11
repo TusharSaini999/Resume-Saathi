@@ -9,209 +9,184 @@ import AuthService from "../services/authService";
 import ErrorForm from "../components/layout/ErrorForm";
 import { useDispatch } from "react-redux";
 import { Login as LoginThunk } from "../context/Thunk/Auth.js";
+import { BUTTON_ACCENT_CLASS } from "../constants/style";
+
 const Login = () => {
-    const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
-    const location = useLocation();
-    const dispatch = useDispatch();
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm();
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-    const onSubmit = async (data) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await AuthService.login(data);
-            if (response.success) {
-                dispatch(LoginThunk(response.data));
-                if (response.statusCode == 200 && response?.data?.email_verified) {
-                    const redirectPath = location.state?.from?.pathname || "/dashboard";
-                    navigate(redirectPath, { replace: true });
-                } else {
-                    navigate("/auth/verify-email");
-                }
-            } else {
-                setError(response.message || "Login failed");
-            }
-        } catch {
-            setError("Something went wrong. Please try again.");
-        } finally {
-            setTimeout(() => {
-                setError(null);
-            }, 5000);
-            setLoading(false);
+  const onSubmit = async (data) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await AuthService.login(data);
+      if (response.success) {
+        dispatch(LoginThunk(response.data));
+        if (response.statusCode == 200 && response?.data?.email_verified) {
+          const redirectPath = location.state?.from?.pathname || "/dashboard";
+          navigate(redirectPath, { replace: true });
+        } else {
+          navigate("/auth/verify-email");
         }
-    };
+      } else {
+        setError(response.message || "Login failed");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setTimeout(() => {
+        setError(null);
+      }, 5000);
+      setLoading(false);
+    }
+  };
 
-    // Reusable Styles
-    const inputClass =
-        "w-full pl-10 pr-4 py-2.5 rounded-lg text-sm text-[#1E293B] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-[#94A3B8] bg-[#F9FAFB] dark:bg-[#374151] border focus:ring-2 focus:ring-[#FE3E91] dark:focus:ring-[#FF5FA7] focus:border-transparent outline-none transition";
+  const inputClass =
+    "w-full pl-9 pr-4 py-2 rounded-lg text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 bg-white dark:bg-zinc-900 border focus:border-[#fe3e91] focus:outline-none transition-colors";
 
-    const errorClass = "text-xs text-bold text-red-400 mt-1";
+  const errorClass = "text-xs text-red-500 mt-1";
 
-    return (
-        <div className="h-screen overflow-hidden flex items-center justify-center bg-[#FFFFFF] dark:bg-[#111827] px-4">
+  return (
+    <div className="h-screen overflow-hidden flex items-center justify-center bg-[#fafafa] dark:bg-[#141415] px-4">
+      {/* Container */}
+      <div className="relative w-full max-w-5xl h-[88vh] rounded-xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden bg-white dark:bg-[#19191b] shadow-xs">
+        <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
+          {/* LEFT SIDE - Side Panel */}
+          <LoginSidePanel />
 
-            {/* Background */}
-            <div className="absolute inset-0 opacity-20 blur-3xl pointer-events-none">
-                <div className="absolute top-0 left-0 w-80 h-80 bg-[#FE3E91] rounded-full"></div>
-                <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#803AD1] rounded-full"></div>
+          {/* RIGHT SIDE - Form */}
+          <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-12 py-6 overflow-y-auto">
+            {/* Header */}
+            <div className="mb-6 text-center lg:text-left">
+              <h1 className="text-2xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+                Sign in to your account
+              </h1>
+              <p className="mt-1 text-xs text-zinc-500">
+                Enter your credentials to access your saved resume diagnostics.
+              </p>
             </div>
 
-            {/* Container */}
-            <div className="relative w-full max-w-6xl h-[90vh] rounded-3xl shadow-2xl border border-[#E5E7EB] dark:border-[#374151] overflow-hidden bg-[#FFFFFF] dark:bg-[#1F2937]">
+            {/* Form */}
+            <form className="space-y-3.5" onSubmit={handleSubmit(onSubmit)}>
+              {/* Email */}
+              <div>
+                <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  Email address
+                </label>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
-
-                    {/* RIGHT */}
-                    <LoginSidePanel />
-
-                    {/* LEFT */}
-                    <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-12 py-6">
-
-                        {/* Header */}
-                        <div className="mb-6 text-center lg:text-left">
-                            <h1 className="text-3xl sm:text-4xl font-bold text-[#1E293B] dark:text-white">
-                                Access Your Account 🔐
-                            </h1>
-                            <p className="mt-1 text-sm text-[#475569] dark:text-[#94A3B8]">
-                                Sign in to your{" "}
-                                <span className="text-[#FE3E91] font-medium">
-                                    Resume Saathi
-                                </span>{" "}
-                                account
-                            </p>
-                        </div>
-
-                        {/* Form */}
-                        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-
-                            {/* Email */}
-                            <div>
-                                <label className="text-sm font-medium text-[#1E293B] dark:text-white">
-                                    Email Address
-                                </label>
-
-                                <div className="relative mt-1">
-                                    <Mail className="absolute left-3 top-3 w-5 h-5 text-[#64748B]" />
-
-                                    <input
-                                        type="text"
-                                        placeholder="you@example.com"
-                                        disabled={loading}
-                                        {...register("email", {
-                                            required: "Email is required",
-                                            pattern: {
-                                                value: /^\S+@\S+$/i,
-                                                message: "Invalid email address",
-                                            },
-                                        })}
-                                        className={`${inputClass} ${errors.email
-                                            ? "border-red-500"
-                                            : "border-[#E5E7EB] dark:border-[#374151]"
-                                            }`}
-                                    />
-                                </div>
-
-                                {errors.email && (
-                                    <p className={errorClass}>
-                                        {errors.email.message}
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* Password */}
-                            <div>
-                                <label className="text-sm font-medium text-[#1E293B] dark:text-white">
-                                    Password
-                                </label>
-
-                                <div className="relative mt-1">
-                                    <Lock className="absolute left-3 top-3 w-5 h-5 text-[#64748B]" />
-
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder="Enter your password"
-                                        disabled={loading}
-                                        {...register("password", {
-                                            required: "Password is required",
-                                            minLength: {
-                                                value: 8,
-                                                message: "Minimum 8 characters",
-                                            },
-                                        })}
-                                        className={`${inputClass} pr-10 ${errors.password
-                                            ? "border-red-500"
-                                            : "border-[#E5E7EB] dark:border-[#374151]"
-                                            }`}
-                                    />
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setShowPassword(!showPassword)
-                                        }
-                                        className="absolute right-3 top-3 text-[#64748B] hover:text-[#FE3E91]"
-                                    >
-                                        {showPassword ? <EyeOff /> : <Eye />}
-                                    </button>
-                                </div>
-
-                                {errors.password && (
-                                    <p className={errorClass}>
-                                        {errors.password.message}
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* Forgot */}
-                            <div className="text-right text-xs">
-                                <Link
-                                    to="/auth/forgot-password"
-                                    className="text-[#FE3E91] font-medium hover:text-[#FF66A8]"
-                                >
-                                    Forgot password?
-                                </Link>
-                            </div>
-
-                            {/* Button */}
-                            <ErrorForm error={error} />
-
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full py-2.5 rounded-lg text-white font-semibold 
-                                bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1]
-                                dark:from-[#FF5FA7] dark:via-[#D340BD] dark:to-[#9D65D5]
-                                hover:scale-[1.02] active:scale-95 transition-all disabled:cursor-not-allowed disabled:opacity-70 shadow-lg shadow-purple-500/25"
-                            >
-                                {loading ? (
-                                    <>
-                                        <Loader2 className="inline mr-2 animate-spin" />
-                                        Signing In...
-                                    </>
-                                ) : (
-                                    <>
-                                        <LogIn className="inline mr-2" />
-                                        Sign In
-                                    </>
-                                )}
-                            </button>
-                        </form>
-
-                        <SocialLogin />
-
-                        <FormFooter type="login" />
-                    </div>
+                <div className="relative mt-1">
+                  <Mail className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400" />
+                  <input
+                    type="text"
+                    placeholder="you@example.com"
+                    disabled={loading}
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: "Invalid email address",
+                      },
+                    })}
+                    className={`${inputClass} ${
+                      errors.email
+                        ? "border-red-500"
+                        : "border-zinc-200 dark:border-zinc-800"
+                    }`}
+                  />
                 </div>
-            </div>
+
+                {errors.email && (
+                  <p className={errorClass}>{errors.email.message}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  Password
+                </label>
+
+                <div className="relative mt-1">
+                  <Lock className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    disabled={loading}
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 8,
+                        message: "Minimum 8 characters",
+                      },
+                    })}
+                    className={`${inputClass} pr-10 ${
+                      errors.password
+                        ? "border-red-500"
+                        : "border-zinc-200 dark:border-zinc-800"
+                    }`}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+
+                {errors.password && (
+                  <p className={errorClass}>{errors.password.message}</p>
+                )}
+              </div>
+
+              {/* Forgot Password */}
+              <div className="text-right text-xs">
+                <Link
+                  to="/auth/forgot-password"
+                  className="text-[#fe3e91] hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
+              <ErrorForm error={error} />
+
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full ${BUTTON_ACCENT_CLASS}`}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} />
+                    <span>Signing in...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogIn size={16} />
+                    <span>Sign in</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            <SocialLogin />
+            <FormFooter type="login" />
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default Login;

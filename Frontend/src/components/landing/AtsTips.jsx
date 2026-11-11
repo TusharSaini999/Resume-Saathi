@@ -1,51 +1,45 @@
-import { CheckCircle2 } from "lucide-react";
+import { Check } from "lucide-react";
 import ScrollReveal from "../ScrollReveal";
 
 const tips = [
-  "Run the Deep ATS Analyzer to uncover hidden issues like font inconsistencies, tight spacing, and misalignments.",
-  "Ensure your resume strictly matches the Job Description. The Analyzer will assign a 0-100 Match Score.",
-  "Extract exact missing skills directly from the Matcher and weave them naturally into your experience bullets.",
-  "Address any flagged grammatical errors or awkward phrasing identified by the AI analysis engine.",
-  "Consult your persistent AI Chatbot assistant for section-by-section improvements before you hit apply.",
-  "Avoid multi-column layouts, as the format analyzer specifically flags them for ATS risk.",
+  "Use a single-column layout. Multi-column tables and text boxes frequently scramble section hierarchy in parser outputs.",
+  "Include standard section headings like Experience, Education, and Skills so parsers map fields to their schema correctly.",
+  "Match target job keywords directly in bullet points where you have demonstrated real production experience.",
+  "Avoid embedding critical contact details or skills inside document headers, footers, or non-standard graphical shapes.",
+  "Quantify impact with verifiable metrics (latencies, percentages, revenue figures) to improve recruiter evaluation scores.",
+  "Use standard cross-platform fonts (e.g. Inter, Helvetica, Arial) and clean UTF-8 bullet characters rather than decorative icons.",
 ];
 
 const AtsTips = () => {
   return (
     <section
       id="ats-tips"
-      className="scroll-mt-28 relative bg-white dark:bg-[#111827] py-20"
+      className="scroll-mt-28 relative bg-[#fafafa] dark:bg-[#141415] py-20 border-t border-zinc-200/80 dark:border-zinc-800/80"
     >
       <div className="max-w-7xl mx-auto px-6">
-        <div className="rounded-3xl border border-[#E5E7EB] dark:border-[#374151] bg-[#F8FAFC] dark:bg-[#1F2937] p-8 md:p-10">
-          <p className="text-sm font-bold uppercase tracking-widest text-[#CA25AF]">
-            ATS Tips
+        <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#19191b] p-6 sm:p-8 md:p-10">
+          <p className="text-xs font-mono font-medium text-[#fe3e91]">
+            ATS guidelines
           </p>
 
-          <h2 className="mt-3 text-3xl md:text-4xl font-black text-[#1E293B] dark:text-white">
-            Quick Wins
-            <span className="bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] bg-clip-text text-transparent">
-              {" "}
-              Before You Hit Apply
-            </span>
+          <h2 className="mt-2 text-2xl sm:text-3xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+            Key criteria evaluated by applicant tracking systems
           </h2>
 
-          <p className="mt-4 max-w-3xl text-[#64748B] dark:text-[#94A3B8]">
-            Improve results in minutes with ATS checks, job matching, chatbot
-            guidance, and interview readiness tips.
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 max-w-2xl">
+            Guidelines to ensure your resume parses accurately into recruiter databases without losing structural context.
           </p>
 
-          <ul className="mt-8 grid gap-4 md:grid-cols-2 items-stretch">
+          <ul className="mt-8 grid gap-3 md:grid-cols-2">
             {tips.map((tip, index) => (
-              <ScrollReveal key={tip} as="li" delay={index * 80}>
-                <div className="group h-full flex items-center gap-3 rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#803AD1]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
-                  
-                  <CheckCircle2 className="h-5 w-5 text-[#FE3E91] transition-transform duration-300 group-hover:scale-110 shrink-0" />
-
-                  <span className="text-sm leading-6 text-[#475569] dark:text-[#CBD5E1]">
+              <ScrollReveal key={tip} as="li" delay={index * 50}>
+                <div className="h-full flex items-start gap-3 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/40 p-4">
+                  <div className="rounded p-1 bg-rose-50 dark:bg-rose-950/40 text-[#fe3e91] shrink-0 mt-0.5">
+                    <Check size={14} />
+                  </div>
+                  <span className="text-xs leading-relaxed text-zinc-700 dark:text-zinc-300">
                     {tip}
                   </span>
-
                 </div>
               </ScrollReveal>
             ))}

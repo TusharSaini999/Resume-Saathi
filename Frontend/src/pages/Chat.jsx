@@ -38,7 +38,7 @@ export default function Chat() {
     };
 
     return (
-        <div className="h-dvh w-full overflow-hidden bg-[#FFFFFF] md:h-screen dark:bg-[#020617]">
+        <div className="h-dvh w-full overflow-hidden bg-[#fafafa] md:h-screen dark:bg-[#141415]">
             {!resume ? (
                 <div className="flex h-dvh w-full items-center justify-center md:h-screen">
                     <NoResumeNotice />
@@ -57,7 +57,7 @@ export default function Chat() {
                         chatHistory={chatHistory}
                     />
 
-                    <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#FFFFFF] dark:bg-[#0B1120]">
+                    <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#fafafa] dark:bg-[#141415]">
                         <ChatMessages
                             setMobileSidebarOpen={setMobileSidebarOpen}
                             activeChatTitle={

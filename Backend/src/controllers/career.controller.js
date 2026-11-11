@@ -3,6 +3,8 @@ import ApiResponse from "../utils/ApiResponse.js";
 import ApiError from "../utils/ApiError.js";
 import { COMPANIES_REGISTRY, COMPANY_CATEGORIES } from "../services/ats/companyRegistry.js";
 import { TECH_COUNTRIES } from "../services/ats/techLocations.js";
+import { resolveCompanyLinks, searchCompaniesDirectory } from "../services/ats/companyDiscovery.service.js";
+import indiaTechSpiderService from "../services/ats/indiaTechSpider.service.js";
 import {
   getJobsForCandidate,
   clearCareerCache,
@@ -24,41 +26,38 @@ export const purgeCache = asyncHandler(async (req, res) => {
 });
 
 export const getCompanies = asyncHandler(async (req, res) => {
+  const { q = "", query = "", category = "", limit = 50 } = req.query;
+  const searchTerm = (q || query).trim();
+
+  let companies = [];
+  if (searchTerm) {
+    companies = searchCompaniesDirectory(searchTerm, Number(limit) || 50);
+  } else if (category && category !== "All") {
+    const catLower = category.toLowerCase();
+    companies = COMPANIES_REGISTRY.filter((c) =>
+      (c.category || "").toLowerCase().includes(catLower)
+    )
+      .slice(0, Number(limit) || 50)
+      .map((c) => resolveCompanyLinks(c.slug || c.id || c.name));
+  } else {
+    companies = COMPANIES_REGISTRY.slice(0, Number(limit) || 50).map((c) =>
+      resolveCompanyLinks(c.slug || c.id || c.name)
+    );
+  }
+
   res.status(200).json(
     new ApiResponse(true, 200, "Companies registry retrieved successfully", {
+      totalCompanies: COMPANIES_REGISTRY.length,
       categories: [...new Set(Object.values(COMPANY_CATEGORIES))],
-      companies: COMPANIES_REGISTRY,
+      companies,
     })
   );
 });
 
 export const getCompanyProfile = asyncHandler(async (req, res) => {
   const { slug = "" } = req.params;
-  const cleanSlug = slug.toLowerCase().trim();
-  const company = COMPANIES_REGISTRY.find(
-    (c) => c.slug.toLowerCase() === cleanSlug || c.id.toLowerCase() === cleanSlug || c.name.toLowerCase() === cleanSlug
-  );
-
-  if (!company) {
-    const resolvedName = cleanSlug.charAt(0).toUpperCase() + cleanSlug.slice(1);
-    return res.status(200).json(
-      new ApiResponse(true, 200, "Dynamic company profile", {
-        id: cleanSlug,
-        name: resolvedName,
-        slug: cleanSlug,
-        provider: "ai_search",
-        category: "Tech & Innovation Leader",
-        logo: `https://${cleanSlug}.com/favicon.ico`,
-        website: `https://${cleanSlug}.com`,
-        officialPortalUrl: `https://${cleanSlug}.com/careers`,
-        headquarters: "India / Global",
-        description: `${resolvedName} is an innovative organization actively expanding its technical, product, and leadership teams.`,
-        tags: ["Tech", "India"],
-      })
-    );
-  }
-
-  res.status(200).json(new ApiResponse(true, 200, "Company profile retrieved", company));
+  const profile = resolveCompanyLinks(slug);
+  res.status(200).json(new ApiResponse(true, 200, "Company profile retrieved successfully", profile));
 });
 
 import { inspectJobSystem, identifyPortalProvider } from "../services/ats/jobVerifier.service.js";
@@ -329,4 +328,30 @@ export const getFullJobDescription = asyncHandler(async (req, res) => {
   res.status(200).json(
     new ApiResponse(true, 200, "Full job description retrieved successfully", result)
   );
+});
+
+export const spiderIndiaTech = asyncHandler(async (req, res) => {
+  const { hub, sector, role, location, limit = 50 } = { ...req.query, ...req.body };
+  let discovered = [];
+
+  if (hub) {
+    discovered = await indiaTechSpiderService.spiderHubTechJobs(hub, role, Number(limit) || 40);
+  } else if (sector) {
+    discovered = await indiaTechSpiderService.spiderSectorTechJobs(sector, role, Number(limit) || 50);
+  } else {
+    discovered = await indiaTechSpiderService.spiderAllIndiaTech({ role, location, limit: Number(limit) || 60 });
+  }
+
+  res.status(200).json(
+    new ApiResponse(true, 200, `Crawled ${discovered.length} live openings across India tech companies`, {
+      totalDiscovered: discovered.length,
+      jobs: discovered,
+      telemetry: indiaTechSpiderService.getSpiderStatus(),
+    })
+  );
+});
+
+export const getSpiderStatus = asyncHandler(async (req, res) => {
+  const status = indiaTechSpiderService.getSpiderStatus();
+  res.status(200).json(new ApiResponse(true, 200, "India Tech Spider status retrieved successfully", status));
 });

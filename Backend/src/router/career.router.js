@@ -14,6 +14,8 @@ import {
   updateTrackedStatus,
   deleteTrackedJob,
   getFullJobDescription,
+  spiderIndiaTech,
+  getSpiderStatus,
 } from "../controllers/career.controller.js";
 
 const careerRouter = Router();
@@ -37,6 +39,11 @@ careerRouter.post("/jobs/full-description", getFullJobDescription);
 careerRouter.get("/jobs/full-description", getFullJobDescription);
 careerRouter.post("/clear-cache", purgeCache);
 careerRouter.post("/post-job", postJobProfile);
+
+// India Tech Spidering Endpoints
+careerRouter.get("/spider-india-tech", spiderIndiaTech);
+careerRouter.post("/spider-india-tech", spiderIndiaTech);
+careerRouter.get("/spider-india-tech/status", getSpiderStatus);
 
 // Candidate Application Tracking Endpoints
 careerRouter.post("/track", trackJob);

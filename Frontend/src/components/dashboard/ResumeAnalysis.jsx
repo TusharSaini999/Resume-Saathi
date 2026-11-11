@@ -66,10 +66,10 @@ const AnalysisSection = ({
       className={`w-full px-5 md:px-6 py-4 md:py-5 flex items-center justify-between transition-all ${hoverBg}`}
     >
       <div className="flex items-center gap-3">
-        <div className="rounded-xl p-2 bg-linear-to-r from-[#fe3e91]/20 via-[#ca25af]/20 to-[#803ad1]/20">
-          {createElement(icon, { size: 18, className: "text-[#fe3e91]" })}
+        <div className="rounded-lg p-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+          {createElement(icon, { size: 16, className: "text-zinc-700 dark:text-zinc-300" })}
         </div>
-        <span className={`font-extrabold tracking-wide text-sm md:text-base ${heading}`}>
+        <span className={`font-medium tracking-normal text-sm md:text-base ${heading}`}>
           {title}
         </span>
       </div>
@@ -97,12 +97,12 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
     }));
   }, []);
 
-  const panel = "border-[#e2e8f0] bg-white dark:border-[#334155] dark:bg-[#111827]/80";
-  const tile = "border-[#e2e8f0] bg-[#f8fafc] dark:border-[#334155] dark:bg-[#0f172a]";
-  const muted = "text-[#64748b] dark:text-[#cbd5e1]";
-  const heading = "text-[#1E293B] dark:text-white";
-  const hoverBg = "hover:bg-[#f8fafc] dark:hover:bg-[#0b1220]";
-  const borderColor = "border-[#e2e8f0] dark:border-[#334155]";
+  const panel = "border-zinc-200/80 bg-white dark:border-zinc-800 dark:bg-[#19191b]";
+  const tile = "border-zinc-200/80 bg-zinc-50 dark:border-zinc-800 dark:bg-[#141415]";
+  const muted = "text-zinc-500 dark:text-zinc-400";
+  const heading = "text-zinc-900 dark:text-zinc-100";
+  const hoverBg = "hover:bg-[#fe3e91]/5 dark:hover:bg-zinc-800/50";
+  const borderColor = "border-zinc-200/80 dark:border-zinc-800";
 
   const summary = data?.summary;
   const atsAnalysis = data?.ats_analysis;
@@ -129,25 +129,25 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
               <p className={`text-xs uppercase tracking-widest font-bold ${muted}`}>AI Resume Snapshot</p>
               <h3 className={`text-2xl md:text-3xl font-black mt-1 ${heading}`}>Overall Analysis</h3>
             </div>
-            <div className="rounded-2xl px-4 py-2 bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] text-white font-bold text-sm">
+            <div className="rounded-md px-3 py-1 bg-rose-50 dark:bg-rose-950/40 text-[#fe3e91] border border-rose-200/60 dark:border-rose-900/60 font-mono text-xs font-medium">
               {summary.ats_compatibility} Compatibility
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div className={`rounded-2xl border p-4 ${tile}`}>
-              <p className={`text-xs font-bold uppercase ${muted}`}>Overall Score</p>
-              <p className={`text-3xl mt-2 font-black ${getScoreColor(summary.overall_rating)}`}>
+            <div className={`rounded-xl border p-4 ${tile}`}>
+              <p className={`text-xs font-mono uppercase ${muted}`}>Overall Score</p>
+              <p className={`text-3xl mt-2 font-mono font-medium tabular-nums ${getScoreColor(summary.overall_rating)}`}>
                 {formatScore(summary.overall_rating)}
               </p>
             </div>
-            <div className={`rounded-2xl border p-4 ${tile}`}>
-              <p className={`text-xs font-bold uppercase ${muted}`}>ATS Compatibility</p>
-              <p className="text-2xl mt-2 font-black text-[#fe3e91]">{summary.ats_compatibility}</p>
+            <div className={`rounded-xl border p-4 ${tile}`}>
+              <p className={`text-xs font-mono uppercase ${muted}`}>ATS Compatibility</p>
+              <p className="text-2xl mt-2 font-mono font-medium text-[#fe3e91]">{summary.ats_compatibility}</p>
             </div>
-            <div className={`rounded-2xl border p-4 ${tile}`}>
-              <p className={`text-xs font-bold uppercase ${muted}`}>Keyword Match</p>
-              <p className={`text-3xl mt-2 font-black ${getScoreColor(keywordAnalysis?.keyword_score)}`}>
+            <div className={`rounded-xl border p-4 ${tile}`}>
+              <p className={`text-xs font-mono uppercase ${muted}`}>Keyword Match</p>
+              <p className={`text-3xl mt-2 font-mono font-medium tabular-nums ${getScoreColor(keywordAnalysis?.keyword_score)}`}>
                 {formatScore(keywordAnalysis?.keyword_score)}
               </p>
             </div>
@@ -200,8 +200,8 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
                 </p>
               </div>
               <div className={`rounded-xl border p-4 ${tile}`}>
-                <p className={`text-xs font-bold uppercase ${muted}`}>Compatibility</p>
-                <p className="text-2xl mt-2 font-black text-[#fe3e91]">{atsAnalysis.compatibility}</p>
+                <p className={`text-xs font-mono uppercase ${muted}`}>Compatibility</p>
+                <p className="text-2xl mt-2 font-mono font-medium text-[#fe3e91]">{atsAnalysis.compatibility}</p>
               </div>
             </div>
 
@@ -480,7 +480,7 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
               {keywordsFound.map((keyword, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 rounded-full text-xs font-bold bg-linear-to-r from-[#fe3e91]/20 via-[#ca25af]/20 to-[#803ad1]/20 text-[#fe3e91]"
+                  className="px-2.5 py-1 rounded-md text-xs font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60"
                 >
                   {keyword}
                 </span>
@@ -512,7 +512,7 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
                     ? "border-l-rose-500 bg-rose-500/10"
                     : suggestion.priority === "Medium"
                     ? "border-l-amber-500 bg-amber-500/10"
-                    : "border-l-blue-500 bg-blue-500/10"
+                    : "border-l-violet-500 bg-violet-500/10"
                 }`}
               >
                 <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
@@ -522,7 +522,7 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
                       ? "bg-rose-500/20 text-rose-500"
                       : suggestion.priority === "Medium"
                       ? "bg-amber-500/20 text-amber-500"
-                      : "bg-blue-500/20 text-blue-500"
+                      : "bg-violet-500/20 text-violet-500"
                   }`}>
                     {suggestion.priority}
                   </span>
@@ -538,14 +538,14 @@ const ResumeAnalysis = ({ data, onReupload, loading }) => {
       <button
         onClick={onReupload}
         disabled={loading}
-        className={`w-full py-3.5 font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
+        className={`w-full py-2.5 font-medium text-sm rounded-lg transition-all flex items-center justify-center gap-2 ${
           loading
-            ? "bg-[#fe3e91]/50 text-white cursor-not-allowed"
-            : "bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5] text-white hover:scale-[1.01] active:scale-95 shadow-lg shadow-purple-500/25"
+            ? "bg-zinc-400 text-white cursor-not-allowed"
+            : "bg-[#fe3e91] text-white hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] shadow-xs dark:shadow-[0_0_15px_rgba(254,62,145,0.25)] active:scale-[0.98]"
         }`}
       >
-        <RotateCcw size={18} />
-        Upload New Resume
+        <RotateCcw size={16} />
+        Upload new resume
       </button>
     </div>
   );

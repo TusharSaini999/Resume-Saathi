@@ -56,21 +56,22 @@ import NewResumeModal from "../components/career/NewResumeModal";
 import CompanyProfileModal from "../components/career/CompanyProfileModal";
 import ApplicationTracker from "../components/career/ApplicationTracker";
 import CareerFilterBar from "../components/career/CareerFilterBar";
+import CompanyDirectoryExplorer from "../components/career/CompanyDirectoryExplorer";
 import AgUiSearchConsole from "../components/career/AgUiSearchConsole";
 import { TECH_COUNTRIES } from "../constants/techLocations";
 
 const GRADIENT_PRIMARY =
-  "bg-gradient-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5]";
+  "bg-[#fe3e91] text-white hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] dark:text-white shadow-xs dark:shadow-[0_0_15px_rgba(254,62,145,0.25)] transition-all";
 
 const POPULAR_LOCATIONS = [
-  { id: "All", label: "All Locations", icon: "🌐" },
-  { id: "Remote", label: "Remote / WFH", icon: "🏠" },
-  { id: "Bengaluru", label: "Bengaluru", icon: "📍" },
-  { id: "Hyderabad", label: "Hyderabad", icon: "📍" },
-  { id: "Pune", label: "Pune", icon: "📍" },
-  { id: "Delhi NCR", label: "Delhi NCR", icon: "📍" },
-  { id: "Mumbai", label: "Mumbai", icon: "📍" },
-  { id: "Chennai", label: "Chennai", icon: "📍" },
+  { id: "All", label: "All locations" },
+  { id: "Remote", label: "Remote / WFH" },
+  { id: "Bengaluru", label: "Bengaluru" },
+  { id: "Hyderabad", label: "Hyderabad" },
+  { id: "Pune", label: "Pune" },
+  { id: "Delhi NCR", label: "Delhi NCR" },
+  { id: "Mumbai", label: "Mumbai" },
+  { id: "Chennai", label: "Chennai" },
 ];
 
 const JOBS_PER_PAGE = 12;
@@ -268,11 +269,11 @@ export default function CareerOpenings() {
     handleApplyFilters(null, false, null, null, null, null, null, null, null, null, null, pSourceId);
     const label =
       pSourceId === "official"
-        ? "Official ATS Portals (Greenhouse, Lever, SmartRecruiters, TCS iON)"
+        ? "Official Company Career Portals"
         : pSourceId === "linkedin"
         ? "LinkedIn Verified Company Requisitions"
         : pSourceId === "third_party"
-        ? "Third-Party & Startup Portals"
+        ? "Startup & Tech Portals"
         : "All Portals Unified Feed";
     dispatch(setSuccess(`Filtering by: ${label}`));
   };
@@ -722,7 +723,7 @@ export default function CareerOpenings() {
     }
   };
 
-  const handleOpenCompanyProfile = (companyNameOrSlug, e) => {
+  const handleOpenCompanyProfile = async (companyNameOrSlug, e) => {
     if (e) e.stopPropagation();
     const clean = (companyNameOrSlug || "").toLowerCase().trim();
     let found = companies.find(
@@ -732,16 +733,33 @@ export default function CareerOpenings() {
         c.name?.toLowerCase() === clean
     );
 
+    // If company not found in memory or missing official channel links, fetch from backend resolution service
+    if (!found || !found.careerPageUrl || !found.companyPageUrl || !found.linkedInJobsUrl) {
+      try {
+        const res = await careerService.getCompanyProfile(clean);
+        if (res?.success && res?.data) {
+          found = { ...found, ...res.data };
+        }
+      } catch (err) {
+        console.error("Failed to fetch official company profile", err);
+      }
+    }
+
     if (!found) {
       const displayName = companyNameOrSlug || "Company";
+      const domainSlug = clean.replace(/[^a-z0-9]/g, "");
       found = {
         id: clean,
         name: displayName,
         slug: clean,
         provider: "Official Career Portal",
         category: "Tech & Innovation Leader",
-        logo: `https://${clean.replace(/[^a-z0-9]/g, "")}.com/favicon.ico`,
-        website: `https://${clean.replace(/[^a-z0-9]/g, "")}.com`,
+        logo: `https://${domainSlug}.com/favicon.ico`,
+        website: `https://${domainSlug}.com`,
+        companyPageUrl: `https://${domainSlug}.com`,
+        careerPageUrl: `https://${domainSlug}.com/careers`,
+        linkedInUrl: `https://www.linkedin.com/company/${domainSlug}/`,
+        linkedInJobsUrl: `https://www.linkedin.com/company/${domainSlug}/jobs/`,
         headquarters: "India / Global Hubs",
         description: `${displayName} is actively hiring across technology, product, and leadership domains.`,
       };
@@ -787,13 +805,9 @@ export default function CareerOpenings() {
       const sourceLabel =
         job.sourcePortal ||
         job.portalLabel ||
-        (job.source === "greenhouse"
-          ? "Greenhouse ATS"
-          : job.source === "lever"
-            ? "Lever ATS"
-            : job.source === "smartrecruiters"
-              ? "SmartRecruiters ATS"
-              : "Official Portal");
+        (job.portalType === "linkedin" || job.applyUrl?.includes("linkedin.com")
+          ? "LinkedIn"
+          : "Official Portal");
 
       await dispatch(
         trackJobThunk({
@@ -1210,61 +1224,59 @@ export default function CareerOpenings() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pt-24 sm:pt-28 pb-20 px-3.5 sm:px-6 lg:px-8 transition-colors duration-300 overflow-x-hidden">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#141415] text-zinc-900 dark:text-zinc-100 pt-24 sm:pt-28 pb-20 px-3.5 sm:px-6 lg:px-8 transition-colors duration-300 overflow-x-hidden">
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* ─── Hero Header & Candidate Stream Profile ────────────── */}
-        <div className="relative overflow-hidden rounded-3xl p-5 sm:p-8 md:p-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-purple-500/5">
+        <div className="relative overflow-hidden rounded-xl p-5 sm:p-7 md:p-8 bg-white dark:bg-[#19191b] border border-zinc-200/80 dark:border-zinc-800 shadow-xs">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             {/* Left Title and Subtitle */}
-            <div className="space-y-2.5 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-purple-100 text-purple-700 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                <Sparkles className="w-3.5 h-3.5" /> Direct Verified ATS Openings
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-md text-xs font-mono font-medium bg-[#fe3e91]/10 text-[#fe3e91] border border-[#fe3e91]/25">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#fe3e91]"></span>
+                Direct Verified Company Openings
               </div>
-              <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
-                Official Company{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5]">
-                  Career Opportunities
-                </span>
+              <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+                Verified company career opportunities
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Direct requisitions from Greenhouse, Lever, SmartRecruiters, and official portals of India's top unicorns, emerging startups, and global tech leaders.
+              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                Direct requisitions and live engineering openings from official company career portals and tech teams.
               </p>
             </div>
 
             {/* AI Candidate Profile Card */}
-            <div className="w-full lg:w-auto flex flex-col gap-3 p-4 sm:p-5 rounded-2xl bg-slate-100/90 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 min-w-0 sm:min-w-[320px]">
+            <div className="w-full lg:w-auto flex flex-col gap-3 p-4 sm:p-5 rounded-2xl bg-zinc-100/90 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 min-w-0 sm:min-w-[320px]">
               <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-purple-600/10 text-purple-600 dark:text-purple-400 shrink-0">
+                <div className="p-3 rounded-xl bg-[#fe3e91]/10 text-[#fe3e91] shrink-0">
                   <span className="text-2xl">
                     {candidateProfile?.track?.id === "management" ? "👔" : "💻"}
                   </span>
                 </div>
                 <div className="space-y-0.5 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
                       Detected Track
                     </span>
                     <span
                       className={`px-2 py-0.2 rounded-full text-[10px] font-extrabold ${candidateProfile?.track?.id === "management"
                           ? "bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300"
-                          : "bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300"
+                          : "bg-[#5309b6]/10 text-[#5309b6] dark:text-violet-300"
                         }`}
                     >
                       {candidateProfile?.track?.label || "Tech & Engineering"}
                     </span>
                   </div>
-                  <div className="text-sm font-extrabold text-slate-900 dark:text-white truncate">
+                  <div className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
                     {candidateProfile?.primaryStream?.icon || "🌐"}{" "}
                     {candidateProfile?.primaryStream?.label || (hasResume ? "Tech & Engineering" : "All Career Domains")}
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400 font-semibold flex-wrap">
+                  <div className="flex items-center gap-1.5 text-xs text-[#fe3e91] font-semibold flex-wrap">
                     <span>
                       {candidateProfile?.isFresher
                         ? "🌱 Fresher (0-1 YOE)"
                         : `💼 Experienced (${candidateProfile?.experienceYears || 1} YOE)`}
                     </span>
                     {candidateProfile?.primaryInferredStack && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md bg-cyan-100 text-cyan-900 dark:bg-cyan-950 dark:text-cyan-200 text-[10px] font-black border border-cyan-300 dark:border-cyan-800 shadow-2xs">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md bg-[#fe3e91]/10 text-[#fe3e91] text-[10px] font-mono border border-[#fe3e91]/25 shadow-2xs">
                         <span>{candidateProfile.primaryInferredStack.icon || "⚡"}</span>
                         <span>{candidateProfile.primaryInferredStack.name}</span>
                       </span>
@@ -1274,20 +1286,21 @@ export default function CareerOpenings() {
               </div>
 
               {/* 1-Click Auto-Match CTA + Inferred Roles Quick Search */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2 border-t border-zinc-200/80 dark:border-zinc-800">
                 <button
                   onClick={handleAutoMatchProfile}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${trackFilter === (candidateProfile?.track?.id || "tech") &&
-                      (streamFilter === (candidateProfile?.primaryStream?.id || "All") || streamFilter === "All")
-                      ? "bg-emerald-600 text-white shadow-2xs"
-                      : `${GRADIENT_PRIMARY} text-white shadow-sm hover:scale-[1.02] active:scale-[0.98]`
-                    }`}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    trackFilter === (candidateProfile?.track?.id || "tech") &&
+                    (streamFilter === (candidateProfile?.primaryStream?.id || "All") || streamFilter === "All")
+                      ? "bg-emerald-600 text-white"
+                      : `${GRADIENT_PRIMARY} text-white`
+                  }`}
                 >
                   <Target className="w-3.5 h-3.5" />
                   <span>
                     {trackFilter === (candidateProfile?.track?.id || "tech")
-                      ? "✓ Auto-Matched Relevant Roles"
-                      : `🎯 Auto-Match (${candidateProfile?.track?.id === "management" ? "Management" : "Tech"})`}
+                      ? "Auto-matched profile roles"
+                      : `Auto-match (${candidateProfile?.track?.id === "management" ? "Management" : "Tech"})`}
                   </span>
                 </button>
 
@@ -1313,21 +1326,21 @@ export default function CareerOpenings() {
                         nextVal
                       );
                       if (!isCurrentlyActive) {
-                        dispatch(setSuccess("⚡ Searching jobs matching all your inferred roles & stacks!"));
+                        dispatch(setSuccess("Searching jobs matching inferred roles & stacks."));
                       }
                     }}
-                    className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all border shrink-0 ${
+                    className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all border shrink-0 ${
                       (roleSearchInput || "").toLowerCase().includes("all inferred")
-                        ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-transparent shadow-xs"
-                        : "bg-cyan-50/90 dark:bg-cyan-950/40 text-cyan-950 dark:text-cyan-100 border-cyan-300 dark:border-cyan-700 hover:border-cyan-400 hover:scale-[1.02]"
+                        ? "bg-[#fe3e91] text-white border-[#fe3e91]"
+                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                     }`}
-                    title="Search all jobs based on all your inferred tech stacks & derived industry roles"
+                    title="Search all jobs based on inferred tech stacks & derived industry roles"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-300 animate-pulse" />
+                    <Sparkles className={`w-3.5 h-3.5 ${(roleSearchInput || "").toLowerCase().includes("all inferred") ? "text-white" : "text-[#fe3e91]"}`} />
                     <span>
                       {(roleSearchInput || "").toLowerCase().includes("all inferred")
-                        ? "✓ Inferred Roles Active"
-                        : "⚡ Search Inferred Roles"}
+                        ? "Inferred roles active"
+                        : "Search inferred roles"}
                     </span>
                   </button>
                 )}
@@ -1336,49 +1349,69 @@ export default function CareerOpenings() {
           </div>
 
           {/* Navigation Tabs & Utility Toolbar */}
-          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mt-6 pt-5 border-t border-slate-200/80 dark:border-slate-800">
-            {/* Primary 2 Navigation Tabs: All Sources & Application Pipeline */}
-            <div className="inline-flex items-center p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/60 shadow-2xs shrink-0">
-              {/* Button 1: All Sources */}
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mt-6 pt-5 border-t border-zinc-200/80 dark:border-zinc-800">
+            {/* Primary Navigation Tabs: Job Openings, Company & Career Portals, Application Pipeline */}
+            <div className="inline-flex items-center p-1 rounded-xl bg-zinc-100 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/60 shadow-2xs shrink-0 flex-wrap sm:flex-nowrap">
+              {/* Button 1: All Job Openings */}
               <button
-                onClick={() => {
-                  setActiveTab("openings");
-                }}
-                className={`whitespace-nowrap flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
-                  activeTab !== "tracker"
+                onClick={() => setActiveTab("openings")}
+                className={`whitespace-nowrap flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-lg font-mono font-medium text-xs sm:text-sm transition-all ${
+                  activeTab === "openings"
                     ? `${GRADIENT_PRIMARY} text-white shadow-xs`
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                 }`}
               >
-                <Globe className="w-4 h-4" />
-                <span>All Sources</span>
+                <Globe className={`w-3.5 h-3.5 ${activeTab === "openings" ? "text-white" : "text-[#fe3e91]"}`} />
+                <span>Job Openings</span>
                 <span
-                  className={`px-2 py-0.5 text-xs rounded-full font-black ${
-                    activeTab !== "tracker"
+                  className={`px-1.5 py-0.2 text-[10px] rounded-full font-mono font-medium ${
+                    activeTab === "openings"
                       ? "bg-white/20 text-white"
-                      : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+                      : "bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
                   }`}
                 >
                   {portalCounts?.all || totalJobs}
                 </span>
               </button>
 
-              {/* Button 2: Application Pipeline */}
+              {/* Button 2: Official Company & Career Portals */}
               <button
-                onClick={() => setActiveTab("tracker")}
-                className={`whitespace-nowrap flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
-                  activeTab === "tracker"
+                onClick={() => setActiveTab("companies")}
+                className={`whitespace-nowrap flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-lg font-mono font-medium text-xs sm:text-sm transition-all ${
+                  activeTab === "companies"
                     ? `${GRADIENT_PRIMARY} text-white shadow-xs`
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                 }`}
               >
-                <Bookmark className="w-4 h-4" />
-                <span>Application Pipeline</span>
+                <Building2 className={`w-3.5 h-3.5 ${activeTab === "companies" ? "text-white" : "text-[#fe3e91]"}`} />
+                <span>Company Portals</span>
                 <span
-                  className={`px-2 py-0.5 text-xs rounded-full font-black ${
+                  className={`px-1.5 py-0.2 text-[10px] rounded-full font-mono font-medium ${
+                    activeTab === "companies"
+                      ? "bg-white/20 text-white"
+                      : "bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
+                  }`}
+                >
+                  {companies?.length || "100+"}
+                </span>
+              </button>
+
+              {/* Button 3: Application Pipeline Tracker */}
+              <button
+                onClick={() => setActiveTab("tracker")}
+                className={`whitespace-nowrap flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-lg font-mono font-medium text-xs sm:text-sm transition-all ${
+                  activeTab === "tracker"
+                    ? `${GRADIENT_PRIMARY} text-white shadow-xs`
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                }`}
+              >
+                <Bookmark className={`w-3.5 h-3.5 ${activeTab === "tracker" ? "text-white" : "text-[#fe3e91]"}`} />
+                <span>Tracker</span>
+                <span
+                  className={`px-1.5 py-0.2 text-[10px] rounded-full font-mono font-medium ${
                     activeTab === "tracker"
                       ? "bg-white/20 text-white"
-                      : "bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300"
+                      : "bg-[#fe3e91]/15 text-[#fe3e91]"
                   }`}
                 >
                   {trackedJobs.length}
@@ -1438,19 +1471,19 @@ export default function CareerOpenings() {
                     error: null,
                   })
                 }
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-all shadow-2xs"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 transition-all shadow-2xs"
               >
-                <Upload className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                <Upload className="w-3.5 h-3.5 text-[#fe3e91]" />
                 <span>Sync Resume</span>
               </button>
 
               <button
                 onClick={() => handleApplyFilters(null, true)}
                 disabled={loading}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-purple-400 text-slate-700 dark:text-slate-300 transition-all disabled:opacity-50"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-[#fe3e91]/40 text-zinc-700 dark:text-zinc-300 transition-all disabled:opacity-50"
                 title="Force refresh"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-purple-600" : ""}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-[#fe3e91]" : ""}`} />
                 <span className="hidden sm:inline">Refresh</span>
               </button>
             </div>
@@ -1458,32 +1491,32 @@ export default function CareerOpenings() {
         </div>
 
         {/* ─── TAB 1: DISCOVER CAREER OPENINGS ─── */}
-        {activeTab !== "tracker" && (
+        {activeTab === "openings" && (
           <div className="space-y-6">
             {/* Startups Spotlight */}
             {selectedCategory === "Indian Startups & Unicorns" && (
-              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-orange-500/10 via-rose-500/10 to-transparent border border-orange-200/80 dark:border-orange-900/40 space-y-4 animate-in fade-in duration-200">
+              <div className="p-5 sm:p-6 rounded-xl bg-white dark:bg-[#19191b] border border-zinc-200/80 dark:border-zinc-800 space-y-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                      🚀 Indian Product Unicorns &amp; Startups
+                    <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                      Indian Product Unicorns &amp; Startups
                     </h2>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
-                      Explore live requisitions from Razorpay, Swiggy, Meesho, Paytm, CRED, Groww, Zomato, and more.
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Live requisitions from Razorpay, Swiggy, Meesho, Paytm, CRED, Groww, Zomato, and more.
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleCategoryChange("All")}
-                      className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                     >
-                      ✕ Show All Openings
+                      Show all openings
                     </button>
                     <button
                       onClick={() => handleApplyFilters(null, true, null, null, "Indian Startups & Unicorns")}
-                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-orange-500 to-rose-600 shadow-2xs"
+                      className="px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] shadow-xs transition-all"
                     >
-                      Scan All Startups
+                      Scan startups
                     </button>
                   </div>
                 </div>
@@ -1493,21 +1526,21 @@ export default function CareerOpenings() {
                     <div
                       key={st.id}
                       onClick={(e) => handleOpenCompanyProfile(st.slug || st.id, e)}
-                      className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-orange-400 cursor-pointer transition-all flex flex-col justify-between gap-2 shadow-2xs"
+                      className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 cursor-pointer transition-colors flex flex-col justify-between gap-2"
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 rounded-lg bg-slate-50 dark:bg-slate-800 p-1 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
+                        <div className="w-7 h-7 rounded bg-white dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
                           {st.logo ? (
                             <img src={st.logo} alt="" className="w-full h-full object-contain" onError={(e) => (e.target.style.display = "none")} />
                           ) : (
-                            <Rocket className="w-3.5 h-3.5 text-orange-500" />
+                            <Rocket className="w-3.5 h-3.5 text-zinc-400" />
                           )}
                         </div>
-                        <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                        <span className="text-xs font-medium text-zinc-900 dark:text-zinc-100 truncate">
                           {st.name}
                         </span>
                       </div>
-                      <span className="text-[10px] text-slate-400 truncate">
+                      <span className="text-[10px] font-mono text-zinc-400 truncate">
                         {st.provider || "ATS Portal"}
                       </span>
                     </div>
@@ -1518,28 +1551,28 @@ export default function CareerOpenings() {
 
             {/* Small Startups Spotlight */}
             {selectedCategory === "Small Startups & Emerging Tech" && (
-              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-transparent border border-emerald-200/80 dark:border-emerald-900/40 space-y-4 animate-in fade-in duration-200">
+              <div className="p-5 sm:p-6 rounded-xl bg-white dark:bg-[#19191b] border border-zinc-200/80 dark:border-zinc-800 space-y-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                      🌱 Fast-Growing Small Startups &amp; YC Teams
+                    <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                      Fast-Growing Small Startups &amp; Emerging Tech
                     </h2>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
-                      Opportunities at high-velocity Indian startups (Pocket FM, DevRev, Slice, SigNoz, Devtron, Hasura).
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Opportunities at high-velocity teams (Pocket FM, DevRev, Slice, SigNoz, Devtron, Hasura).
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleCategoryChange("All")}
-                      className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                     >
-                      ✕ Show All Openings
+                      Show all openings
                     </button>
                     <button
                       onClick={() => handleApplyFilters(null, true, null, null, "Small Startups & Emerging Tech")}
-                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-2xs"
+                      className="px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] shadow-xs transition-all"
                     >
-                      Scan Emerging Teams
+                      Scan emerging teams
                     </button>
                   </div>
                 </div>
@@ -1549,21 +1582,21 @@ export default function CareerOpenings() {
                     <div
                       key={st.id}
                       onClick={(e) => handleOpenCompanyProfile(st.slug || st.id, e)}
-                      className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-400 cursor-pointer transition-all flex flex-col justify-between gap-2 shadow-2xs"
+                      className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 cursor-pointer transition-colors flex flex-col justify-between gap-2"
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 rounded-lg bg-slate-50 dark:bg-slate-800 p-1 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
+                        <div className="w-7 h-7 rounded bg-white dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
                           {st.logo ? (
                             <img src={st.logo} alt="" className="w-full h-full object-contain" onError={(e) => (e.target.style.display = "none")} />
                           ) : (
-                            <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+                            <Sparkles className="w-3.5 h-3.5 text-zinc-400" />
                           )}
                         </div>
-                        <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                        <span className="text-xs font-medium text-zinc-900 dark:text-zinc-100 truncate">
                           {st.name}
                         </span>
                       </div>
-                      <span className="text-[10px] text-slate-400 truncate">
+                      <span className="text-[10px] font-mono text-zinc-400 truncate">
                         {st.provider || "ATS Portal"}
                       </span>
                     </div>
@@ -1574,28 +1607,28 @@ export default function CareerOpenings() {
 
             {/* Tech Giants Spotlight */}
             {selectedCategory === "Indian Tech Giants & IT Leaders" && (
-              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-transparent border border-blue-200/80 dark:border-blue-900/40 space-y-4 animate-in fade-in duration-200">
+              <div className="p-5 sm:p-6 rounded-xl bg-white dark:bg-[#19191b] border border-zinc-200/80 dark:border-zinc-800 space-y-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                      🇮🇳 Indian Tech Giants &amp; IT Leaders
+                    <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                      Indian Tech Giants &amp; IT Leaders
                     </h2>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       Direct career openings across TCS, Infosys, Wipro, Zoho, Jio, HCLTech, and LTIMindtree.
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleCategoryChange("All")}
-                      className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                     >
-                      ✕ Show All Openings
+                      Show all openings
                     </button>
                     <button
                       onClick={() => handleApplyFilters(null, true, null, null, "Indian Tech Giants & IT Leaders")}
-                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 shadow-2xs"
+                      className="px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] shadow-xs transition-all"
                     >
-                      Scan Tech Giants
+                      Scan tech giants
                     </button>
                   </div>
                 </div>
@@ -1605,21 +1638,21 @@ export default function CareerOpenings() {
                     <div
                       key={st.id}
                       onClick={(e) => handleOpenCompanyProfile(st.slug || st.id, e)}
-                      className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-400 cursor-pointer transition-all flex flex-col justify-between gap-2 shadow-2xs"
+                      className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 cursor-pointer transition-colors flex flex-col justify-between gap-2"
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 rounded-lg bg-slate-50 dark:bg-slate-800 p-1 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
+                        <div className="w-7 h-7 rounded bg-white dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
                           {st.logo ? (
                             <img src={st.logo} alt="" className="w-full h-full object-contain" onError={(e) => (e.target.style.display = "none")} />
                           ) : (
-                            <Building2 className="w-3.5 h-3.5 text-blue-500" />
+                            <Building2 className="w-3.5 h-3.5 text-zinc-400" />
                           )}
                         </div>
-                        <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                        <span className="text-xs font-medium text-zinc-900 dark:text-zinc-100 truncate">
                           {st.name}
                         </span>
                       </div>
-                      <span className="text-[10px] text-slate-400 truncate">
+                      <span className="text-[10px] font-mono text-zinc-400 truncate">
                         {st.provider || "Official Portal"}
                       </span>
                     </div>
@@ -1703,32 +1736,32 @@ export default function CareerOpenings() {
 
             {/* Results Header & Sort */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 py-1 px-1">
-              <div className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">
+              <div className="text-xs sm:text-sm font-normal text-zinc-600 dark:text-zinc-400">
                 Showing{" "}
-                <span className="text-slate-900 dark:text-white font-bold">
+                <span className="text-zinc-900 dark:text-zinc-100 font-mono font-medium">
                   {sortedJobs.length > 0 ? (currentPage - 1) * JOBS_PER_PAGE + 1 : 0}–
                   {Math.min(currentPage * JOBS_PER_PAGE, sortedJobs.length)}
                 </span>{" "}
                 of{" "}
-                <span className="text-purple-600 dark:text-purple-400 font-bold">
+                <span className="text-zinc-900 dark:text-zinc-100 font-mono font-medium">
                   {sortedJobs.length}
                 </span>{" "}
                 verified openings
               </div>
 
               <div className="flex items-center gap-2 ml-auto">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
                   Sort:
                 </span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="text-xs font-semibold py-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 shadow-2xs"
+                  className="text-xs font-medium py-1.5 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600"
                 >
-                  <option value="match">🎯 Highest Match %</option>
-                  <option value="recent">🕒 Most Recent</option>
-                  <option value="company">🏢 Company (A-Z)</option>
-                  <option value="title">💼 Role Title (A-Z)</option>
+                  <option value="match">Highest Match %</option>
+                  <option value="recent">Most Recent</option>
+                  <option value="company">Company (A-Z)</option>
+                  <option value="title">Role Title (A-Z)</option>
                 </select>
               </div>
             </div>
@@ -1759,12 +1792,12 @@ export default function CareerOpenings() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4">
-                <AlertCircle className="w-10 h-10 text-slate-400 mx-auto" />
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+              <div className="text-center py-16 p-8 rounded-3xl bg-white dark:bg-[#19191b] border border-zinc-200/80 dark:border-zinc-800 space-y-4">
+                <AlertCircle className="w-10 h-10 text-zinc-400 mx-auto" />
+                <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white">
                   No Openings Found For These Filters
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-md mx-auto">
                   Try broadening your location, stream, or resetting filters to browse all verified listings.
                 </p>
                 <button
@@ -1792,7 +1825,7 @@ export default function CareerOpenings() {
                     window.scrollTo({ top: 400, behavior: "smooth" });
                   }}
                   disabled={currentPage === 1}
-                  className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 disabled:opacity-30 hover:bg-slate-100 transition-colors"
+                  className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 disabled:opacity-30 hover:bg-zinc-100 transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -1808,17 +1841,18 @@ export default function CareerOpenings() {
                       return (
                         <div key={pageNum} className="flex items-center gap-1">
                           {prev && pageNum - prev > 1 && (
-                            <span className="px-1 text-slate-400">...</span>
+                            <span className="px-1 text-zinc-400">...</span>
                           )}
                           <button
                             onClick={() => {
                               setCurrentPage(pageNum);
                               window.scrollTo({ top: 400, behavior: "smooth" });
                             }}
-                            className={`w-8 h-8 rounded-xl text-xs font-bold transition-all ${currentPage === pageNum
-                                ? "bg-purple-600 text-white shadow-2xs"
-                                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100"
-                              }`}
+                            className={`w-8 h-8 rounded-lg text-xs font-mono font-medium transition-all ${
+                              currentPage === pageNum
+                                ? "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-xs"
+                                : "bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                            }`}
                           >
                             {pageNum}
                           </button>
@@ -1833,7 +1867,7 @@ export default function CareerOpenings() {
                     window.scrollTo({ top: 400, behavior: "smooth" });
                   }}
                   disabled={currentPage === totalPages}
-                  className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 disabled:opacity-30 hover:bg-slate-100 transition-colors"
+                  className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 disabled:opacity-30 hover:bg-zinc-100 transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -1842,7 +1876,22 @@ export default function CareerOpenings() {
           </div>
         )}
 
-        {/* ─── TAB 2: MY APPLICATION TRACKER PIPELINE ─────────────── */}
+        {/* ─── TAB 2: OFFICIAL COMPANY & CAREER PORTALS DIRECTORY ─── */}
+        {activeTab === "companies" && (
+          <CompanyDirectoryExplorer
+            companies={companies}
+            onOpenCompanyProfile={handleOpenCompanyProfile}
+            onScanPortal={handleScanCompanyOriginalPortal}
+            scanningPortalCompany={scanningPortalCompany}
+            onSelectCompanyFilter={(slug) => {
+              handleSelectQuickCompany(slug);
+              setActiveTab("openings");
+            }}
+            GRADIENT_PRIMARY={GRADIENT_PRIMARY}
+          />
+        )}
+
+        {/* ─── TAB 3: MY APPLICATION TRACKER PIPELINE ─────────────── */}
         {activeTab === "tracker" && (
           <ApplicationTracker
             trackedJobs={trackedJobs}

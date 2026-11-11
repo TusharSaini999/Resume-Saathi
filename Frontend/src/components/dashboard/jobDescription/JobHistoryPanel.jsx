@@ -1,16 +1,32 @@
 import { Briefcase, ChevronDown, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { formatDate, getScoreTone } from "./jobDescriptionUtils";
+import { BUTTON_CLASS } from "../../../constants/style";
+
+const formatDate = (isoString) => {
+  if (!isoString) return "Recently";
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return "Recently";
+  return date.toLocaleDateString("en-IN", {
+    month: "short",
+    day: "numeric",
+  });
+};
+
+const getScoreTone = (score) => {
+  if (score >= 80) return "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60";
+  if (score >= 60) return "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60";
+  return "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 border border-red-200/60 dark:border-red-800/60";
+};
 
 function JobHistoryPanel({
-  history,
+  history = [],
   selectedId,
   onSelect,
   onNew,
   disabled = false,
-  searchQuery,
-  onSearchChange,
-  isSearchMode,
+  searchQuery = "",
+  onSearchChange = () => {},
+  isSearchMode = false,
 }) {
   const listRef = useRef(null);
   const [showScrollHint, setShowScrollHint] = useState(false);
@@ -22,20 +38,16 @@ function JobHistoryPanel({
         setShowScrollHint(false);
         return;
       }
-
-      const hasOverflow = listEl.scrollHeight > listEl.clientHeight + 4;
-      const isNearBottom = listEl.scrollTop + listEl.clientHeight >= listEl.scrollHeight - 6;
-      setShowScrollHint(hasOverflow && !isNearBottom);
+      const canScroll = listEl.scrollHeight > listEl.clientHeight + 8;
+      const isNearBottom = listEl.scrollTop + listEl.clientHeight >= listEl.scrollHeight - 16;
+      setShowScrollHint(canScroll && !isNearBottom);
     };
 
-    const listEl = listRef.current;
     updateScrollHint();
+    const listEl = listRef.current;
+    if (!listEl) return;
 
-    if (!listEl) {
-      return undefined;
-    }
-
-    listEl.addEventListener("scroll", updateScrollHint, { passive: true });
+    listEl.addEventListener("scroll", updateScrollHint);
     window.addEventListener("resize", updateScrollHint);
 
     return () => {
@@ -45,22 +57,21 @@ function JobHistoryPanel({
   }, [history.length]);
 
   return (
-    <aside className="rounded-3xl border border-white/70 bg-white/80 p-4 shadow-lg backdrop-blur-sm dark:border-[#334155] dark:bg-[#0f172a]/85 md:p-5 lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-7.5rem)] lg:flex-col">
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2 text-base font-black text-[#1e293b] dark:text-white">
-          <Briefcase size={18} className="text-[#e11d48]" /> JD History
+    <aside className="rounded-xl border border-zinc-200/80 bg-white p-4 dark:border-zinc-800 dark:bg-[#19191b] shadow-xs lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-7.5rem)] lg:flex-col">
+      <div className="mb-3.5 flex items-center justify-between gap-2">
+        <h2 className="flex items-center gap-2 text-xs font-mono font-medium text-zinc-900 dark:text-zinc-100 uppercase">
+          <Briefcase size={15} className="text-[#fe3e91]" />
+          <span>JD History</span>
         </h2>
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-[#f1f5f9] px-2.5 py-1 text-xs font-bold text-[#475569] dark:bg-[#1e293b] dark:text-[#cbd5e1]">
+          <span className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs font-mono text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
             {history.length}
           </span>
           <button
             type="button"
             onClick={onNew}
             disabled={disabled}
-            className={`rounded-lg bg-[linear-gradient(120deg,#ff4f87_0%,#f43f5e_45%,#8b5cf6_100%)] px-3 py-1.5 text-xs font-black text-white shadow-sm transition-transform active:scale-95 ${
-              disabled ? "cursor-not-allowed opacity-60" : "hover:scale-[1.03]"
-            }`}
+            className="rounded-lg bg-[#fe3e91] px-2.5 py-1 text-xs font-medium text-white hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] shadow-xs transition-all"
           >
             New
           </button>
@@ -72,7 +83,7 @@ function JobHistoryPanel({
           Search job descriptions
         </label>
         <div className="relative">
-          <Search size={14} className="pointer-events-none absolute left-3 top-2.5 text-[#64748b] dark:text-[#94a3b8]" />
+          <Search size={14} className="pointer-events-none absolute left-3 top-2.5 text-zinc-400" />
           <input
             id="jd-history-search"
             type="text"
@@ -80,17 +91,17 @@ function JobHistoryPanel({
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search job title..."
             disabled={disabled}
-            className="w-full rounded-xl border border-[#dbe2ea] bg-white py-2 pl-9 pr-8 text-xs font-medium text-[#1e293b] outline-none transition focus:border-[#f43f5e] focus:ring-2 focus:ring-[#f43f5e]/20 dark:border-[#334155] dark:bg-[#111827] dark:text-white"
+            className="w-full rounded-lg border border-zinc-200 bg-zinc-50/50 py-2 pl-9 pr-3 text-xs text-zinc-900 outline-none transition focus:border-[#fe3e91] dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100"
           />
         </div>
       </div>
 
       {!history.length ? (
-        <div className="rounded-2xl border border-dashed border-[#cbd5e1] p-5 text-center dark:border-[#475569]">
-          <p className="text-sm font-semibold text-[#475569] dark:text-[#cbd5e1]">
+        <div className="rounded-lg border border-dashed border-zinc-200 p-5 text-center dark:border-zinc-800">
+          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
             {isSearchMode ? "No matching jobs" : "No history yet"}
           </p>
-          <p className="mt-1 text-xs text-[#64748b] dark:text-[#94a3b8]">
+          <p className="mt-1 text-[11px] text-zinc-500">
             {isSearchMode ? "Try another keyword." : "Analyze your first job description."}
           </p>
         </div>
@@ -98,7 +109,7 @@ function JobHistoryPanel({
         <div className="relative lg:min-h-0 lg:flex-1">
           <div
             ref={listRef}
-            className="history-scroll-hidden max-h-[60vh] space-y-3 overflow-y-auto pr-1 lg:min-h-0 lg:max-h-none lg:h-full"
+            className="history-scroll-hidden max-h-[60vh] space-y-2 overflow-y-auto pr-1 lg:min-h-0 lg:max-h-none lg:h-full"
           >
             {history.map((item) => {
               const active = item?._id === selectedId;
@@ -109,23 +120,23 @@ function JobHistoryPanel({
                   key={item?._id}
                   onClick={() => onSelect(item?._id)}
                   disabled={disabled}
-                  className={`w-full rounded-2xl border p-3 text-left transition-all ${
+                  className={`w-full rounded-lg border p-3 text-left transition-colors ${
                     active
-                      ? "border-[#f43f5e] bg-[#fff1f2] shadow-sm dark:border-[#fb7185] dark:bg-[#3b1120]"
-                      : "border-[#e2e8f0] bg-white hover:-translate-y-0.5 hover:shadow-sm dark:border-[#334155] dark:bg-[#0b1220]"
+                      ? "border-[#fe3e91]/60 bg-rose-50/30 dark:border-[#fe3e91]/40 dark:bg-rose-950/20"
+                      : "border-zinc-200/80 bg-white hover:bg-zinc-50/60 dark:border-zinc-800 dark:bg-[#19191b] dark:hover:bg-zinc-800/40"
                   } ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
                 >
-                  <p className="truncate text-sm font-black text-[#1e293b] dark:text-white">
+                  <p className="truncate text-xs font-medium text-zinc-900 dark:text-zinc-100">
                     {item?.title || "Untitled Position"}
                   </p>
-                  <p className="mt-1 truncate text-xs text-[#64748b] dark:text-[#94a3b8]">
-                    {item?.company_name || "Company not provided"}
+                  <p className="mt-0.5 truncate text-[11px] text-zinc-500">
+                    {item?.company_name || "Company not specified"}
                   </p>
-                  <div className="mt-3 flex items-center justify-between gap-2 text-xs">
-                    <span className={`rounded-full px-2 py-1 font-bold ${getScoreTone(matchScore)}`}>
-                      {matchScore}% Match
+                  <div className="mt-2.5 flex items-center justify-between gap-2 text-[11px] font-mono">
+                    <span className={`rounded px-1.5 py-0.5 font-medium ${getScoreTone(matchScore)}`}>
+                      {matchScore}% match
                     </span>
-                    <span className="text-[#64748b] dark:text-[#94a3b8]">{formatDate(item?.createdAt)}</span>
+                    <span className="text-zinc-400">{formatDate(item?.createdAt)}</span>
                   </div>
                 </button>
               );
@@ -134,9 +145,9 @@ function JobHistoryPanel({
 
           {showScrollHint && (
             <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center">
-              <div className="inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#64748b] shadow-sm dark:bg-[#111827]/90 dark:text-[#94a3b8]">
+              <div className="inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-mono uppercase text-zinc-500 shadow-xs dark:bg-zinc-900/90 dark:text-zinc-400">
                 Scroll
-                <ChevronDown size={12} className="animate-bounce" />
+                <ChevronDown size={12} />
               </div>
             </div>
           )}

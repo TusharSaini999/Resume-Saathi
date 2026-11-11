@@ -4,20 +4,21 @@ import { useSelector, useDispatch } from "react-redux";
 import { setTheme } from "../../context/themeSlice";
 import Logout from "./Logout";
 import { Link, useLocation } from "react-router";
+import { BUTTON_CLASS, UNDERLINE_CLASS } from "../../constants/style";
 
 const navItems = [
   { label: "Overview", id: "overview" },
-  { label: "How It Works", id: "how-it-works" },
+  { label: "How it works", id: "how-it-works" },
   { label: "Features", id: "features" },
-  { label: "ATS Tips", id: "ats-tips" },
+  { label: "ATS tips", id: "ats-tips" },
   { label: "About", id: "about" },
   { label: "Support", id: "support" },
 ];
 
 const dashboardNavItems = [
   { label: "Resume", path: "/dashboard" },
-  { label: "Career Openings", path: "/dashboard/careers" },
-  { label: "Job Description", path: "/dashboard/job" },
+  { label: "Career openings", path: "/dashboard/careers" },
+  { label: "Job description", path: "/dashboard/job" },
   { label: "Chat", path: "/dashboard/chat" },
   { label: "Settings", path: "/dashboard/settings" },
 ];
@@ -27,9 +28,6 @@ const publicBaseUrl = import.meta.env.BASE_URL;
 // Constants - extracted to reduce string duplication
 const ACTIVE_SECTION_STORAGE_KEY = "activeSection";
 const THEME_STORAGE_KEY = "theme";
-const GRADIENT_SHARED = "bg-linear-to-r from-[#fe3e91] via-[#ca25af] to-[#803ad1] dark:from-[#ff5fa7] dark:via-[#d340bd] dark:to-[#9d65d5]";
-const BUTTON_CLASS = `w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-bold text-white rounded-xl ${GRADIENT_SHARED} hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25 transition-all`;
-const UNDERLINE_CLASS = `h-0.5 rounded-full ${GRADIENT_SHARED} transition-all duration-300 origin-left`;
 
 const getStoredActiveSection = () => {
   const stored = localStorage.getItem(ACTIVE_SECTION_STORAGE_KEY);
@@ -205,54 +203,49 @@ const Header = () => {
   }, [location.pathname]);
 
   const getNavItemClass = useCallback((isActive) =>
-    `w-full lg:w-auto text-center text-sm font-bold uppercase tracking-wider relative transition-colors duration-300 py-1 ${
+    `w-full lg:w-auto text-center text-sm font-medium relative transition-colors duration-150 py-1 ${
       isActive
-        ? "text-[#fe3e91] dark:text-[#ff5fa7]"
-        : "text-[#475569] dark:text-[#ffffff] hover:text-[#ff66a8] hover:dark:text-[#fa7db3]"
+        ? "text-[#fe3e91] font-semibold"
+        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
     }`, []);
 
   return (
     <header>
       <nav
         ref={navRef}
-        className="fixed top-0 w-full z-25 border-b border-[#E5E7EB] bg-white/80 px-4 py-3 backdrop-blur-md
-                   transition-colors duration-300 dark:border-[#374151] dark:bg-[#111827] lg:px-6"
+        className="fixed top-0 w-full z-25 border-b border-zinc-200/80 bg-white/90 px-4 py-3 backdrop-blur-md
+                   transition-colors duration-150 dark:border-zinc-800/90 dark:bg-[#141415]/90 lg:px-6"
       >
         <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center">
           {/* Logo */}
           <div
-            className="group flex cursor-pointer items-center"
+            className="flex cursor-pointer items-center gap-2.5"
             onClick={() => scrollToSection("Overview", "overview")}
           >
             <img
               src={!isDark ? `${publicBaseUrl}Logo/lightLogo.png` : `${publicBaseUrl}Logo/darkLogo.png`}
-              alt="ResumeSaathi Logo"
+              alt="Resume Saathi Logo"
               loading="eager"
               fetchPriority="high"
-              className="w-10 h-10 mr-2 rounded-2xl border-2 border-[#fe3e91] shadow-lg shadow-pink-500/20
-                         transition-transform duration-500 transform group-hover:rotate-12 group-hover:scale-110"
+              className="w-8 h-8 rounded-lg object-contain"
             />
 
-            <span className="text-xl font-black tracking-tight text-[#1E293B] dark:text-white
-                             transition-transform duration-500 group-hover:translate-x-1 group-hover:scale-105">
-              Resume
-              <span className={`bg-clip-text text-transparent ${GRADIENT_SHARED}`}>
-                Saathi
-              </span>
+            <span className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+              Resume <span className="text-[#fe3e91]">Saathi</span>
             </span>
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center lg:order-2 space-x-3">
+          <div className="flex items-center lg:order-2 space-x-2">
             {/* Theme Toggle */}
             <button
               onClick={handleThemeToggle}
-              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition text-slate-600 dark:text-slate-400"
+              className="p-1.5 rounded-lg border border-zinc-200/60 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition text-zinc-600 dark:text-zinc-400"
               aria-label="Toggle Theme"
             >
-              {btnTheme === "light" && <Sun size={20} className="text-gray-600 dark:text-white" />}
-              {btnTheme === "dark" && <Moon size={20} className="text-gray-600 dark:text-white" />}
-              {btnTheme === "system" && <Laptop size={20} className="text-gray-600 dark:text-white" />}
+              {btnTheme === "light" && <Sun size={18} />}
+              {btnTheme === "dark" && <Moon size={18} />}
+              {btnTheme === "system" && <Laptop size={18} />}
             </button>
 
             {/* Get Started Button */}
@@ -261,31 +254,25 @@ const Header = () => {
                 to={isLoggedIn ? "/dashboard" : "/auth/login"}
                 className={`hidden sm:inline-flex ${BUTTON_CLASS}`}
               >
-                Get Started
+                Get started
               </Link>
             )}
 
             {/* Logout Button */}
             {isLoggedIn && showDashboardNav && (
               <Logout style={`hidden sm:inline-flex ${BUTTON_CLASS}`} />
-              // <button
-              //   onClick={handleLogout}
-              //   className=
-              //   title="Logout"
-              // >
-              //   Logout
-              // </button>
             )}
 
             {/* Mobile Menu Toggle */}
             <button
               onClick={toggleMobileMenu}
-              className="lg:hidden p-2 text-[#64748B] dark:text-[#94A3B8]"
+              className="lg:hidden p-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+              aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
-                <X size={24} />
+                <X size={20} />
               ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -299,11 +286,11 @@ const Header = () => {
 
           {/* Navigation */}
           <div
-            className={`w-full transition-all duration-300 lg:order-1 lg:flex lg:w-auto ${
+            className={`w-full transition-all duration-150 lg:order-1 lg:flex lg:w-auto ${
               mobileMenuOpen ? "block mt-4" : "hidden lg:block"
             }`}
           >
-            <ul className="flex flex-col items-center lg:flex-row lg:space-x-8 space-y-2 lg:space-y-0">
+            <ul className="flex flex-col items-center lg:flex-row lg:space-x-7 space-y-2 lg:space-y-0">
               {/* Show landing nav items if on root page or not logged in */}
               {!showDashboardNav && navItems.map(({ label, id }) => (
                 <li key={label} className="relative w-full lg:w-auto">
@@ -312,13 +299,6 @@ const Header = () => {
                     className={getNavItemClass(active === label)}
                   >
                     {label}
-                    {!mobileMenuOpen && (
-                      <span
-                        className={`absolute left-0 -bottom-1 w-full ${UNDERLINE_CLASS} ${
-                          active === label ? "scale-x-100" : "scale-x-0"
-                        }`}
-                      />
-                    )}
                   </button>
                 </li>
               ))}
@@ -332,13 +312,6 @@ const Header = () => {
                     className={getNavItemClass(location.pathname === path)}
                   >
                     {label}
-                    {!mobileMenuOpen && (
-                      <span
-                        className={`absolute left-0 -bottom-1 w-full ${UNDERLINE_CLASS} ${
-                          location.pathname === path ? "scale-x-100" : "scale-x-0"
-                        }`}
-                      />
-                    )}
                   </Link>
                 </li>
               ))}
@@ -348,21 +321,14 @@ const Header = () => {
             {mobileMenuOpen && !showDashboardNav && (
               <Link
                 to={isLoggedIn ? "/dashboard" : "/auth/login"}
-                className={`flex sm:hidden ${BUTTON_CLASS} mt-4 w-full`}
+                className={`flex sm:hidden ${BUTTON_CLASS} mt-4 w-full justify-center`}
               >
-                Get Started
+                Get started
               </Link>
             )}
 
             {isLoggedIn && mobileMenuOpen && showDashboardNav && (
-              <Logout style={`flex sm:hidden ${BUTTON_CLASS} mt-4 w-full`} />
-              // <button
-              //   onClick={handleLogout}
-              //   className={`flex sm:hidden ${BUTTON_CLASS} mt-4 w-full`}
-              //   title="Logout"
-              // >
-              //   Logout
-              // </button>
+              <Logout style={`flex sm:hidden ${BUTTON_CLASS} mt-4 w-full justify-center`} />
             )}
           </div>
         </div>

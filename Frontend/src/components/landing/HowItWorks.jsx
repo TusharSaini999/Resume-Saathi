@@ -4,59 +4,73 @@ import ScrollReveal from "../ScrollReveal";
 
 const steps = [
   {
+    step: "01",
     icon: FileUp,
-    title: "1. Upload Resume",
+    title: "Upload resume",
     description:
-      "Upload your resume securely. We process everything in a private environment so your personal data stays safe.",
+      "Upload your PDF or DOCX file. Analysis is executed locally with private session storage.",
   },
   {
+    step: "02",
     icon: SearchCheck,
-    title: "2. ATS & Stack Analysis",
+    title: "ATS and format audit",
     description:
-      "AI extracts your genuine skills, flags formatting traps, and infers your target tech stacks and industry roles.",
+      "Audit formatting traps, calculate keyword density against target descriptions, and detect inferred tech stacks.",
   },
   {
+    step: "03",
     icon: Briefcase,
-    title: "3. Live ATS Job Discovery",
+    title: "Live ATS job discovery",
     description:
-      "Browse live openings from official Greenhouse, Lever, and LinkedIn portals, pre-scored for match compatibility.",
+      "Browse verified openings fetched directly from employer portals across Greenhouse, Lever, and SmartRecruiters.",
   },
   {
+    step: "04",
     icon: BadgeCheck,
-    title: "4. Tailor & Apply",
+    title: "Tailor and apply",
     description:
-      "Tailor your resume for any opening with 1-click, polish bullet points, and apply directly with confidence.",
+      "Align bullet points with missing target keywords, verify portal links, and apply directly to official listings.",
   },
 ];
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="scroll-mt-28 relative bg-white dark:bg-[#111827] py-20">
+    <section id="how-it-works" className="scroll-mt-28 relative bg-[#fafafa] dark:bg-[#141415] py-20 border-t border-zinc-200/80 dark:border-zinc-800/80">
       <div className="max-w-7xl mx-auto px-6">
         <ScrollReveal>
-        <div className="max-w-3xl">
-          <p className="text-sm font-bold uppercase tracking-widest text-[#FE3E91]">How It Works</p>
-          <h2 className="mt-3 text-3xl md:text-4xl font-black text-[#1E293B] dark:text-white">
-            Your Blueprint to
-            <span className="bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] bg-clip-text text-transparent">
-              {" "}Career Success
-            </span>
-          </h2>
-          <p className="mt-4 text-[#64748B] dark:text-[#94A3B8]">
-            We've streamlined the entire job search into four powerful steps. Go from resume upload to interview-ready applications in minutes.
-          </p>
-        </div>
+          <div className="max-w-2xl">
+            <p className="text-xs font-mono font-medium text-[#fe3e91]">
+              Workflow
+            </p>
+            <h2 className="mt-2 text-3xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+              Four steps from resume upload to verified application
+            </h2>
+            <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+              A structured diagnostic pipeline to check parse compatibility, inspect missing skills, and match direct employer requisitions.
+            </p>
+          </div>
         </ScrollReveal>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map(({ icon: Icon, title, description }, index) => (
-            <ScrollReveal key={title} delay={index * 120}>
-              <article className="how-card rounded-2xl border border-[#E5E7EB] dark:border-[#374151] p-6 bg-[#F8FAFC] dark:bg-[#1F2937] h-full">
-                <div className="how-card-icon inline-flex rounded-xl p-3 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151]">
-                  {createElement(Icon, { className: "w-5 h-5 text-[#CA25AF]" })}
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map(({ step, icon: Icon, title, description }, index) => (
+            <ScrollReveal key={title} delay={index * 80}>
+              <article className="how-card rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#19191b] p-5 h-full flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="how-card-icon inline-flex rounded-lg p-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                      {createElement(Icon, { size: 18 })}
+                    </div>
+                    <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">
+                      {step}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-medium text-zinc-900 dark:text-zinc-100">
+                    {title}
+                  </h3>
+                  <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+                    {description}
+                  </p>
                 </div>
-                <h3 className="mt-4 text-xl font-bold text-[#1E293B] dark:text-white">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-[#64748B] dark:text-[#94A3B8]">{description}</p>
               </article>
             </ScrollReveal>
           ))}

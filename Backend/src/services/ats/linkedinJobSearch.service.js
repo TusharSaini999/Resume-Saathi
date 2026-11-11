@@ -17,8 +17,8 @@ class LinkedInJobSearchService {
   }
 
   /**
-   * Search LinkedIn public guest jobs endpoint for a specific company or role query
-   * @param {string} companyName - Target company name (e.g. "Swiggy", "Razorpay", "Google")
+   * Search LinkedIn public guest jobs endpoint specifically for a target company's official job requisitions
+   * @param {string} companyName - Target company name (e.g. "Swiggy", "Razorpay", "CRED")
    * @param {string} roleQuery - Optional role/title keywords (e.g. "Software Engineer", "Backend")
    * @param {string} location - Target location (default "India")
    * @param {number} limit - Maximum jobs to return (default 15)
@@ -28,7 +28,11 @@ class LinkedInJobSearchService {
     const cleanRole = (roleQuery || "").trim();
     const cleanLoc = (location || "India").trim();
 
-    const queryTerms = [cleanCompany, cleanRole].filter(Boolean).join(" ");
+    // Use exact company name in quotes to force LinkedIn to search specifically for the target company
+    const queryTerms = cleanCompany
+      ? (cleanRole ? `"${cleanCompany}" ${cleanRole}` : `"${cleanCompany}"`)
+      : cleanRole;
+
     if (!queryTerms) return [];
     if (Date.now() < this.rateLimitedUntil) return [];
 
@@ -60,7 +64,8 @@ class LinkedInJobSearchService {
       }
 
       const html = await response.text();
-      const jobs = this.parseLinkedInHtml(html, cleanCompany);
+      // Pass cleanCompany as targetCompany so third-party recruitment agencies and unrelated companies are discarded
+      const jobs = this.parseLinkedInHtml(html, cleanCompany, cleanCompany);
 
       // Pre-enrich the top 4 jobs with full descriptions for instant rich rendering
       const topBatch = jobs.slice(0, 4);
@@ -275,49 +280,123 @@ class LinkedInJobSearchService {
   }
 
   /**
-   * Parse HTML returned by LinkedIn guest job search API
+   * Cleans a raw LinkedIn company URL into standard canonical form:
+   * e.g. "https://in.linkedin.com/company/swiggy-in?trk=..." -> "https://www.linkedin.com/company/swiggy-in/"
    */
-  parseLinkedInHtml(html, fallbackCompany = "") {
+  cleanLinkedInCompanyUrl(rawUrl = "") {
+    if (!rawUrl || typeof rawUrl !== "string") return "";
+    try {
+      const match = rawUrl.match(/linkedin\.com\/company\/([a-zA-Z0-9_-]+)/i);
+      if (match) {
+        return `https://www.linkedin.com/company/${match[1]}/`;
+      }
+      const parsed = new URL(rawUrl);
+      const pathname = parsed.pathname.replace(/\/+$/, "");
+      return `https://www.linkedin.com${pathname}/`;
+    } catch {
+      return "";
+    }
+  }
+
+  /**
+   * Builds the official company jobs page URL on LinkedIn:
+   * e.g. "https://www.linkedin.com/company/swiggy-in/jobs/"
+   */
+  cleanLinkedInCompanyJobsUrl(companyUrl = "") {
+    if (!companyUrl) return "";
+    const cleaned = this.cleanLinkedInCompanyUrl(companyUrl);
+    return cleaned ? `${cleaned.replace(/\/+$/, "")}/jobs/` : "";
+  }
+
+  /**
+   * Verifies that the requisition is authentically from the official company,
+   * strictly filtering out third-party staffing agencies, recruitment consultancies,
+   * or competing companies.
+   */
+  isOfficialCompanyMatch(jobCompanyName = "", targetCompanyName = "") {
+    if (!targetCompanyName) return true;
+    if (!jobCompanyName) return false;
+
+    const j = jobCompanyName.toLowerCase().trim();
+    const t = targetCompanyName.toLowerCase().trim();
+
+    // 1. Direct match
+    if (j === t) return true;
+
+    // 2. Exact word-boundary match (e.g. "CRED" in "CRED Club", "Swiggy" in "Swiggy Instamart")
+    const escaped = t.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const wordRegex = new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, "i");
+    if (wordRegex.test(j)) {
+      // Discard false positives like "CreditSea" or "CreditVidya" for "CRED"
+      if (t === "cred" && (j.includes("credit") || j.includes("credible"))) {
+        return false;
+      }
+      return true;
+    }
+
+    // 3. Normalized alphanumeric exact match
+    const normJ = j.replace(/[^a-z0-9]/g, "");
+    const normT = t.replace(/[^a-z0-9]/g, "");
+    if (normJ === normT) return true;
+
+    return false;
+  }
+
+  /**
+   * Parse HTML returned by LinkedIn guest job search API.
+   * When targetCompany is specified, strictly extracts requisitions from that official company
+   * and links back to the verified official company LinkedIn page.
+   */
+  parseLinkedInHtml(html, fallbackCompany = "", targetCompany = "") {
     if (!html || typeof html !== "string") return [];
 
     const jobs = [];
-    // Split into individual card chunks by job-search-card or base-card
-    const cardChunks = html.split(/<li[^>]*>[\s\S]*?<div class="[^"]*job-search-card/i);
+    const cardChunks = html.split(/<li[^>]*>[\s\S]*?<div class="[^"]*job-search-card/i).slice(1);
+    const chunks = cardChunks.length > 0 ? cardChunks : html.split(/<div class="[^"]*job-search-card/i).slice(1);
 
-    // If split didn't yield chunks, fallback to regex matchAll across full document
-    const titleRegex = /<h3 class="base-search-card__title">([\s\S]*?)<\/h3>/g;
-    const companyRegex = /<h4 class="base-search-card__subtitle">[\s\S]*?<a[^>]*>([\s\S]*?)<\/a>/g;
-    const locationRegex = /<span class="job-search-card__location">([\s\S]*?)<\/span>/g;
-    const linkRegex = /<a class="base-card__full-link[^"]*"[^>]*href="([^"]+)"/g;
-    const logoRegex = /<img[^>]*data-delayed-url="([^"]+)"/g;
-    const urnRegex = /data-entity-urn="urn:li:jobPosting:(\d+)"/g;
-    const timeRegex = /<time[^>]*datetime="([^"]+)"/g;
+    for (let i = 0; i < chunks.length; i++) {
+      const card = chunks[i];
 
-    const titles = [...html.matchAll(titleRegex)].map((m) => m[1].replace(/<[^>]+>/g, "").trim());
-    const companies = [...html.matchAll(companyRegex)].map((m) => m[1].replace(/<[^>]+>/g, "").trim());
-    const locations = [...html.matchAll(locationRegex)].map((m) => m[1].replace(/<[^>]+>/g, "").trim());
-    const links = [...html.matchAll(linkRegex)].map((m) => m[1].trim());
-    const logos = [...html.matchAll(logoRegex)].map((m) => m[1].trim());
-    const urns = [...html.matchAll(urnRegex)].map((m) => m[1].trim());
-    const times = [...html.matchAll(timeRegex)].map((m) => m[1].trim());
+      const titleMatch = card.match(/<h3 class="base-search-card__title">([\s\S]*?)<\/h3>/i);
+      const compMatch = card.match(/<h4 class="base-search-card__subtitle">[\s\S]*?<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i);
+      const simpleCompMatch = card.match(/<h4 class="base-search-card__subtitle">([\s\S]*?)<\/h4>/i);
+      const applyMatch = card.match(/<a class="base-card__full-link[^"]*"[^>]*href="([^"]+)"/i);
+      const locationMatch = card.match(/<span class="job-search-card__location">([\s\S]*?)<\/span>/i);
+      const logoMatch = card.match(/<img[^>]*data-delayed-url="([^"]+)"/i);
+      const urnMatch = card.match(/data-entity-urn="urn:li:jobPosting:(\d+)"/i);
+      const timeMatch = card.match(/<time[^>]*datetime="([^"]+)"/i);
 
-    const total = Math.min(titles.length, links.length);
+      const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "").trim() : "";
+      let company = compMatch
+        ? compMatch[2].replace(/<[^>]+>/g, "").trim()
+        : simpleCompMatch
+        ? simpleCompMatch[1].replace(/<[^>]+>/g, "").trim()
+        : fallbackCompany || "Tech Company";
+      let rawCompanyUrl = compMatch ? compMatch[1] : "";
+      let applyUrl = applyMatch ? applyMatch[1].trim() : "";
 
-    for (let i = 0; i < total; i++) {
-      const title = titles[i];
-      if (!title) continue;
+      if (!title || !applyUrl) continue;
 
-      const company = companies[i] || fallbackCompany || "Tech Company";
-      const location = locations[i] || "India";
-      let applyUrl = links[i] || "";
-      // Strip tracking query params from applyUrl for clean direct access
+      // Clean applyUrl by stripping tracking parameters
       if (applyUrl.includes("?")) {
         applyUrl = applyUrl.split("?")[0];
       }
 
-      const externalId = urns[i] || (applyUrl.match(/view\/([a-zA-Z0-9-]+)/) ? RegExp.$1 : `li-${Date.now()}-${i}`);
-      const logo = logos[i] || `https://${company.toLowerCase().replace(/[^a-z0-9]/g, "")}.com/favicon.ico`;
-      const postedAt = times[i] ? new Date(times[i]).toISOString() : new Date().toISOString();
+      // If target company is specified, enforce strict official company match!
+      // This discards recruitment agencies, competing companies, and unrelated job postings.
+      if (targetCompany && !this.isOfficialCompanyMatch(company, targetCompany)) {
+        continue;
+      }
+
+      const location = locationMatch ? locationMatch[1].replace(/<[^>]+>/g, "").trim() : "India";
+      const externalId = urnMatch ? urnMatch[1] : (applyUrl.match(/view\/([a-zA-Z0-9-]+)/) ? RegExp.$1 : `li-${Date.now()}-${i}`);
+      const logo = logoMatch ? logoMatch[1].trim() : `https://${company.toLowerCase().replace(/[^a-z0-9]/g, "")}.com/favicon.ico`;
+      const postedAt = timeMatch ? new Date(timeMatch[1]).toISOString() : new Date().toISOString();
+
+      // Official LinkedIn Company Page URLs
+      const cleanSlug = company.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const officialCompanyPage = this.cleanLinkedInCompanyUrl(rawCompanyUrl) || `https://www.linkedin.com/company/${cleanSlug}/`;
+      const officialCompanyJobsPage = this.cleanLinkedInCompanyJobsUrl(officialCompanyPage);
 
       const structuredJD = parseStructuredJD(title, `${title} at ${company} in ${location}. Verified direct job requisition on LinkedIn.`);
       const streamInfo = detectStreamFromTextAndSkills(title, [], title);
@@ -328,7 +407,7 @@ class LinkedInJobSearchService {
         externalId: String(externalId),
         title,
         company,
-        companySlug: company.toLowerCase().replace(/[^a-z0-9]/g, ""),
+        companySlug: cleanSlug,
         location,
         applyUrl,
         companyLogo: logo,
@@ -340,8 +419,13 @@ class LinkedInJobSearchService {
         maxExperienceYears: expClassification.maxYears || 5,
         isFresherFriendly: Boolean(expClassification.isFresher),
         source: "linkedin",
-        sourcePortal: "LinkedIn Company Jobs",
-        portalLabel: "LinkedIn Verified Requisition",
+        sourcePortal: "Official LinkedIn Portal",
+        portalLabel: "Official LinkedIn Portal",
+        companyLinkedInUrl: officialCompanyPage,
+        linkedInUrl: officialCompanyPage,
+        linkedInJobsUrl: officialCompanyJobsPage,
+        officialPortalUrl: officialCompanyJobsPage,
+        careerPageUrl: officialCompanyJobsPage,
         isRealOpening: true,
         stream: {
           id: streamInfo.id || "full_stack",

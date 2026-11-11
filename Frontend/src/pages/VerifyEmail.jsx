@@ -1,244 +1,198 @@
-import { useState, useEffect } from "react";
-import { Mail, RefreshCw, CheckCircle, Loader2, InboxIcon, MailOpen } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { Mail, CheckCircle, RefreshCw, Loader2, ArrowLeft, Inbox as InboxIcon } from "lucide-react";
+import { Link, useNavigate } from "react-router";
 import AuthService from "../services/authService";
-import { useSelector, useDispatch } from "react-redux";
-import { updateExpiration } from "../context/authSlice";
-const getRemainingSeconds = (expiresAt) => {
-    if (!expiresAt) return 0;
-    const expiresAtMs = new Date(expiresAt).getTime();
-    if (Number.isNaN(expiresAtMs)) return 0;
-
-    return Math.max(0, Math.ceil((expiresAtMs - Date.now()) / 1000));
-};
-
-const formatCountdown = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-};
+import { BUTTON_ACCENT_CLASS } from "../constants/style";
 
 const VerifyEmail = () => {
-    const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState(false);
-    const [error, setError] = useState(null);
-    const user = useSelector((state) => state.auth?.user);
-    const userId = user?._id;
-    const email = user?.email;
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const [cooldown, setCooldown] = useState(() =>
-        user?.email_Send ? getRemainingSeconds(user?.email_ExpiresAt) : 0
-    );
+  const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!userId) {
-            navigate("/error");
-        }
+  useEffect(() => {
+    const rawUser = localStorage.getItem("user");
+    if (!rawUser) {
+      navigate("/auth/login");
+      return;
+    }
 
-        if (user?.email_Send) {
-            setCooldown(getRemainingSeconds(user?.email_ExpiresAt));
-        }
+    try {
+      const parsed = JSON.parse(rawUser);
+      if (parsed?.email_verified) {
+        navigate("/dashboard");
+        return;
+      }
+      setEmail(parsed?.email || "");
+      setUserId(parsed?._id || parsed?.id || null);
+    } catch {
+      navigate("/auth/login");
+    }
+  }, [navigate]);
 
-    }, [userId, user?.email_Send, user?.email_ExpiresAt, user, navigate]);
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => {
+      setCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
 
-    useEffect(() => {
-        if (cooldown > 0) {
-            const timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [cooldown]);
+  const formatCountdown = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? "0" : ""}${s}`;
+  };
 
-    const handleResend = async () => {
-        if (!userId || loading || cooldown > 0) return;
-        setLoading(true);
-        setError(null);
-        setSuccess(false);
-        try {
-            const response = await AuthService.resendVerificationEmail(userId);
-            if (response.success) {
-                dispatch(updateExpiration(response.data.email_ExpiresAt));
-                setSuccess(true);
-                setTimeout(() => setSuccess(false), 5000);
-            } else {
-                setError(response.message || "Failed to resend email. Please try again.");
-            }
-        } catch {
-            setError("Something went wrong. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleResend = async () => {
+    if (!userId || cooldown > 0) return;
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
 
-    return (
-        <div className="h-screen overflow-hidden flex items-center justify-center bg-[#FFFFFF] dark:bg-[#111827] px-4">
+    try {
+      const response = await AuthService.resendVerificationEmail(userId);
+      if (response.success) {
+        setSuccess(true);
+        setCooldown(120);
+      } else {
+        setError(response.message || "Failed to resend verification email.");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            {/* Gradient Background Blobs */}
-            <div className="absolute inset-0 opacity-20 blur-3xl pointer-events-none">
-                <div className="absolute top-0 right-0 w-80 h-80 bg-[#803AD1] rounded-full"></div>
-                <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#FE3E91] rounded-full"></div>
-            </div>
-
-            {/* Card Container */}
-            <div
-                className="relative w-full max-w-6xl h-[90vh] rounded-3xl shadow-2xl border border-[#E5E7EB] dark:border-[#374151] overflow-hidden bg-[#FFFFFF] dark:bg-[#1F2937]"
-                style={{ boxShadow: "0 25px 50px rgba(0,0,0,0.2)" }}
-            >
-                <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
-
-                    {/* LEFT SIDE - Decorative Panel */}
-                    <div className="hidden lg:flex flex-col justify-center items-center p-12 h-full relative overflow-hidden
-            bg-linear-to-br from-[#803AD1]/10 via-[#CA25AF]/10 to-[#FE3E91]/10
-            dark:from-[#9D65D5]/15 dark:via-[#D340BD]/15 dark:to-[#FF5FA7]/15
-            border-r border-[#E5E7EB] dark:border-[#374151]">
-
-                        {/* Orbs */}
-                        <div className="absolute top-0 left-0 w-40 h-40 bg-[#803AD1] dark:bg-[#9D65D5] rounded-full blur-3xl opacity-20"></div>
-                        <div className="absolute bottom-0 right-0 w-40 h-40 bg-[#FE3E91] dark:bg-[#FF5FA7] rounded-full blur-3xl opacity-20"></div>
-
-                        <div className="relative z-10 text-center max-w-sm">
-
-                            {/* Animated Icon */}
-                            <div className="mb-8 flex justify-center">
-                                <div
-                                    className="w-24 h-24 rounded-3xl bg-linear-to-br from-[#803AD1] to-[#FE3E91] dark:from-[#9D65D5] dark:to-[#FF5FA7] flex items-center justify-center shadow-2xl animate-bounce"
-                                    style={{ boxShadow: "0 10px 30px rgba(128, 58, 209, 0.35)", animationDuration: "2s" }}
-                                >
-                                    <MailOpen className="w-12 h-12 text-white" />
-                                </div>
-                            </div>
-
-                            {/* Title */}
-                            <h2 className="text-3xl font-bold text-[#1E293B] dark:text-white mb-4">
-                                Almost There!
-                            </h2>
-                            <p className="text-sm text-[#475569] dark:text-[#94A3B8] mb-8">
-                                Just one step left — verify your email to unlock Resume Saathi.
-                            </p>
-
-                            {/* Steps */}
-                            <div className="space-y-4 text-left">
-                                {[
-                                    { step: "1", label: "Check your inbox", sub: "Look for an email from Resume Saathi" },
-                                    { step: "2", label: "Open the email", sub: "Find the verification message we sent" },
-                                    { step: "3", label: "Click the link", sub: "Confirm your email to get started" },
-                                ].map(({ step, label, sub }) => (
-                                    <div
-                                        key={step}
-                                        className="flex items-center gap-3 p-4 rounded-xl bg-[#FFFFFF]/70 dark:bg-[#1F2937]/70 backdrop-blur-md border border-[#E5E7EB]/60 dark:border-[#374151]/60 hover:scale-[1.02] hover:shadow-md transition"
-                                    >
-                                        <div className="w-10 h-10 rounded-full bg-linear-to-r from-[#803AD1] to-[#FE3E91] dark:from-[#9D65D5] dark:to-[#FF5FA7] flex items-center justify-center shrink-0 text-white text-sm font-bold shadow-md">
-                                            {step}
-                                        </div>
-                                        <div>
-                                            <p className="font-semibold text-[#1E293B] dark:text-white text-sm">{label}</p>
-                                            <p className="text-xs text-[#475569] dark:text-[#94A3B8]">{sub}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* RIGHT SIDE - Content */}
-                    <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-12 py-6 overflow-y-auto">
-
-                        {/* Email icon */}
-                        <div className="flex justify-center lg:justify-start mb-6">
-                            <div
-                                className="w-20 h-20 rounded-2xl bg-linear-to-br from-[#803AD1] via-[#CA25AF] to-[#FE3E91] dark:from-[#9D65D5] dark:via-[#D340BD] dark:to-[#FF5FA7] flex items-center justify-center shadow-lg"
-                                style={{ boxShadow: "0 8px 24px rgba(128, 58, 209, 0.3)" }}
-                            >
-                                <Mail className="w-10 h-10 text-white" />
-                            </div>
-                        </div>
-
-                        {/* Header */}
-                        <div className="mb-6">
-                            <h1 className="text-3xl sm:text-4xl font-bold text-[#1E293B] dark:text-white">
-                                Check Your Email 📬
-                            </h1>
-                            <p className="mt-2 text-sm text-[#475569] dark:text-[#94A3B8]">
-                                We sent a verification link to{" "}
-                                {email ? (
-                                    <span className="font-semibold text-[#FE3E91] dark:text-[#FF5FA7]">{email}</span>
-                                ) : (
-                                    "your email address"
-                                )}
-                                . Click the link to activate your account.
-                            </p>
-                        </div>
-
-                        {/* Info Box */}
-                        <div className="mb-6 p-4 rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-[#F9FAFB] dark:bg-[#374151]/40">
-                            <div className="flex items-start gap-3">
-                                <InboxIcon className="w-5 h-5 text-[#803AD1] dark:text-[#9D65D5] shrink-0 mt-0.5" />
-                                <div className="text-sm text-[#475569] dark:text-[#94A3B8] space-y-1">
-                                    <p>Can't find the email? Check your <span className="font-medium text-[#1E293B] dark:text-white">spam or junk folder</span>.</p>
-                                    <p>The link expires in <span className="font-medium text-[#1E293B] dark:text-white">15 min</span>.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Success Message */}
-                        {success && (
-                            <div className="mb-4 flex items-center gap-2 rounded-lg border border-green-200 dark:border-green-500/40 bg-green-50 dark:bg-green-500/10 px-4 py-3 text-sm text-green-700 dark:text-green-300">
-                                <CheckCircle className="w-4 h-4 shrink-0" />
-                                <span>Verification email resent successfully! Please check your inbox.</span>
-                            </div>
-                        )}
-
-                        {/* Error Message */}
-                        {error && (
-                            <div className="mb-4 rounded-lg border border-red-200 dark:border-red-500/40 bg-red-50 dark:bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
-                                {error}
-                            </div>
-                        )}
-
-                        {/* Resend Button */}
-                        {userId && (
-                            <>
-                                <button
-                                    type="button"
-                                    onClick={handleResend}
-                                    disabled={loading || cooldown > 0}
-                                    className="w-full py-2.5 rounded-lg text-white font-semibold
-                  bg-linear-to-r from-[#803AD1] via-[#CA25AF] to-[#FE3E91]
-                  dark:from-[#9D65D5] dark:via-[#D340BD] dark:to-[#FF5FA7]
-                  hover:opacity-90 hover:scale-[1.02] active:scale-95 transition-all
-                  disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                                    style={{ boxShadow: "0 8px 20px rgba(128, 58, 209, 0.25)" }}
-                                >
-                                    {loading ? (
-                                        <>
-                                            <Loader2 className="inline mr-2 w-4 h-4 animate-spin" />
-                                            Sending...
-                                        </>
-                                    ) : cooldown > 0 ? (
-                                        <>
-                                            <RefreshCw className="inline mr-2 w-4 h-4" />
-                                            Resend in {formatCountdown(cooldown)}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <RefreshCw className="inline mr-2 w-4 h-4" />
-                                            Resend Verification Email
-                                        </>
-                                    )}
-                                </button>
-
-                                {cooldown > 0 && (
-                                    <p className="mt-2 text-center text-xs text-[#475569] dark:text-[#94A3B8]">
-                                        You can request another verification email in {formatCountdown(cooldown)}.
-                                    </p>
-                                )}
-                            </>
-                        )}
-                    </div>
+  return (
+    <div className="h-screen overflow-hidden flex items-center justify-center bg-[#fafafa] dark:bg-[#141415] px-4">
+      <div className="relative w-full max-w-5xl h-[88vh] rounded-xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden bg-white dark:bg-[#19191b] shadow-xs">
+        <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
+          {/* LEFT SIDE - Decorative Panel */}
+          <div className="hidden lg:flex flex-col justify-center items-center p-12 h-full relative overflow-hidden bg-[#fe3e91]/[0.03] dark:bg-[#19191b] border-r border-zinc-200/80 dark:border-zinc-800">
+            <div className="relative z-10 text-center max-w-sm">
+              <div className="mb-6 flex justify-center">
+                <div className="w-12 h-12 rounded-lg bg-[#fe3e91]/10 text-[#fe3e91] flex items-center justify-center border border-[#fe3e91]/25">
+                  <Mail size={22} />
                 </div>
+              </div>
+
+              <h2 className="text-2xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100 mb-2">
+                Verify your email
+              </h2>
+              <p className="text-xs text-zinc-500 mb-8">
+                Confirm your account address to begin resume audits
+              </p>
+
+              <div className="space-y-3 text-left">
+                {[
+                  { step: "01", label: "Check your inbox", sub: "Look for an email from Resume Saathi" },
+                  { step: "02", label: "Open the link", sub: "Click the secure verification token" },
+                  { step: "03", label: "Access dashboard", sub: "Start your live ATS resume audits" },
+                ].map(({ step, label, sub }) => (
+                  <div
+                    key={step}
+                    className="flex items-center gap-3 p-3.5 rounded-lg bg-white dark:bg-[#141415] border border-zinc-200/80 dark:border-zinc-800"
+                  >
+                    <div className="w-8 h-8 rounded-md bg-[#fe3e91]/10 border border-[#fe3e91]/20 flex items-center justify-center shrink-0 text-[#fe3e91] font-mono text-xs">
+                      {step}
+                    </div>
+                    <div>
+                      <p className="font-medium text-zinc-900 dark:text-zinc-100 text-xs">{label}</p>
+                      <p className="text-[11px] text-zinc-500">{sub}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
+          </div>
+
+          {/* RIGHT SIDE - Content */}
+          <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-12 py-6 overflow-y-auto">
+            <div className="mb-6">
+              <h1 className="text-2xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+                Check your inbox
+              </h1>
+              <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                We sent a verification link to{" "}
+                {email ? (
+                  <span className="font-mono font-medium text-zinc-900 dark:text-zinc-100">{email}</span>
+                ) : (
+                  "your email address"
+                )}
+                . Click the link to complete account setup.
+              </p>
+            </div>
+
+            <div className="mb-6 p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40">
+              <div className="flex items-start gap-3">
+                <InboxIcon className="w-4 h-4 text-[#fe3e91] shrink-0 mt-0.5" />
+                <div className="text-xs text-zinc-600 dark:text-zinc-400 space-y-1">
+                  <p>Check your spam or junk folder if the email does not arrive promptly.</p>
+                  <p>The verification link remains active for 15 minutes.</p>
+                </div>
+              </div>
+            </div>
+
+            {success && (
+              <div className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-xs text-emerald-800 dark:border-emerald-800/60 dark:bg-emerald-950/30 dark:text-emerald-300">
+                <CheckCircle className="w-4 h-4 shrink-0" />
+                <span>Verification email resent. Please check your inbox.</span>
+              </div>
+            )}
+
+            {error && (
+              <div className="mb-4 rounded-lg border border-red-200 dark:border-red-800/60 bg-red-50 dark:bg-red-950/30 px-3 py-2.5 text-xs text-red-600 dark:text-red-400">
+                {error}
+              </div>
+            )}
+
+            {userId && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={loading || cooldown > 0}
+                  className={`w-full ${BUTTON_ACCENT_CLASS}`}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} />
+                      <span>Sending...</span>
+                    </>
+                  ) : cooldown > 0 ? (
+                    <>
+                      <RefreshCw size={14} />
+                      <span>Resend in {formatCountdown(cooldown)}</span>
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw size={14} />
+                      <span>Resend verification email</span>
+                    </>
+                  )}
+                </button>
+              </>
+            )}
+
+            <div className="mt-6 flex items-center justify-between text-xs">
+              <Link
+                to="/auth/login"
+                className="inline-flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to sign in</span>
+              </Link>
+            </div>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default VerifyEmail;

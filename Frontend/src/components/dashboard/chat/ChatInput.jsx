@@ -9,9 +9,9 @@ export default function ChatInput({ input, setInput, handleSend, handleKeyDown }
   const isInputDisabled = loading || initialLoading || initialError !== null;
 
   return (
-    <div className="border-t border-[#E2E8F0] bg-[#FFFFFF] p-2 dark:border-[#1E293B] dark:bg-[#020617]">
+    <div className="border-t border-zinc-200/80 bg-white p-2 dark:border-zinc-800 dark:bg-[#141415]">
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-3xl border border-[#E2E8F0] bg-[#F8FAFC] p-2 shadow-inner dark:border-[#334155] dark:bg-[#111827]">
+        <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-2 shadow-inner dark:border-zinc-800 dark:bg-[#19191b]">
           <div className="flex items-end gap-2">
             <textarea
               rows={1}
@@ -24,33 +24,33 @@ export default function ChatInput({ input, setInput, handleSend, handleKeyDown }
                 }
                 handleKeyDown(e);
               }}
-              placeholder="Ask anything about your resume, jobs, or ATS..."
+              placeholder="Ask about your resume, missing keywords, or job match criteria..."
               disabled={isInputDisabled}
               aria-label="Chat input"
-              className="max-h-32 min-h-8 w-full resize-none bg-transparent px-2 py-2 text-xs text-[#0F172A] placeholder:text-[#64748B] outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:text-white dark:placeholder:text-[#94A3B8]"
+              className="max-h-32 min-h-8 w-full resize-none bg-transparent px-2 py-2 text-xs text-zinc-900 placeholder:text-zinc-400 outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:text-zinc-100 dark:placeholder:text-zinc-500"
             />
 
             <button
               onClick={handleSend}
               disabled={isInputDisabled}
               aria-label="Send message"
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white shadow-[0_8px_20px_rgba(254,62,145,0.18)] transition-all duration-300 active:scale-95
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white transition-colors duration-150 active:scale-[0.97]
                 ${
                   isInputDisabled
-                    ? "cursor-not-allowed opacity-70 bg-[#94A3B8]"
-                    : "bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] hover:scale-105"
+                    ? "cursor-not-allowed opacity-50 bg-zinc-300 dark:bg-zinc-700"
+                    : "bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] text-white shadow-xs dark:shadow-[0_0_12px_rgba(254,62,145,0.25)]"
                 }`}
             >
               {loading || initialLoading ? (
-                <Loader2 size={15} className="animate-spin" />
+                <Loader2 size={14} className="animate-spin" />
               ) : (
-                <Send size={15} />
+                <Send size={14} />
               )}
             </button>
           </div>
         </div>
-        <p className="mt-2 px-2 text-[11px] text-[#64748B] dark:text-[#94A3B8]">
-          Get resume tips, ATS advice, and job matching help instantly.
+        <p className="mt-2 px-1 text-[11px] text-zinc-500 dark:text-zinc-500">
+          Informed by your parsed resume context.
         </p>
       </div>
     </div>

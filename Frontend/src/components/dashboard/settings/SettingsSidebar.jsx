@@ -1,28 +1,26 @@
-import { GRADIENT_SHARED } from "../../../constants/style";
 const SettingsSidebar = ({ tabItems, activeTab, onTabChange }) => {
   return (
-    <aside className="rounded-3xl border border-slate-200/70 bg-white/85 shadow-[0_20px_70px_-30px_rgba(128,58,209,0.45)] backdrop-blur-md lg:h-full lg:overflow-hidden dark:border-slate-700/80 dark:bg-slate-900/85">
-      <div className="h-full overflow-y-auto p-3">
-        <p className="px-3 pt-3 pb-4 text-xs font-semibold tracking-[0.18em] text-[#ca25af] uppercase dark:text-pink-300">
+    <aside className="rounded-xl border border-zinc-200/80 bg-white shadow-xs dark:border-zinc-800 dark:bg-[#19191b]">
+      <div className="h-full overflow-y-auto p-2.5">
+        <p className="px-3 pt-2.5 pb-3 text-xs font-mono font-medium text-zinc-500 uppercase">
           Settings
         </p>
 
-        <div className="space-y-2.5">
+        <div className="space-y-1">
           {tabItems.map((item) => {
-             
             const { key, label, icon: Icon } = item;
             const isActive = activeTab === key;
             return (
               <button
                 key={key}
                 onClick={() => onTabChange(key)}
-                className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-left text-sm font-semibold transition ${
+                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs font-medium transition-colors duration-150 ${
                   isActive
-                    ? `${GRADIENT_SHARED} text-white shadow-md shadow-violet-400/30`
-                    : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                    ? "bg-[#fe3e91] text-white dark:bg-[#fe3e91] dark:text-white shadow-xs"
+                    : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800/60"
                 }`}
               >
-                <Icon size={16} />
+                <Icon size={15} />
                 {label}
               </button>
             );

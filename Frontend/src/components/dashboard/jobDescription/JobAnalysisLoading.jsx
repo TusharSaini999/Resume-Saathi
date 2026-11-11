@@ -1,45 +1,43 @@
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 function JobAnalysisLoading({ loadingStage }) {
   const loadingTitle =
     loadingStage === "processing"
-      ? "Analyzing your JD"
+      ? "Evaluating candidate criteria against job description"
       : loadingStage === "finalizing"
-        ? "Preparing recommendations"
-        : "Submitting your JD";
+        ? "Generating comparative match insights"
+        : "Submitting job description";
 
   const loadingDescription =
     loadingStage === "processing"
-      ? "We are matching your resume against required skills, experience, and keywords."
+      ? "Auditing required hard skills, experience duration, and keyword overlap against parsed resume data."
       : loadingStage === "finalizing"
-        ? "Final touches are being added to your score insights and recommendations."
-        : "Your job description is being sent securely for analysis.";
+        ? "Structuring missing competencies and actionable bullet recommendations."
+        : "Sending listing criteria into secure processing pipeline.";
 
   const loadingStepText =
     loadingStage === "processing"
-      ? "Step 2 of 3: Deep analysis"
+      ? "Step 2 of 3 · Deep comparative analysis"
       : loadingStage === "finalizing"
-        ? "Step 3 of 3: Finalizing"
-        : "Step 1 of 3: Submitting";
+        ? "Step 3 of 3 · Finalizing scoring"
+        : "Step 1 of 3 · Ingestion";
 
   return (
-    <div className="rounded-3xl border border-white/70 bg-white/85 p-6 shadow-lg backdrop-blur-sm dark:border-[#334155] dark:bg-[#0f172a]/85 md:p-8">
-      <div className="mx-auto flex min-h-[42vh] max-w-2xl flex-col items-center justify-center text-center">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#fce7f3] px-3 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-[#be185d] dark:bg-[#4a1538] dark:text-[#f9a8d4]">
-          <Sparkles size={12} /> JD Analysis In Progress
+    <div className="rounded-xl border border-zinc-200/80 bg-white p-6 dark:border-zinc-800 dark:bg-[#19191b] md:p-8 shadow-xs">
+      <div className="mx-auto flex min-h-[36vh] max-w-xl flex-col items-center justify-center text-center">
+        <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-100 text-[#fe3e91] dark:bg-zinc-800">
+          <Loader2 size={24} className="animate-spin" />
         </div>
 
-        <div className="relative mb-4">
-          <span className="absolute inset-0 animate-ping rounded-full bg-[#f43f5e]/20" />
-          <span className="relative inline-flex h-14 w-14 items-center justify-center rounded-full bg-[linear-gradient(120deg,#ff4f87_0%,#f43f5e_45%,#8b5cf6_100%)] text-white shadow-lg">
-            <Loader2 size={26} className="animate-spin" />
-          </span>
-        </div>
+        <h3 className="text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+          {loadingTitle}
+        </h3>
+        
+        <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400 max-w-md">
+          {loadingDescription}
+        </p>
 
-        <h3 className="text-2xl font-black text-[#1e293b] dark:text-white">{loadingTitle}</h3>
-        <p className="mt-2 text-sm text-[#475569] dark:text-[#cbd5e1] md:text-base">{loadingDescription}</p>
-
-        <p className="mt-4 inline-flex rounded-full bg-[#e2e8f0] px-3 py-1 text-xs font-bold text-[#475569] dark:bg-[#1e293b] dark:text-[#cbd5e1]">
+        <p className="mt-5 inline-flex rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 px-3 py-1 text-xs font-mono text-zinc-600 dark:text-zinc-400">
           {loadingStepText}
         </p>
       </div>

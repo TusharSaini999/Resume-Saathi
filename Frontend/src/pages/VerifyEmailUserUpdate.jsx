@@ -64,23 +64,23 @@ const VerifyEmailUserUpdate = () => {
     }, [token, dispatch]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#FFFFFF] dark:bg-[#111827] px-4">
-            <div className="w-full max-w-md rounded-2xl border border-[#E5E7EB] dark:border-[#374151] bg-[#FFFFFF] dark:bg-[#1F2937] p-8 shadow-xl text-center">
-                <div className="mb-6 flex justify-center">
+        <div className="min-h-screen flex items-center justify-center bg-[#fafafa] dark:bg-[#141415] px-4">
+            <div className="w-full max-w-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#19191b] p-8 shadow-xs text-center">
+                <div className="mb-5 flex justify-center">
                     {loading ? (
-                        <Loader2 className="w-12 h-12 animate-spin text-[#803AD1] dark:text-[#9D65D5]" />
+                        <Loader2 className="w-10 h-10 animate-spin text-[#fe3e91]" />
                     ) : success ? (
-                        <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
+                        <CheckCircle2 className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
                     ) : (
-                        <XCircle className="w-12 h-12 text-red-600 dark:text-red-400" />
+                        <XCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
                     )}
                 </div>
 
-                <h1 className="text-2xl font-bold text-[#1E293B] dark:text-white mb-2">
-                    {loading ? "Verifying Email" : success ? "Email Verified" : "Verification Failed"}
+                <h1 className="text-xl font-medium text-zinc-900 dark:text-zinc-100 mb-2">
+                    {loading ? "Verifying email" : success ? "Email verified" : "Verification failed"}
                 </h1>
 
-                <p className="text-sm text-[#475569] dark:text-[#94A3B8]">{message}</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">{message}</p>
             </div>
         </div>
     );

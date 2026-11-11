@@ -1,66 +1,56 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Sidebar open/close animation */
 .sidebar-animated {
-	transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s, box-shadow 0.3s;
+	transition: width 0.25s cubic-bezier(0.22, 1, 0.36, 1), background 0.2s, box-shadow 0.2s;
 	will-change: width, background, box-shadow;
 	overflow: hidden;
 }
 .sidebar-animated.sidebar-open {
 	width: 260px !important;
 	opacity: 1;
-	box-shadow: 0 8px 32px rgba(30,41,59,0.10);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 .sidebar-animated.sidebar-closed {
 	width: 72px !important;
 	opacity: 0.98;
 	box-shadow: none;
 }
+
 /* Chat bubble animation */
 .chat-bubble-animate {
-	animation: chat-bubble-fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+	animation: chat-bubble-fade-in 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes chat-bubble-fade-in {
 	0% {
 		opacity: 0;
-		transform: translateY(24px) scale(0.98);
-	}
-	80% {
-		opacity: 1;
-		transform: translateY(-2px) scale(1.01);
+		transform: translateY(8px);
 	}
 	100% {
 		opacity: 1;
-		transform: translateY(0) scale(1);
+		transform: translateY(0);
 	}
 }
-@import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
 
+/* Quiet card hover: hairline border tint, no bounce, no colored glow */
 .how-card {
-	will-change: transform, box-shadow, border-color;
-	transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
+	transition: border-color 150ms cubic-bezier(0.22, 1, 0.36, 1), background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .how-card-icon {
-	transition: transform 260ms ease, box-shadow 260ms ease, background-color 260ms ease;
+	transition: color 150ms cubic-bezier(0.22, 1, 0.36, 1), background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (hover: hover) and (pointer: fine) {
 	.how-card:hover {
-		transform: translateY(-8px);
-		box-shadow: 0 18px 40px rgba(30, 41, 59, 0.14);
-		border-color: rgba(202, 37, 175, 0.38);
-	}
-
-	.how-card:hover .how-card-icon {
-		transform: translateY(-2px) scale(1.06);
-		box-shadow: 0 10px 24px rgba(202, 37, 175, 0.22);
-		background-color: rgba(254, 62, 145, 0.08);
+		border-color: rgba(254, 62, 145, 0.35);
 	}
 }
 
 .how-card:active {
-	transform: translateY(-2px) scale(0.995);
+	transform: scale(0.99);
 }
 
 @media (hover: none), (pointer: coarse) {

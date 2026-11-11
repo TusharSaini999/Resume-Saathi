@@ -1,8 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail } from "lucide-react";
 import { SERVER_URL } from "../../constants/envConfig";
 import ScrollReveal from "../ScrollReveal";
+import { BUTTON_CLASS } from "../../constants/style";
 
 const Support = () => {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
@@ -17,11 +18,11 @@ const Support = () => {
     try {
       const res = await axios.post(`${SERVER_URL}/contact`, formData);
       setIsSuccess(true);
-      setStatusMessage(res.data?.message || "Message sent successfully!");
+      setStatusMessage(res.data?.message || "Message sent successfully.");
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
       setIsSuccess(false);
-      setStatusMessage(error.response?.data?.message || "Failed to send message.");
+      setStatusMessage(error.response?.data?.message || "Failed to send message. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -30,118 +31,119 @@ const Support = () => {
   return (
     <section
       id="support"
-      className="scroll-mt-28 relative bg-white dark:bg-[#111827] py-20 pb-28"
+      className="scroll-mt-28 relative bg-[#fafafa] dark:bg-[#141415] py-20 border-t border-zinc-200/80 dark:border-zinc-800/80"
     >
       <div className="max-w-7xl mx-auto px-6">
-        <div className="rounded-3xl border border-[#E5E7EB] dark:border-[#374151] bg-[#F8FAFC] dark:bg-[#1F2937] p-8 md:p-10 lg:p-12">
+        <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#19191b] p-6 sm:p-8 md:p-10">
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             
-            {/* Left Side: Content */}
-            <div className="text-left">
-              <p className="text-sm font-bold uppercase tracking-widest text-[#FE3E91]">
-                We've Got Your Back
+            {/* Left Side: Information */}
+            <div className="lg:col-span-5">
+              <p className="text-xs font-mono font-medium text-[#fe3e91]">
+                Support &amp; feedback
               </p>
 
-              <h2 className="mt-3 text-3xl md:text-4xl font-black text-[#1E293B] dark:text-white leading-tight">
-                Ready to Boost Your
-                <br className="hidden lg:block" />
-                <span className="bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] bg-clip-text text-transparent">
-                  {" "}Interview Rate?
-                </span>
+              <h2 className="mt-2 text-2xl sm:text-3xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+                Have questions or need assistance?
               </h2>
 
-              <p className="mt-4 text-base md:text-lg text-[#64748B] dark:text-[#94A3B8]">
-                Our dedicated support team is ready to help you navigate our AI tools, understand your scores, and ensure you're putting your absolute best foot forward. Drop us a line at{" "}
-                <a
-                  href="mailto:support@resumesaathi.tusharsaini.tech"
-                  className="font-semibold text-[#FE3E91] hover:underline"
-                >
-                  support@resumesaathi.tusharsaini.tech
-                </a>
-                .
+              <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                Whether you have suggestions for new parser formats, need assistance reviewing your match score, or want to report an ATS feed update, our team is available to assist.
               </p>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                <ScrollReveal delay={0}>
-                  <article className="rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-5 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#FE3E91]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
-                    <h3 className="text-base font-bold text-[#1E293B] dark:text-white">
-                      Instant AI Guidance
-                    </h3>
-                    <p className="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                      Stuck on a bullet point? Our AI assistant gives you real-time suggestions and rewrites instantly.
-                    </p>
-                  </article>
-                </ScrollReveal>
-
-                <ScrollReveal delay={100}>
-                  <article className="rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-5 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#FE3E91]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
-                    <h3 className="text-base font-bold text-[#1E293B] dark:text-white">
-                      Absolute Privacy
-                    </h3>
-                    <p className="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                      Your career moves are private. Benefit from secure session management and seamless logins.
-                    </p>
-                  </article>
-                </ScrollReveal>
-
-                <ScrollReveal delay={200}>
-                  <article className="rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-5 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#FE3E91]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
-                    <h3 className="text-base font-bold text-[#1E293B] dark:text-white">
-                      Beat the ATS
-                    </h3>
-                    <p className="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                      Stop automated rejections. We analyze keywords, structure, and formatting to maximize your visibility.
-                    </p>
-                  </article>
-                </ScrollReveal>
-
-                <ScrollReveal delay={300}>
-                  <article className="rounded-xl border border-[#E5E7EB] dark:border-[#374151] bg-white dark:bg-[#111827] p-5 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#FE3E91]/10 hover:border-[#CA25AF]/40 dark:hover:border-[#CA25AF]/50">
-                    <h3 className="text-base font-bold text-[#1E293B] dark:text-white">
-                      Precision Matching
-                    </h3>
-                    <p className="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                      Align your experience perfectly with target job descriptions to stand out to recruiters immediately.
-                    </p>
-                  </article>
-                </ScrollReveal>
+              <div className="mt-6 flex items-center gap-2 text-xs font-mono text-zinc-600 dark:text-zinc-400">
+                <Mail size={14} className="text-[#fe3e91]" />
+                <span>support@resumesaathi.tusharsaini.tech</span>
               </div>
             </div>
 
-            {/* Right Side: Form */}
-            <div className="bg-white dark:bg-[#111827] rounded-2xl border border-[#E5E7EB] dark:border-[#374151] p-6 md:p-8 shadow-xl shadow-gray-200/50 dark:shadow-none text-left h-fit w-full">
-              <h3 className="text-2xl font-bold text-[#1E293B] dark:text-white mb-6">Send us a message</h3>
-              {statusMessage && (
-                <div className={`p-4 rounded-lg mb-6 ${isSuccess ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
-                  {statusMessage}
-                </div>
-              )}
+            {/* Right Side: Clean Form */}
+            <div className="lg:col-span-7">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-                    <input type="text" id="name" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-[#CA25AF] focus:border-transparent outline-none transition-all" />
+                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                      Your name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Alex Vance"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/60 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-[#fe3e91] dark:focus:border-[#fe3e91] transition-colors"
+                    />
                   </div>
+
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                    <input type="email" id="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-[#CA25AF] focus:border-transparent outline-none transition-all" />
+                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                      Email address
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="alex@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/60 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-[#fe3e91] dark:focus:border-[#fe3e91] transition-colors"
+                    />
                   </div>
                 </div>
+
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject</label>
-                  <input type="text" id="subject" required value={formData.subject} onChange={(e) => setFormData({...formData, subject: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-[#CA25AF] focus:border-transparent outline-none transition-all" />
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="ATS parser feedback or issue"
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/60 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-[#fe3e91] dark:focus:border-[#fe3e91] transition-colors"
+                  />
                 </div>
+
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message</label>
-                  <textarea id="message" required rows="4" value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-[#CA25AF] focus:border-transparent outline-none transition-all resize-none"></textarea>
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                    Message
+                  </label>
+                  <textarea
+                    rows={4}
+                    required
+                    placeholder="Describe your inquiry or feedback..."
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/60 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-[#fe3e91] dark:focus:border-[#fe3e91] transition-colors"
+                  ></textarea>
                 </div>
-                <button disabled={loading} type="submit" className="w-full mt-4 px-6 py-3.5 font-semibold rounded-xl text-white bg-linear-to-r from-[#FE3E91] via-[#CA25AF] to-[#803AD1] dark:from-[#FF5FA7] dark:via-[#D340BD] dark:to-[#9D65D5] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/25 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed">
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send Message"}
+
+                {statusMessage && (
+                  <div
+                    className={`p-3 rounded-lg text-xs font-medium ${
+                      isSuccess
+                        ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
+                        : "bg-red-50 text-red-800 dark:bg-red-950/40 dark:text-red-300 border border-red-200 dark:border-red-800/60"
+                    }`}
+                  >
+                    {statusMessage}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`${BUTTON_CLASS} w-full sm:w-auto`}
+                >
+                  {loading && <Loader2 size={14} className="animate-spin" />}
+                  <span>{loading ? "Sending..." : "Submit message"}</span>
                 </button>
               </form>
             </div>
+
           </div>
+
         </div>
       </div>
     </section>
