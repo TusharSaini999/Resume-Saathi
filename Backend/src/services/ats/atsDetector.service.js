@@ -104,7 +104,34 @@ export function isRealOpeningUrl(urlString = "") {
       return false;
     }
 
-    // 3. Discard generic root / home / overview career pages
+    // 3. Definite Direct ATS Requisitions (Greenhouse, Lever, SmartRecruiters, Ashby, Workday, Wellfound, LinkedIn)
+    if (host.includes("greenhouse.io") || host.includes("grnh.se")) {
+      return pathname.includes("/jobs/") || search.includes("gh_jid=") || search.includes("token=");
+    }
+    if (host.includes("lever.co")) {
+      const parts = pathname.split("/").filter(Boolean);
+      return parts.length >= 2;
+    }
+    if (host.includes("smartrecruiters.com")) {
+      const parts = pathname.split("/").filter(Boolean);
+      return parts.length >= 2;
+    }
+    if (host.includes("ashbyhq.com")) {
+      const parts = pathname.split("/").filter(Boolean);
+      return parts.length >= 2;
+    }
+    if (host.includes("myworkdayjobs.com") || host.includes("myworkday.com")) {
+      return pathname.includes("/job/") || pathname.includes("/job-detail/");
+    }
+    if (host.includes("wellfound.com") || host.includes("angel.co")) {
+      return pathname.includes("/jobs/");
+    }
+    if (host.includes("linkedin.com")) {
+      return pathname.includes("/jobs/view/");
+    }
+
+    // 4. Reject root/homepage generic paths and search result pages
+    const cleanPath = pathname.replace(/\/+$/, "");
     const genericRoots = [
       "",
       "/",
@@ -120,56 +147,27 @@ export function isRealOpeningUrl(urlString = "") {
       "/work-with-us/",
       "/join-us",
       "/join-us/",
+      "/ibegin",
+      "/careers-home",
+      "/jobs/results",
+      "/joblist",
+      "/careers-listing",
+      "/careers-home/jobs",
+      "/jobs/search",
     ];
-    if (genericRoots.includes(pathname) && !search) {
+    if (genericRoots.includes(cleanPath) && !search) {
       return false;
     }
 
-    // 4. Require valid specific job requisition tokens
-    const segments = pathname.split("/").filter(Boolean);
-    const hasNumericId = segments.some((seg) => /^\d{4,}$/.test(seg));
+    // 5. Require valid specific job requisition tokens
+    const segments = cleanPath.split("/").filter(Boolean);
     const hasJobParam =
-      search.includes("gh_jid") ||
-      search.includes("jobid") ||
-      search.includes("job_id") ||
-      search.includes("reqid") ||
-      search.includes("requisitionid") ||
+      search.includes("id=") ||
+      search.includes("jid=") ||
+      search.includes("requisition=") ||
+      search.includes("job_id=") ||
+      search.includes("gh_jid=") ||
       search.includes("currentjobid");
-
-    const atsPatterns = [
-      "boards.greenhouse.io",
-      "jobs.lever.co",
-      "smartrecruiters.com",
-      "ashbyhq.com",
-      "myworkdayjobs.com",
-      "workable.com",
-      "recruitee.com",
-      "bamboohr.com",
-      "taleo.net",
-      "icims.com",
-      "jobvite.com",
-    ];
-    const isATS = atsPatterns.some((p) => host.includes(p));
-
-    if (isATS) {
-      if (host.includes("greenhouse.io")) {
-        return (segments.includes("jobs") && segments.length >= 2) || hasNumericId || hasJobParam;
-      }
-      if (host.includes("lever.co")) {
-        return segments.length >= 2 || hasJobParam;
-      }
-      if (host.includes("smartrecruiters.com")) {
-        return segments.length >= 2 || hasJobParam;
-      }
-      if (host.includes("ashbyhq.com")) {
-        return segments.length >= 2 || hasJobParam;
-      }
-      return segments.length >= 2 || hasJobParam || hasNumericId;
-    }
-
-    if (host.includes("linkedin.com")) {
-      return pathname.includes("/jobs/view/") && segments.length >= 3;
-    }
 
     if (segments.length >= 2 || hasJobParam) {
       return true;
@@ -348,8 +346,9 @@ export async function fetchJobsForCompany(companyIdentifier, roleQuery = "", loc
  * Fetch curated jobs across all verified live ATS boards in parallel.
  * Queries Greenhouse, Lever, SmartRecruiters, and Ashby as the core source of jobs.
  */
-export async function fetchAllCuratedJobs(limitPerCompany = 30, roleQuery = "") {
-  const primaryRole = (roleQuery || "").trim();
+export async function fetchAllCuratedJobs(limitPerCompany = 30, roleQuery = "", candidateKeywords = []) {
+  const searchKeywords = Array.isArray(candidateKeywords) ? candidateKeywords.map((k) => k.toLowerCase()) : [];
+  const primaryRole = (roleQuery || (searchKeywords.length > 0 ? searchKeywords[0] : "")).trim();
 
   // Query verified live ATS boards in parallel
   const promises = VERIFIED_LIVE_ATS_COMPANIES.map(async (company) => {

@@ -721,6 +721,9 @@ export async function getJobsForCandidate(userId, options = {}) {
     // Filter strictly to ensure 100% genuine live requisitions
     rawJobs = (rawJobs || []).filter((j) => isRealOpeningUrl(j.applyUrl));
 
+    // Filter strictly to ensure 100% genuine live requisitions
+    rawJobs = (rawJobs || []).filter((j) => isRealOpeningUrl(j.applyUrl));
+
     // Update in-memory cache
     jobsCache.set(cacheKey, { timestamp: Date.now(), jobs: rawJobs });
 

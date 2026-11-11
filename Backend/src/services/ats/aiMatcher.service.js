@@ -247,6 +247,19 @@ Format:
         });
       }
     }
+
+    // Graceful fallback for this batch if all Gemini models failed/timed out
+    for (const job of batch) {
+      if (!evaluatedJobsMap.has(job.id)) {
+        const heuristic = this._generateHeuristicAiMatch(job, context);
+        evaluatedJobsMap.set(job.id, heuristic);
+        // Cache fallback with 10-minute TTL to prevent continuous retries during same session
+        this.aiMatchCache.set(`${context.resumeHash}_${job.id}`, {
+          aiMatch: heuristic,
+          timestamp: Date.now() - (this.CACHE_TTL_MS - 10 * 60 * 1000),
+        });
+      }
+    }
   }
 
   _generateHeuristicAiMatch(job, candidateProfile) {

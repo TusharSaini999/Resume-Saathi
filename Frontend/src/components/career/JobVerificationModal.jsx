@@ -102,8 +102,8 @@ export default function JobVerificationModal({ modalState, onClose, GRADIENT_PRI
                     )}
                   </div>
                   <div>
-                    <div className="text-xs font-medium">
-                      {data.online ? "Verified Live Requisition" : (data.probe?.statusBadge || "Requisition Inaccessible")}
+                    <div className="text-xs font-semibold">
+                      {data.online ? "Verified Live Requisition" : (data.probe?.statusBadge || "Requisition Closed / Inaccessible")}
                     </div>
                     <div className="text-[11px] opacity-85">
                       {data.probe?.statusSummary ||
