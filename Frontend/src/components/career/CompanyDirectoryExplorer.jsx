@@ -66,7 +66,7 @@ export default function CompanyDirectoryExplorer({
   GRADIENT_PRIMARY,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const selectedCategory = "All";
   const [remoteCompanies, setRemoteCompanies] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -391,8 +391,14 @@ export default function CompanyDirectoryExplorer({
                   </button>
 
                   <button
-                    onClick={() => onOpenCompanyProfile(comp.slug || comp.id)}
-                    className="flex items-center gap-1 px-3 py-1 rounded-md text-xs font-mono font-medium text-white bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] shadow-xs transition-all"
+                    onClick={() => {
+                      if (onSelectCompanyFilter) {
+                        onSelectCompanyFilter(comp.slug || comp.id);
+                      } else {
+                        onOpenCompanyProfile(comp.slug || comp.id);
+                      }
+                    }}
+                    className={`flex items-center gap-1 px-3 py-1 rounded-md text-xs font-mono font-medium text-white ${GRADIENT_PRIMARY || "bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac]"} shadow-xs transition-all`}
                   >
                     <span>Openings</span>
                     <ChevronRight size={11} />

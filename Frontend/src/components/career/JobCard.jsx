@@ -40,8 +40,6 @@ export default function JobCard({
     job.source === "linkedin_job_post" ||
     (job.applyUrl || "").toLowerCase().includes("linkedin.com");
 
-  const portalName = isLinkedIn ? "LinkedIn" : "Official Portal";
-
   return (
     <div className="group relative flex flex-col justify-between p-5 rounded-xl bg-white dark:bg-[#19191b] border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
       <div className="space-y-3.5">
@@ -416,7 +414,7 @@ export default function JobCard({
             href={job.applyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium text-white bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] shadow-xs dark:shadow-[0_0_12px_rgba(254,62,145,0.25)] transition-all"
+            className={`flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium text-white ${GRADIENT_PRIMARY || "bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac]"} shadow-xs dark:shadow-[0_0_12px_rgba(254,62,145,0.25)] transition-all`}
           >
             <span>Apply</span>
             <ExternalLink size={12} />

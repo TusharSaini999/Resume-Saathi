@@ -272,7 +272,7 @@ export default function CompanyProfileModal({
                       href={j.applyUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium text-white bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac] shadow-xs transition-all"
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium text-white ${GRADIENT_PRIMARY || "bg-[#fe3e91] hover:bg-[#e11d48] dark:bg-[#fe3e91] dark:hover:bg-[#ff2aac]"} shadow-xs transition-all`}
                     >
                       <span>Apply</span>
                       <ExternalLink className="w-3 h-3" />
