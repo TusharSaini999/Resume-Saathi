@@ -32,7 +32,7 @@ flowchart TD
   User -->|HTTPS Request| CF
   CF -->|Origin Cloaked Traffic| Nginx
   Nginx -->|Proxy Pass :3000| FE
-  Nginx -->|Proxy Pass /api (:5000)| BE
+  Nginx -->|"Proxy Pass /api (:5000)"| BE
   BE <-->|Mongoose ODM| DB
   BE <-->|GenAI SDK| AI
   BE <-->|Signed Uploads| Cloudinary
