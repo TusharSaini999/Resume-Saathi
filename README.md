@@ -18,36 +18,35 @@ powered by Google Gemini 3.5 Flash Lite.
 ## Architecture Flow
 
 ```mermaid
-
 flowchart TD
-    User(["Candidate Browser<br/>HTTPS :443"])
+  User(["Candidate Browser<br/>HTTPS :443"])
 
-    subgraph Edge["Edge & CDN Layer"]
-        CF("AWS CloudFront CDN<br/>Global Edge POPs & WAF")
-    end
+  subgraph Edge ["Edge & CDN Layer"]
+    CF("AWS CloudFront CDN<br/>Global Edge POPs & WAF")
+  end
 
-    subgraph Host["Application Host"]
-        Nginx("Nginx Reverse Proxy<br/>SSL Termination :443")
-        FE("React 19 + Vite<br/>Frontend SPA :3000")
-        BE("Node.js + Express<br/>Backend REST API :5000")
-    end
+  subgraph Host ["Application Host"]
+    Nginx("Nginx Reverse Proxy<br/>SSL Termination :443")
+    FE("React 19 + Vite<br/>Frontend SPA :3000")
+    BE("Node.js + Express<br/>Backend REST API :5000")
+  end
 
-    subgraph Services["Managed & External Services"]
-        DB[("MongoDB Atlas")]
-        AI("Google Gemini Flash Lite")
-        Cloudinary[("Cloudinary<br/>PDF Storage CDN")]
-        ATS("Live ATS Discovery<br/>Greenhouse, Lever & Ashby")
-    end
+  subgraph Services ["Managed & External Services"]
+    DB[("MongoDB Atlas")]
+    AI("Google Gemini Flash Lite")
+    Cloudinary[("Cloudinary<br/>PDF Storage CDN")]
+    ATS("Live ATS Discovery<br/>Greenhouse, Lever & Ashby")
+  end
 
-    User -->|"HTTPS Request"| CF
-    CF -->|"Origin Request"| Nginx
-    Nginx -->|"Proxy :3000"| FE
-    Nginx -->|"API Proxy :5000"| BE
+  User -->|"HTTPS Request"| CF
+  CF -->|"Origin Request"| Nginx
+  Nginx -->|"Proxy :3000"| FE
+  Nginx -->|"API Proxy :5000"| BE
 
-    BE <-->|"Mongoose ODM"| DB
-    BE <-->|"GenAI SDK"| AI
-    BE <-->|"Signed Uploads"| Cloudinary
-    BE <-->|"Job Ingestion"| ATS
+  BE <-->|"Mongoose ODM"| DB
+  BE <-->|"GenAI SDK"| AI
+  BE <-->|"Signed Uploads"| Cloudinary
+  BE <-->|"Job Ingestion"| ATS
 ```
 
 ### End-to-End User & AI Analysis Flow (Sequence Diagram)
