@@ -28,8 +28,8 @@ flowchart TD
   CF -->|Forward with Secret| Cloak
   Cloak -->|Authorized| Nginx
   Cloak -->|Unauthorized| Drop
-  Nginx -->|proxy_pass :3000| FE
-  Nginx -->|proxy_pass /api (:5000)| BE
+  Nginx -->|proxy_pass Port 3000| FE
+  Nginx -->|proxy_pass API Port 5000| BE
   BE -->|Persist Data| DB
   BE -->|ATS Analysis| AI
   BE -->|Upload PDFs| Cloudinary
@@ -145,18 +145,18 @@ gantt
   axisFormat %s s
 
   section 1. Host Preparation
-  Step 0: Cleanup Legacy Containers      :done, s0, 0, 5
-  Step 1: Core Packages and Firewall     :done, s1, 5, 20
-  Step 2: Install Docker Engine v2       :done, s2, 20, 45
-  Step 3: Docker Hub Registry Auth       :done, s3, 45, 55
+  Step 0 - Cleanup Legacy Containers     :done, s0, 0, 5
+  Step 1 - Core Packages and Firewall    :done, s1, 5, 20
+  Step 2 - Install Docker Engine v2      :done, s2, 20, 45
+  Step 3 - Docker Hub Registry Auth      :done, s3, 45, 55
 
   section 2. Application and Secrets
-  Step 4: Git Repository Workspace       :active, s4, 55, 75
-  Step 5: Inject Production Secrets      :active, s5, 75, 80
-  Step 6: Atomic Container Rollout       :crit, s6, 80, 110
+  Step 4 - Git Repository Workspace      :active, s4, 55, 75
+  Step 5 - Inject Production Secrets     :active, s5, 75, 80
+  Step 6 - Atomic Container Rollout      :crit, s6, 80, 110
 
   section 3. Ingress and SSL
-  Step 7: Host Nginx and Certbot SSL     :s7, 110, 130
+  Step 7 - Host Nginx and Certbot SSL    :s7, 110, 130
 ```
 
 ---
