@@ -71,6 +71,66 @@ flowchart TD
   style Tier4 fill:#051b14,stroke:#059669,stroke-width:3px,color:#fff
 ```
 
+
+### 1.1 Candidate Application Lifecycle & State Machine
+
+```mermaid
+stateDiagram-v2
+  [*] --> Discovered: Crawled from Greenhouse / Lever / Ashby / LinkedIn
+  Discovered --> Verified_Live: Probed HTTP 200 OK (Live Portal)
+  Discovered --> Expired_Closed: HTTP 404 / Requisition Inaccessible
+  Expired_Closed --> [*]
+  
+  Verified_Live --> AI_Evaluated: Scored by Gemini 3.5 Flash Lite
+  AI_Evaluated --> Saved: Bookmarked by Candidate
+  Saved --> Tailoring: Resume Tailored to Match JD
+  Tailoring --> Applied: Submitted on Official Portal
+  
+  state Application_Pipeline {
+    [*] --> Applied_Submitted
+    Applied_Submitted --> Screening: Recruiter Review
+    Screening --> Technical_Interview: Coding / System Design
+    Technical_Interview --> Final_Round: Culture / Leadership
+    Final_Round --> Offer_Received: 🎉 Official Offer Extended!
+    Final_Round --> Rejected: Closed / Position Filled
+  }
+
+  Applied --> Application_Pipeline
+  Offer_Received --> [*]
+  Rejected --> [*]
+```
+
+### 1.2 Real-Time Online Verification Probe (Sequence Flow)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User as 👤 Candidate
+  participant UI as 🎨 Job Card (React)
+  participant Modal as 🔍 Verification Modal
+  participant API as ⚙️ Career API Service
+  participant Prober as 🛡️ ATS Online Prober
+  participant ATS as 🏢 Official ATS Server (Greenhouse/Lever/LinkedIn)
+
+  User->>UI: Click "Verify" Shield Icon
+  UI->>API: GET /api/v1/careers/probe-job-url?url=...
+  API->>Prober: probeJobRequisitionUrl(url)
+  Prober->>ATS: HTTP HEAD / GET Request (Custom UA & Headers)
+  alt Portal Responds HTTP 200 (Active Job Requisition)
+    ATS-->>Prober: HTTP 200 OK (Requisition Live)
+    Prober-->>API: { online: true, portalType: "Greenhouse", responseTimeMs: 142 }
+    API-->>UI: Verified Live Status
+    UI-->>User: Display Green Live Pulse Badge & Verified Requisition Notice
+  else Portal Closed / Expired / 404
+    ATS-->>Prober: HTTP 404 / 410 / Redirect to Careers Home
+    Prober-->>API: { online: false, statusSummary: "Requisition closed or expired" }
+    API-->>UI: Closed / Inaccessible Notice
+    UI-->>User: Display Amber Closed Notice (Prevents wasted application time)
+  end
+```
+
+---
+
 ### Key Pillars:
 1. **Direct Official ATS Openings**: Zero dead ends or third-party spam. Pulls live openings straight from official company career portals (`boards.greenhouse.io`, `jobs.lever.co`, `smartrecruiters.com`, etc.).
 2. **LinkedIn Verified Requisitions**: Connects to unauthenticated LinkedIn guest endpoints with customized headers to fetch live company requisitions without requiring user tokens or auth walls.

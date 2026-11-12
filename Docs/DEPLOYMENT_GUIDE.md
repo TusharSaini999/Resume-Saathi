@@ -69,7 +69,6 @@ flowchart TD
   style Tier4 fill:#051b14,stroke:#059669,stroke-width:3px,color:#fff
 ```
 
----
 
 ## 2. Prerequisites & Server Preparation
 
@@ -172,21 +171,24 @@ The repository includes three deployment script variants designed for different 
 All scripts automate the 8-step server lifecycle with built-in idempotency tracking via `~/.rs_deploy_state`:
 
 ```mermaid
-flowchart LR
-  classDef step fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#ffffff,rx:8,ry:8
-  classDef active fill:#831843,stroke:#fe3e91,stroke-width:2px,color:#ffffff,rx:8,ry:8
-  classDef success fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ffffff,rx:8,ry:8
+gantt
+  title Resume-Saathi 8-Step Automated Server Deployment Lifecycle
+  dateFormat X
+  axisFormat %s s
 
-  S0["🧹 Step 0<br/><b>Pre-flight Cleanup</b><br/>Purge legacy containers"]:::step
-  S1["📦 Step 1<br/><b>Core Packages</b><br/>apt-get, curl, git, ufw"]:::step
-  S2["🐳 Step 2<br/><b>Docker Engine</b><br/>containerd & compose v2"]:::step
-  S3["🔑 Step 3<br/><b>Registry Auth</b><br/>Docker Hub login"]:::step
-  S4["📁 Step 4<br/><b>Workspace Setup</b><br/>Git clone / pull repo"]:::step
-  S5["⚙️ Step 5<br/><b>Environment Secret</b><br/>Inject .env & secrets"]:::active
-  S6["🚀 Step 6<br/><b>Container Launch</b><br/>docker compose up -d"]:::active
-  S7["🔒 Step 7<br/><b>Nginx & ACM/SSL</b><br/>Certbot & HTTPS reverse proxy"]:::success
+  section 1. Host Preparation
+  Step 0 · Cleanup Legacy Containers    :done, s0, 0, 5
+  Step 1 · Core Packages & Firewall     :done, s1, 5, 20
+  Step 2 · Install Docker Engine v2     :done, s2, 20, 45
+  Step 3 · Docker Hub Registry Auth     :done, s3, 45, 55
 
-  S0 --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
+  section 2. App & Environment
+  Step 4 · Git Repository Workspace    :active, s4, 55, 75
+  Step 5 · Inject Production Secrets    :active, s5, 75, 80
+  Step 6 · Atomic Container Rollout     :crit, s6, 80, 110
+
+  section 3. Ingress & TLS
+  Step 7 · Host Nginx & Certbot SSL     :s7, 110, 130
 ```
 
 ---
@@ -421,33 +423,29 @@ Two distinct AWS IAM configurations are required:
 2. **GitHub Actions IAM Identity (`ResumeSaathi-GitHubActions-Deployer`)**: Grants GitHub Actions permissions to execute `ssm:SendCommand` against the target EC2 instance.
 
 ```mermaid
-flowchart LR
-  classDef runner fill:#18181b,stroke:#27272a,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef aws fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef ec2 fill:#831843,stroke:#fe3e91,stroke-width:2px,color:#ffffff,rx:10,ry:10
+sequenceDiagram
+  autonumber
+  actor Dev as 👨‍💻 Developer
+  participant GH as 🚀 GitHub Actions (cd.yml)
+  participant SSM as ⚡ AWS Systems Manager
+  participant Agent as 🤖 amazon-ssm-agent (EC2)
+  participant Docker as 🐳 Docker Compose
+  participant App as ✨ Live Containers
+  participant CDN as 🌐 CloudFront CDN
 
-  subgraph CI["GitHub Actions Deployment Pipeline"]
-    GH[["🚀 GitHub Actions Runner<br/>(cd.yml / rollback.yml)"]]:::runner
-    IAM_GH["🔑 AWS_ACCESS_KEY_ID<br/>(ResumeSaathi-Deployer)"]:::runner
-  end
-
-  subgraph AWS_Cloud["AWS Cloud Infrastructure"]
-    SSM[["⚡ AWS Systems Manager (SSM)<br/>ssm:SendCommand Dispatcher"]]:::aws
-    IAM_EC2["🛡️ IAM Role Profile<br/>ResumeSaathi-EC2-SSM-Role"]:::aws
-  end
-
-  subgraph Host["AWS EC2 Ubuntu 22.04 / 24.04 Target"]
-    Agent[["🤖 amazon-ssm-agent<br/>Secure Inbound Polling (Port 443)"]]:::ec2
-    Docker[["🐳 Docker Compose Engine<br/>Atomic Container Rollout / Rollback"]]:::ec2
-    LiveApp[["✨ Zero-Downtime Live App<br/>(Version Swapped in < 30s)"]]:::ec2
-  end
-
-  GH -->|ssm:SendCommand| SSM
-  IAM_GH -.->|Authorize API Call| SSM
-  SSM -->|Outbound HTTPS Poll| Agent
-  IAM_EC2 -.->|Validate Instance Identity| Agent
-  Agent -->|Execute Script| Docker
-  Docker -->|Traffic Cutover| LiveApp
+  Dev->>GH: git push origin main
+  GH->>GH: Run Linter & Build Tests
+  GH->>GH: Build & Push Docker Images to Hub
+  GH->>SSM: ssm:SendCommand (AWS_ACCESS_KEY_ID)
+  Note over SSM,Agent: Secure polling over HTTPS port 443 (Zero open port 22)
+  SSM-->>Agent: Dispatch deployment command
+  Agent->>Docker: docker compose pull && up -d
+  Docker->>App: Atomic zero-downtime container swap
+  App-->>Agent: Health check passed (HTTP 200 OK)
+  Agent-->>SSM: Command status: Success (exit 0)
+  SSM-->>GH: Execution finished
+  GH->>CDN: aws cloudfront create-invalidation (/*)
+  CDN-->>Dev: Rollout live globally in < 30 seconds
 ```
 
 ---
@@ -656,27 +654,28 @@ A dedicated rollback workflow is available at `.github/workflows/rollback.yml`:
 When a production incident occurs, follow this decision tree to pick the optimal target version:
 
 ```mermaid
-flowchart TD
-  classDef alert fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef decision fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#ffffff,rx:8,ry:8
-  classDef action fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#ffffff,rx:8,ry:8
-  classDef success fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ffffff,rx:10,ry:10
-
-  Incident(["🚨 Production Incident Triggered<br/>(e.g. on version v1.0.2)"]):::alert
-  CheckDB{"🔍 Did v1.0.2 introduce a<br/>breaking Database Schema Migration?"}:::decision
+stateDiagram-v2
+  [*] --> Incident_Triggered: Error Spike / 5xx Alarm Detected
   
-  DBAction["⚠️ <b>Database Rollback First</b><br/>Execute Mongoose schema revert script<br/>before rolling back container image"]:::action
-  CheckTags["📋 <b>Inspect Git Tags & Docker Hub</b><br/>Current: v1.0.2 (Degraded)<br/>Previous: v1.0.1 (Verified Stable)"]:::action
-  
-  TriggerRollback[["⚡ <b>Run GitHub Actions Rollback</b><br/>Input target tag: 'v1.0.1'"]]:::action
-  Recovery(["✅ <b>Instant Recovery Achieved</b><br/>Healthy containers serving traffic in ~30s"]):::success
+  state Incident_Triage {
+    [*] --> Inspect_DB_Schema
+    Inspect_DB_Schema --> Run_DB_Revert_Script: Breaking Migration Found
+    Inspect_DB_Schema --> Code_Rollback_Ready: Non-Breaking / Additive Change
+    Run_DB_Revert_Script --> Code_Rollback_Ready: Schema Reverted
+  }
 
-  Incident --> CheckDB
-  CheckDB -->|YES| DBAction
-  DBAction --> CheckTags
-  CheckDB -->|NO (Pure Code/Frontend)| CheckTags
-  CheckTags --> TriggerRollback
-  TriggerRollback --> Recovery
+  Incident_Triggered --> Incident_Triage
+  
+  state Rollback_Execution {
+    [*] --> Select_Target_Tag: Identify Prior Stable (e.g. v1.0.1)
+    Select_Target_Tag --> Trigger_GitHub_Workflow: Input Tag in rollback.yml
+    Trigger_GitHub_Workflow --> Pull_Docker_Images: Pull Pre-built Hub Images
+    Pull_Docker_Images --> Container_Swap: Zero-Downtime Compose Up
+  }
+
+  Incident_Triage --> Rollback_Execution
+  Rollback_Execution --> Production_Restored: Healthcheck 200 OK (< 30s)
+  Production_Restored --> [*]
 ```
 
 #### Evaluation Checklist:

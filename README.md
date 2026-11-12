@@ -69,6 +69,33 @@ flowchart TD
   style Tier4 fill:#051b14,stroke:#059669,stroke-width:3px,color:#fff
 ```
 
+
+### End-to-End User & AI Analysis Flow (Sequence Diagram)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User as 👤 Candidate
+  participant FE as 🎨 React Frontend
+  participant Nginx as 🔀 Nginx / CloudFront
+  participant BE as ⚙️ Express Backend API
+  participant DB as 🍃 MongoDB Atlas
+  participant AI as 🤖 Gemini 3.5 Flash Lite
+
+  User->>FE: Upload Resume PDF
+  FE->>Nginx: POST /api/v1/resumes/upload (FormData)
+  Nginx->>BE: proxy_pass 127.0.0.1:5000
+  BE->>BE: Extract Text with pdfjs-dist
+  BE->>AI: Send Resume Text + ATS Rubric Prompt
+  AI-->>BE: Structured JSON (Score, Weaknesses, Bullets)
+  BE->>DB: Save Resume & Analysis Record
+  DB-->>BE: Saved Confirmation
+  BE-->>FE: HTTP 200 (ATS Score & Detailed Analysis)
+  FE-->>User: Render Interactive Score Gauge & Recommendations
+```
+
+---
+
 ## Repository Structure 🗂️
 
 ```

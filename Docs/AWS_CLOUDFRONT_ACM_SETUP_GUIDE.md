@@ -73,6 +73,54 @@ flowchart TD
 
 ---
 
+
+### 1.1 Request & Edge Cache Resolution Lifecycle
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User as 👤 Global Visitor
+  participant DNS as 🗺️ Route 53 DNS
+  participant CF as ⚡ CloudFront CDN Edge (DEL51)
+  participant WAF as 🛡️ AWS WAF & ACM
+  participant Nginx as 🔀 EC2 Host Nginx
+  participant FE as 🎨 React Vite SPA (:3000)
+  participant BE as ⚙️ Express REST API (:5000)
+  participant DB as 🍃 MongoDB Atlas
+  participant AI as 🤖 Gemini 3.5 AI
+
+  User->>DNS: Resolve resumesaathi.tusharsaini.tech
+  DNS-->>User: CloudFront Anycast Edge IP
+  User->>CF: HTTPS GET / (Port 443)
+  CF->>WAF: Verify IP & Anti-DDoS Rate Limits
+  WAF-->>CF: Request Approved
+
+  alt Cache HIT (Static JS, CSS, Media Assets)
+    CF-->>User: 200 OK (Served from Edge POP in < 20ms)
+  else Dynamic API Request (/api/v1/*)
+    CF->>Nginx: HTTPS Port 443 + X-Origin-Verify Header
+    Nginx->>Nginx: Verify Secret (Drop scanners ➔ HTTP 444)
+    Nginx->>BE: proxy_pass http://127.0.0.1:5000
+    BE->>DB: Query User / Resume Collections
+    DB-->>BE: Return Documents
+    opt AI Inference Required
+      BE->>AI: Gemini GenAI SDK Analysis
+      AI-->>BE: ATS Score & Match Feedback
+    end
+    BE-->>Nginx: 200 OK JSON Body
+    Nginx-->>CF: Forward Dynamic Payload
+    CF-->>User: TLS Encrypted Response
+  else SPA Frontend Routing (/dashboard, /career)
+    CF->>Nginx: Forward Route Request
+    Nginx->>FE: proxy_pass http://127.0.0.1:3000
+    FE-->>Nginx: index.html (SPA Fallback)
+    Nginx-->>CF: 200 OK HTML
+    CF-->>User: Rendered Application View
+  end
+```
+
+---
+
 ## 2. Step-by-Step Implementation (Zero to Production)
 
 ### Step 1: Request SSL Certificate in AWS ACM (`us-east-1`)
