@@ -15,32 +15,32 @@ Resume Saathi is an AI-powered ATS resume analysis and live job discovery platfo
 
 ```mermaid
 flowchart TD
-  subgraph Edge ["1. Edge Ingress & CDN"]
-    User["👥 Web Visitors (Worldwide)"]
-    CF["⚡ AWS CloudFront CDN + WAF"]
+  subgraph EdgeLayer ["Edge Ingress and CDN Layer"]
+    User(["Candidate Web Browser<br/>HTTPS Port 443"])
+    CF["AWS CloudFront CDN<br/>Global Edge POPs and WAF"]
   end
 
-  subgraph Host ["2. AWS EC2 Origin Host"]
-    Nginx["🔀 Host Nginx Reverse Proxy (SSL)"]
-    FE["🎨 React 19 / Vite SPA Container"]
-    BE["⚙️ Node.js Express API Container"]
+  subgraph OriginHost ["AWS EC2 Origin Host"]
+    Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL Termination"]
+    FE["React 19 Vite Container<br/>Frontend SPA (:3000)"]
+    BE["Node.js Express Container<br/>Backend REST API (:5000)"]
   end
 
-  subgraph Cloud ["3. Cloud & Intelligence Services"]
-    DB[("🍃 MongoDB Atlas Managed DB")]
-    AI["🤖 Google Gemini 3.5 Flash Lite"]
-    Cloudinary["☁️ Cloudinary Storage CDN"]
-    ATS["🏢 Live ATS Engine (Greenhouse / Lever)"]
+  subgraph CloudServices ["Cloud and Intelligence Services"]
+    DB[("MongoDB Atlas<br/>Managed Database Cluster")]
+    AI["Google Gemini 3.5 Flash Lite<br/>ATS Scoring and Matching Engine"]
+    Cloudinary[("Cloudinary Storage CDN<br/>PDF File Vault")]
+    ATS["Live ATS Discovery Engine<br/>Greenhouse, Lever, and Ashby"]
   end
 
-  User -->|HTTPS : 443| CF
-  CF -->|Origin Cloaked| Nginx
-  Nginx -->|Port 3000| FE
-  Nginx -->|Port 5000| BE
-  BE <--> DB
-  BE <--> AI
-  BE <--> Cloudinary
-  BE <--> ATS
+  User -->|HTTPS Request| CF
+  CF -->|Origin Cloaked Traffic| Nginx
+  Nginx -->|Proxy Pass (:3000)| FE
+  Nginx -->|Proxy Pass /api (:5000)| BE
+  BE <-->|Mongoose ODM| DB
+  BE <-->|GenAI SDK| AI
+  BE <-->|Signed Uploads| Cloudinary
+  BE <-->|Direct Ingestion| ATS
 ```
 
 ### End-to-End User & AI Analysis Flow (Sequence Diagram)
@@ -48,23 +48,23 @@ flowchart TD
 ```mermaid
 sequenceDiagram
   autonumber
-  actor User as 👤 Candidate
-  participant FE as 🎨 React Frontend
-  participant Nginx as 🔀 Nginx / CloudFront
-  participant BE as ⚙️ Express Backend API
-  participant DB as 🍃 MongoDB Atlas
-  participant AI as 🤖 Gemini 3.5 Flash Lite
+  actor User as Candidate Browser
+  participant FE as React Frontend (:3000)
+  participant Nginx as CloudFront / Nginx
+  participant BE as Express Backend (:5000)
+  participant DB as MongoDB Atlas
+  participant AI as Gemini 3.5 AI Engine
 
-  User->>FE: Upload Resume PDF
-  FE->>Nginx: POST /api/v1/resumes/upload (FormData)
-  Nginx->>BE: proxy_pass 127.0.0.1:5000
-  BE->>BE: Extract Text with pdfjs-dist
-  BE->>AI: Send Resume Text + ATS Rubric Prompt
-  AI-->>BE: Structured JSON (Score, Weaknesses, Bullets)
-  BE->>DB: Save Resume & Analysis Record
-  DB-->>BE: Saved Confirmation
-  BE-->>FE: HTTP 200 (ATS Score & Detailed Analysis)
-  FE-->>User: Render Interactive Score Gauge & Recommendations
+  User->>FE: Select and Upload Resume PDF
+  FE->>Nginx: POST /api/v1/resumes/upload<br/>(Multipart Form Data)
+  Nginx->>BE: Forward to API Service (Port 5000)
+  BE->>BE: Extract Raw Text<br/>via pdfjs-dist
+  BE->>AI: Send Resume Text with<br/>ATS Evaluation Rubric
+  AI-->>BE: Return Structured JSON<br/>(Score, Keywords, Suggestions)
+  BE->>DB: Store Resume and Analysis Records
+  DB-->>BE: Acknowledge Persistence
+  BE-->>FE: HTTP 200 OK<br/>(Analysis Payload)
+  FE-->>User: Render Interactive Score Gauge<br/>and Improvement Recommendations
 ```
 
 ---

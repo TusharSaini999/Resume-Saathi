@@ -4,22 +4,22 @@
 
 ```mermaid
 flowchart LR
-  U["👤 User / Candidate"]
-  FE["🎨 Frontend (React / Vite)"]
-  API["⚙️ Backend API (Express)"]
-  DB[("🍃 MongoDB Atlas")]
-  AI["🤖 Gemini 3.5 AI"]
-  CL["☁️ Cloudinary Storage"]
-  EM["📧 SMTP Email"]
-  OAuth["🔐 Google & LinkedIn OAuth"]
+  U(["User / Candidate<br/>Web Browser"])
+  FE["React 19 Frontend<br/>Vite SPA (:3000)"]
+  API["Express Backend API<br/>Node.js REST (:5000)"]
+  DB[("MongoDB Atlas<br/>Managed Database")]
+  AI["Google Gemini 3.5 AI<br/>ATS Scoring Engine"]
+  CL[("Cloudinary Storage<br/>Encrypted PDF Vault")]
+  EM["SMTP Email Service<br/>Verification Mailer"]
+  OAuth["OAuth Providers<br/>Google and LinkedIn"]
 
-  U <-->|HTTP / HTTPS| FE
-  FE <-->|REST API / JWT| API
-  API <--> DB
-  API <--> AI
-  API <--> CL
-  API --> EM
-  API <--> OAuth
+  U <-->|HTTPS Traffic| FE
+  FE <-->|REST API and JWT| API
+  API <-->|Mongoose ODM| DB
+  API <-->|GenAI SDK| AI
+  API <-->|Signed Uploads| CL
+  API -->|Send Notifications| EM
+  API <-->|Token Exchange| OAuth
 ```
 
 ## Database Schema & Entity Relationship Diagram (ERD)

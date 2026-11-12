@@ -10,45 +10,46 @@ The **Career Openings & Live ATS Job Discovery Engine** transforms Resume Saathi
 
 ```mermaid
 flowchart TD
-  Candidate["👤 Job Seeker / Candidate"]
+  Candidate(["Job Seeker / Candidate<br/>Resume and Target Profile"])
 
   subgraph Crawlers ["1. Official ATS Connectors"]
-    GH["🏢 Greenhouse Direct ATS"]
-    LV["⚡ Lever Direct ATS"]
-    SR["💼 SmartRecruiters"]
-    ASH["🚀 Ashby ATS"]
-    LI["🔗 LinkedIn Official Jobs"]
-    TCS["🏛️ Indian Tech Portals"]
+    GH["Greenhouse Direct ATS<br/>boards-api.greenhouse.io"]
+    LV["Lever Direct ATS<br/>api.lever.co"]
+    SR["SmartRecruiters ATS<br/>api.smartrecruiters.com"]
+    ASH["Ashby ATS<br/>jobs.ashbyhq.com"]
+    LI["LinkedIn Official Jobs<br/>Guest Feed Engine"]
+    TCS["Enterprise Tech Portals<br/>TCS, Infosys, and Wipro"]
   end
 
-  subgraph Engine ["2. Processing & Verification"]
-    Infer["🎯 Role & Tech Stack Inference"]
-    Parser["🧹 Clean JD Parser"]
-    Probe{"🛡️ Live Portal Prober"}
+  subgraph Engine ["2. Processing and Verification Pipeline"]
+    Infer["Role and Tech Stack<br/>Skill Pattern Inference"]
+    Parser["Clean JD Parser<br/>Requirement Sanitizer"]
+    Probe{"Live Portal Prober<br/>HTTP HEAD/GET Healthcheck"}
   end
 
-  subgraph Intelligence ["3. AI & Tracking"]
-    AI["🤖 Gemini 3.5 Flash Lite Scorer"]
-    Tracker[("📋 Application Tracker")]
+  subgraph Intelligence ["3. Intelligence and Application Tracker"]
+    AI["Google Gemini 3.5 Flash Lite<br/>ATS Compatibility Scorer"]
+    Tracker[("Application Tracker<br/>Candidate Pipeline Vault")]
   end
 
-  Candidate --> Infer
-  Infer --> Crawlers
-  Crawlers --> Parser
-  Parser --> Probe
-  Probe -->|Verified Live| AI
-  Infer --> AI
-  AI --> Tracker
-  Candidate --> Tracker
+  Candidate -->|Provide Skills and Target Roles| Infer
+  Infer -->|Trigger Requisition Ingestion| Crawlers
+  Crawlers -->|Raw Postings| Parser
+  Parser -->|Sanitized Postings| Probe
+  Probe -->|Verified Live Openings| AI
+  Probe -->|Expired 404 / Inactive| Dead["Flagged Inactive<br/>Filter Out"]
+  Infer -->|Resume Context| AI
+  AI -->|Scored Matches and Fit Metrics| Tracker
+  Candidate -->|Manage Applications| Tracker
 ```
 
 ### 1.1 Candidate Application Lifecycle & State Machine
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Discovered: Crawled from Greenhouse / Lever / Ashby / LinkedIn
+  [*] --> Discovered: Crawled from Greenhouse, Lever, Ashby, or LinkedIn
   Discovered --> Verified_Live: Probed HTTP 200 OK (Live Portal)
-  Discovered --> Expired_Closed: HTTP 404 / Requisition Inaccessible
+  Discovered --> Expired_Closed: HTTP 404 or Requisition Inaccessible
   Expired_Closed --> [*]
   
   Verified_Live --> AI_Evaluated: Scored by Gemini 3.5 Flash Lite
@@ -59,10 +60,10 @@ stateDiagram-v2
   state Application_Pipeline {
     [*] --> Applied_Submitted
     Applied_Submitted --> Screening: Recruiter Review
-    Screening --> Technical_Interview: Coding / System Design
-    Technical_Interview --> Final_Round: Culture / Leadership
-    Final_Round --> Offer_Received: 🎉 Official Offer Extended!
-    Final_Round --> Rejected: Closed / Position Filled
+    Screening --> Technical_Interview: Coding and System Design
+    Technical_Interview --> Final_Round: Culture and Leadership
+    Final_Round --> Offer_Received: Official Offer Extended
+    Final_Round --> Rejected: Closed or Position Filled
   }
 
   Applied --> Application_Pipeline
@@ -75,27 +76,27 @@ stateDiagram-v2
 ```mermaid
 sequenceDiagram
   autonumber
-  actor User as 👤 Candidate
-  participant UI as 🎨 Job Card (React)
-  participant Modal as 🔍 Verification Modal
-  participant API as ⚙️ Career API Service
-  participant Prober as 🛡️ ATS Online Prober
-  participant ATS as 🏢 Official ATS Server (Greenhouse/Lever/LinkedIn)
+  actor User as Candidate Browser
+  participant UI as Job Card Component
+  participant Modal as Verification Modal
+  participant API as Career API Service
+  participant Prober as ATS Online Prober
+  participant ATS as Official ATS Server<br/>(Greenhouse, Lever, LinkedIn)
 
-  User->>UI: Click "Verify" Shield Icon
+  User->>UI: Click Verify Status
   UI->>API: GET /api/v1/careers/probe-job-url?url=...
   API->>Prober: probeJobRequisitionUrl(url)
-  Prober->>ATS: HTTP HEAD / GET Request (Custom UA & Headers)
-  alt Portal Responds HTTP 200 (Active Job Requisition)
-    ATS-->>Prober: HTTP 200 OK (Requisition Live)
-    Prober-->>API: { online: true, portalType: "Greenhouse", responseTimeMs: 142 }
-    API-->>UI: Verified Live Status
-    UI-->>User: Display Green Live Pulse Badge & Verified Requisition Notice
+  Prober->>ATS: HTTP HEAD / GET Request<br/>(Custom UA and Ingress Headers)
+  alt Portal Responds HTTP 200 (Active Requisition)
+    ATS-->>Prober: HTTP 200 OK (Requisition Active)
+    Prober-->>API: Return Status: Online (Latency: 142ms)
+    API-->>UI: Verified Live Payload
+    UI-->>User: Display Green Live Pulse Badge<br/>and Verified Requisition Notice
   else Portal Closed / Expired / 404
-    ATS-->>Prober: HTTP 404 / 410 / Redirect to Careers Home
-    Prober-->>API: { online: false, statusSummary: "Requisition closed or expired" }
-    API-->>UI: Closed / Inaccessible Notice
-    UI-->>User: Display Amber Closed Notice (Prevents wasted application time)
+    ATS-->>Prober: HTTP 404, 410, or Redirect to Careers Home
+    Prober-->>API: Return Status: Offline / Inaccessible
+    API-->>UI: Closed Requisition Notice
+    UI-->>User: Display Amber Closed Notice<br/>(Prevents Wasted Application Effort)
   end
 ```
 
