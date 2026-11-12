@@ -131,8 +131,6 @@ Frontend default URL: `http://localhost:5173`
 
 ## Project Documentation
 
-- [Career Openings & ATS Discovery](Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md)
-- [Career Openings Guide (DOCX)](Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx)
 - [Backend Guide](Backend/README.md)
 - [Frontend Guide](Frontend/README.md)
 - [Deployment Guide](Docs/DEPLOYMENT_GUIDE.md)

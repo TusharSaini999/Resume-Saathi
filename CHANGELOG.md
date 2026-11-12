@@ -18,9 +18,6 @@ All notable changes to this project are documented in this file.
   - New "Live ATS Job Discovery & Verification" and "Inferred Roles & Tech Stacks Matching" feature cards in [Features.jsx](Frontend/src/components/landing/Features.jsx).
   - 4-step job pipeline workflow in [HowItWorks.jsx](Frontend/src/components/landing/HowItWorks.jsx).
   - Direct "Careers" navbar navigation in [Header.jsx](Frontend/src/components/layout/Header.jsx).
-- **Documentation**:
-  - Added comprehensive feature guide [Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md](Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md).
-  - Generated [Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx](Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx).
 
 ## [1.0.0] - Initial Release
 
