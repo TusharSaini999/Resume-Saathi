@@ -8,37 +8,28 @@ A complete, end-to-end technical guide for configuring **AWS CloudFront CDN**, *
 
 ```mermaid
 flowchart TD
-  subgraph EdgeLayer ["1. Global Edge and DNS Routing"]
-    Users(["Global Web Visitors<br/>HTTPS Port 443"])
-    Route53["Amazon Route 53 DNS<br/>Anycast Routing"]
-    WAF{"AWS WAF and ACM<br/>Rate Limiting and SSL"}
-    CF["AWS CloudFront CDN<br/>Global Edge POPs"]
-  end
+  User(["Global Web Visitors<br/>HTTPS Port 443"])
+  Route53["Amazon Route 53 DNS<br/>Anycast Routing"]
+  WAF["AWS WAF and ACM<br/>Rate Limiting and SSL"]
+  CF["AWS CloudFront CDN<br/>Global Edge POPs (DEL51)"]
+  Cloak{"Verify Ingress Secret<br/>X-Origin-Verify Header"}
+  Drop["HTTP 444 Drop<br/>Block Direct Scanners"]
+  Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL Termination"]
+  FE["React 19 Vite Container<br/>Frontend SPA (:3000)"]
+  BE["Node.js Express Container<br/>Backend REST API (:5000)"]
+  DB[("MongoDB Atlas<br/>Managed Cloud Database")]
+  AI["Google Gemini 3.5 Flash Lite<br/>ATS Scoring Engine"]
 
-  subgraph OriginHost ["2. EC2 Origin Server"]
-    Cloak{"Origin Shield Verification<br/>Validate X-Origin-Verify Header"}
-    Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL Termination"]
-  end
-
-  subgraph Containers ["3. Docker Microservices"]
-    FE["React 19 Vite Container<br/>Frontend SPA (:3000)"]
-    BE["Node.js Express Container<br/>Backend REST API (:5000)"]
-  end
-
-  subgraph CloudServices ["4. Cloud Data and AI Services"]
-    DB[("MongoDB Atlas<br/>Managed Database Cluster")]
-    AI["Google Gemini 3.5 Flash Lite<br/>ATS Scoring Engine"]
-  end
-
-  Users -->|DNS Query| Route53
-  Route53 -->|Edge Anycast IP| WAF
-  WAF -->|Validated Traffic| CF
-  CF -->|Forward Request with Secret| Cloak
-  Cloak -->|Authorized Ingress| Nginx
-  Cloak -->|Unauthorized Scanner| Drop["HTTP 444 Drop"]
+  User -->|DNS Lookup| Route53
+  Route53 -->|Edge Anycast IP| User
+  User -->|HTTPS Request| WAF
+  WAF -->|Filtered Traffic| CF
+  CF -->|Forward with Secret| Cloak
+  Cloak -->|Valid Secret| Nginx
+  Cloak -->|Missing / Invalid| Drop
   Nginx -->|proxy_pass :3000| FE
-  Nginx -->|proxy_pass :5000| BE
-  BE <-->|Mongoose Driver| DB
+  Nginx -->|proxy_pass /api (:5000)| BE
+  BE <-->|Mongoose ODM| DB
   BE <-->|GenAI SDK| AI
 ```
 

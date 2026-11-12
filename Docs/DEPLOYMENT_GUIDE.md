@@ -10,36 +10,26 @@ The production environment is globally accelerated and secured via **AWS CloudFr
 
 ```mermaid
 flowchart TD
-  subgraph EdgeLayer ["1. Client and Global Edge Layer"]
-    Users(["Web Clients and Visitors<br/>HTTPS Port 443"])
-    WAF{"AWS WAF Rules<br/>Anti-DDoS and Rate Limiting"}
-    CF["AWS CloudFront CDN<br/>Global Edge POPs and Edge Cache"]
-  end
-
-  subgraph OriginHost ["2. EC2 Host and Security Gateway"]
-    Cloak{"Origin Cloak Verification<br/>Validate X-Origin-Verify Header"}
-    Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL and Routing"]
-  end
-
-  subgraph DockerServices ["3. Docker Compose Microservices"]
-    FE["Frontend Container<br/>React 19 Vite SPA (:3000)"]
-    BE["Backend Container<br/>Node.js 20 Express REST API (:5000)"]
-  end
-
-  subgraph ManagedCloud ["4. Managed Cloud and AI Services"]
-    DB[("MongoDB Atlas<br/>Multi-Tenant Cloud Database")]
-    AI["Google Gemini 3.5 Flash Lite<br/>ATS Intelligence Engine"]
-    Cloudinary[("Cloudinary Storage CDN<br/>Encrypted PDF Storage")]
-    SES["AWS SES SMTP Service<br/>Transactional Email Delivery"]
-  end
+  Users(["Web Clients and Visitors<br/>HTTPS Port 443"])
+  WAF["AWS WAF Rules<br/>Anti-DDoS and Rate Limiting"]
+  CF["AWS CloudFront CDN<br/>Global Edge POPs and Edge Cache"]
+  Cloak{"Origin Cloak Check<br/>Validate X-Origin-Verify"}
+  Drop["HTTP 444 Drop<br/>Direct Scanner Block"]
+  Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL Termination"]
+  FE["Frontend Container<br/>React 19 Vite SPA (:3000)"]
+  BE["Backend Container<br/>Node.js 20 Express API (:5000)"]
+  DB[("MongoDB Atlas<br/>Managed Cloud Cluster")]
+  AI["Google Gemini 3.5 Flash Lite<br/>ATS Scoring Engine"]
+  Cloudinary[("Cloudinary Storage CDN<br/>Encrypted PDF Storage")]
+  SES["AWS SES SMTP Service<br/>Transactional Email Delivery"]
 
   Users -->|HTTPS Request| WAF
-  WAF -->|Filtered Traffic| CF
-  CF -->|Forward with Origin Secret| Cloak
-  Cloak -->|Authorized Request| Nginx
-  Cloak -->|Missing Secret| Drop["HTTP 444 Connection Drop"]
+  WAF -->|Filtered Ingress| CF
+  CF -->|Forward with Secret| Cloak
+  Cloak -->|Authorized| Nginx
+  Cloak -->|Unauthorized| Drop
   Nginx -->|proxy_pass :3000| FE
-  Nginx -->|proxy_pass :5000| BE
+  Nginx -->|proxy_pass /api (:5000)| BE
   BE -->|Persist Data| DB
   BE -->|ATS Analysis| AI
   BE -->|Upload PDFs| Cloudinary
@@ -633,26 +623,15 @@ When a production incident occurs, follow this decision tree to pick the optimal
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Incident_Triggered: Error Spike or 5xx Alarm Detected
-  
-  state Incident_Triage {
-    [*] --> Inspect_DB_Schema
-    Inspect_DB_Schema --> Run_DB_Revert_Script: Breaking Migration Found
-    Inspect_DB_Schema --> Code_Rollback_Ready: Non-Breaking or Additive Change
-    Run_DB_Revert_Script --> Code_Rollback_Ready: Schema Revert Completed
-  }
-
-  Incident_Triggered --> Incident_Triage
-  
-  state Rollback_Execution {
-    [*] --> Select_Target_Tag: Identify Prior Stable Release (e.g. v1.0.3)
-    Select_Target_Tag --> Trigger_GitHub_Workflow: Dispatch rollback.yml Workflow
-    Trigger_GitHub_Workflow --> Pull_Docker_Images: Pull Pre-built Hub Images
-    Pull_Docker_Images --> Container_Swap: Zero-Downtime Compose Up
-  }
-
-  Incident_Triage --> Rollback_Execution
-  Rollback_Execution --> Production_Restored: Healthcheck 200 OK (< 30s)
+  [*] --> Incident_Triggered: Error Spike or 5xx Alarm
+  Incident_Triggered --> Inspect_Database: Inspect Schema Changes
+  Inspect_Database --> Run_DB_Revert: Breaking Migration Found
+  Inspect_Database --> Select_Target_Version: Non-Breaking / Additive
+  Run_DB_Revert --> Select_Target_Version: Schema Revert Completed
+  Select_Target_Version --> Dispatch_Rollback_Workflow: Trigger rollback.yml
+  Dispatch_Rollback_Workflow --> Pull_Docker_Images: Pull Pre-built Hub Images
+  Pull_Docker_Images --> Swap_Containers: Zero-Downtime Compose Up
+  Swap_Containers --> Production_Restored: Healthcheck 200 OK (< 30s)
   Production_Restored --> [*]
 ```
 

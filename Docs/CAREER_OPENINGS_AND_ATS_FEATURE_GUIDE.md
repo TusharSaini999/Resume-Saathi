@@ -10,36 +10,23 @@ The **Career Openings & Live ATS Job Discovery Engine** transforms Resume Saathi
 
 ```mermaid
 flowchart TD
-  Candidate(["Job Seeker / Candidate<br/>Resume and Target Profile"])
+  Candidate(["Candidate Profile<br/>Resume & Target Roles"])
+  Infer["Role and Tech Stack<br/>Skill Pattern Inference"]
+  ATS_Engines["Official ATS Connectors<br/>Greenhouse, Lever, Ashby, LinkedIn"]
+  Parser["Clean JD Parser<br/>Requirement Sanitizer"]
+  Probe{"Live Portal Prober<br/>HTTP HEAD/GET Healthcheck"}
+  Drop["Inactive Requisition<br/>Filter Out"]
+  AI["Google Gemini 3.5 Flash Lite<br/>ATS Compatibility Scorer"]
+  Tracker[("Application Tracker<br/>Candidate Pipeline Vault")]
 
-  subgraph Crawlers ["1. Official ATS Connectors"]
-    GH["Greenhouse Direct ATS<br/>boards-api.greenhouse.io"]
-    LV["Lever Direct ATS<br/>api.lever.co"]
-    SR["SmartRecruiters ATS<br/>api.smartrecruiters.com"]
-    ASH["Ashby ATS<br/>jobs.ashbyhq.com"]
-    LI["LinkedIn Official Jobs<br/>Guest Feed Engine"]
-    TCS["Enterprise Tech Portals<br/>TCS, Infosys, and Wipro"]
-  end
-
-  subgraph Engine ["2. Processing and Verification Pipeline"]
-    Infer["Role and Tech Stack<br/>Skill Pattern Inference"]
-    Parser["Clean JD Parser<br/>Requirement Sanitizer"]
-    Probe{"Live Portal Prober<br/>HTTP HEAD/GET Healthcheck"}
-  end
-
-  subgraph Intelligence ["3. Intelligence and Application Tracker"]
-    AI["Google Gemini 3.5 Flash Lite<br/>ATS Compatibility Scorer"]
-    Tracker[("Application Tracker<br/>Candidate Pipeline Vault")]
-  end
-
-  Candidate -->|Provide Skills and Target Roles| Infer
-  Infer -->|Trigger Requisition Ingestion| Crawlers
-  Crawlers -->|Raw Postings| Parser
-  Parser -->|Sanitized Postings| Probe
-  Probe -->|Verified Live Openings| AI
-  Probe -->|Expired 404 / Inactive| Dead["Flagged Inactive<br/>Filter Out"]
+  Candidate -->|Skills and Preferences| Infer
+  Infer -->|Targeted Queries| ATS_Engines
+  ATS_Engines -->|Raw Requisitions| Parser
+  Parser -->|Sanitized JDs| Probe
+  Probe -->|Verified Live HTTP 200| AI
+  Probe -->|Closed / Expired 404| Drop
   Infer -->|Resume Context| AI
-  AI -->|Scored Matches and Fit Metrics| Tracker
+  AI -->|Compatibility Score & Gaps| Tracker
   Candidate -->|Manage Applications| Tracker
 ```
 
@@ -49,24 +36,18 @@ flowchart TD
 stateDiagram-v2
   [*] --> Discovered: Crawled from Greenhouse, Lever, Ashby, or LinkedIn
   Discovered --> Verified_Live: Probed HTTP 200 OK (Live Portal)
-  Discovered --> Expired_Closed: HTTP 404 or Requisition Inaccessible
+  Discovered --> Expired_Closed: HTTP 404 or Inaccessible
   Expired_Closed --> [*]
   
   Verified_Live --> AI_Evaluated: Scored by Gemini 3.5 Flash Lite
   AI_Evaluated --> Saved: Bookmarked by Candidate
   Saved --> Tailoring: Resume Tailored to Match JD
   Tailoring --> Applied: Submitted on Official Portal
-  
-  state Application_Pipeline {
-    [*] --> Applied_Submitted
-    Applied_Submitted --> Screening: Recruiter Review
-    Screening --> Technical_Interview: Coding and System Design
-    Technical_Interview --> Final_Round: Culture and Leadership
-    Final_Round --> Offer_Received: Official Offer Extended
-    Final_Round --> Rejected: Closed or Position Filled
-  }
-
-  Applied --> Application_Pipeline
+  Applied --> Screening: Recruiter Review
+  Screening --> Technical_Interview: Coding and System Design
+  Technical_Interview --> Final_Round: Culture and Leadership
+  Final_Round --> Offer_Received: Official Offer Extended
+  Final_Round --> Rejected: Position Filled or Closed
   Offer_Received --> [*]
   Rejected --> [*]
 ```

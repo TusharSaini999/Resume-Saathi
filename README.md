@@ -19,27 +19,19 @@ powered by Google Gemini 3.5 Flash Lite.
 
 ```mermaid
 flowchart TD
-  subgraph EdgeLayer ["Edge Ingress and CDN Layer"]
-    User(["Candidate Web Browser<br/>HTTPS Port 443"])
-    CF["AWS CloudFront CDN<br/>Global Edge POPs and WAF"]
-  end
-
-  subgraph OriginHost ["AWS EC2 Origin Host"]
-    Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL Termination"]
-    FE["React 19 Vite Container<br/>Frontend SPA (:3000)"]
-    BE["Node.js Express Container<br/>Backend REST API (:5000)"]
-  end
-
-  subgraph CloudServices ["Cloud and Intelligence Services"]
-    DB[("MongoDB Atlas<br/>Managed Database Cluster")]
-    AI["Google Gemini 3.5 Flash Lite<br/>ATS Scoring and Matching Engine"]
-    Cloudinary[("Cloudinary Storage CDN<br/>PDF File Vault")]
-    ATS["Live ATS Discovery Engine<br/>Greenhouse, Lever, and Ashby"]
-  end
+  User(["Candidate Web Browser<br/>HTTPS Port 443"])
+  CF["AWS CloudFront CDN<br/>Global Edge POPs and WAF"]
+  Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL Termination"]
+  FE["React 19 Vite Container<br/>Frontend SPA (:3000)"]
+  BE["Node.js Express Container<br/>Backend REST API (:5000)"]
+  DB[("MongoDB Atlas<br/>Managed Database Cluster")]
+  AI["Google Gemini 3.5 Flash Lite<br/>ATS Scoring and Matching Engine"]
+  Cloudinary[("Cloudinary Storage CDN<br/>PDF File Vault")]
+  ATS["Live ATS Discovery Engine<br/>Greenhouse, Lever, and Ashby"]
 
   User -->|HTTPS Request| CF
   CF -->|Origin Cloaked Traffic| Nginx
-  Nginx -->|Proxy Pass (:3000)| FE
+  Nginx -->|Proxy Pass :3000| FE
   Nginx -->|Proxy Pass /api (:5000)| BE
   BE <-->|Mongoose ODM| DB
   BE <-->|GenAI SDK| AI
