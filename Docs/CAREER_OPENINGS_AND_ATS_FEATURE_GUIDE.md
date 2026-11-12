@@ -62,7 +62,7 @@ sequenceDiagram
   participant Modal as Verification Modal
   participant API as Career API Service
   participant Prober as ATS Online Prober
-  participant ATS as Official ATS Server<br/>(Greenhouse, Lever, LinkedIn)
+  participant ATS as Official ATS Server (Greenhouse, Lever, LinkedIn)
 
   User->>UI: Click Verify Status
   UI->>API: GET /api/v1/careers/probe-job-url?url=...

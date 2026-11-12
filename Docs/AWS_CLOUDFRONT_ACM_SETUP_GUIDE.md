@@ -27,8 +27,8 @@ flowchart TD
   CF -->|Forward with Secret| Cloak
   Cloak -->|Valid Secret| Nginx
   Cloak -->|Missing / Invalid| Drop
-  Nginx -->|proxy_pass :3000| FE
-  Nginx -->|proxy_pass /api (:5000)| BE
+  Nginx -->|proxy_pass Port 3000| FE
+  Nginx -->|proxy_pass API Port 5000| BE
   BE <-->|Mongoose ODM| DB
   BE <-->|GenAI SDK| AI
 ```
