@@ -60,9 +60,9 @@ The architecture has been benchmarked for low cost, stability, and zero-downtime
 
 | Instance Type | vCPU | RAM | Cost (ap-south-1) | Suitability | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`t3.micro`** | 2 | 1.0 GB | ~$7.50 / mo (Free Tier) | ⚠️ Dev / Minimal | Risk of Out-of-Memory (OOM) during concurrent resume uploads or simultaneous Docker image extraction unless a 2GB swapfile is added. |
-| **`t3.small`** | 2 | 2.0 GB | ~$15.00 / mo | ✅ **Recommended Production** | Sweet-spot for production. Ample memory headroom for Node.js, Nginx, Docker daemon, and SSM agent without memory pressure. |
-| **`t3.medium`** | 2 | 4.0 GB | ~$30.00 / mo | 🚀 High Scale | Recommended when running local background jobs, Redis caching, or >100 concurrent active users. |
+| **`t3.micro`** | 2 | 1.0 GB | ~$7.50 / mo (Free Tier) | Dev / Minimal | Risk of Out-of-Memory (OOM) during concurrent resume uploads or simultaneous Docker image extraction unless a 2GB swapfile is added. |
+| **`t3.small`** | 2 | 2.0 GB | ~$15.00 / mo | **Recommended Production** | Sweet-spot for production. Ample memory headroom for Node.js, Nginx, Docker daemon, and SSM agent without memory pressure. |
+| **`t3.medium`** | 2 | 4.0 GB | ~$30.00 / mo | High Scale | Recommended when running local background jobs, Redis caching, or >100 concurrent active users. |
 
 #### 2. RAM & Memory Allocation Breakdown (2.0 GB Baseline)
 
@@ -607,7 +607,7 @@ CloudFront connects to the EC2 origin over HTTP (Port 80) and handles SSL termin
 
 ---
 
-## 11. Production Rollback Strategy & Version Management 🔄
+## 11. Production Rollback Strategy & Version Management
 
 Resume-Saathi features an automated, zero-rebuild rollback pipeline enabled by immutable versioned Docker images and AWS Systems Manager (SSM).
 
@@ -615,7 +615,7 @@ Resume-Saathi features an automated, zero-rebuild rollback pipeline enabled by i
 A dedicated rollback workflow is available at `.github/workflows/rollback.yml`:
 
 1. Go to the **Actions** tab in your GitHub repository.
-2. Select **"Rollback Production Version 🔄"** from the left workflow sidebar.
+2. Select **"Rollback Production Version"** from the left workflow sidebar.
 3. Click the **"Run workflow"** button.
 4. Input:
    - **Target Version**: Enter the desired version tag (e.g. `v1.0.1` or `1.0.1`).

@@ -1,4 +1,4 @@
-# Resume Saathi - Career Openings & Live ATS Discovery Guide 🚀
+# Resume Saathi - Career Openings & Live ATS Discovery Guide
 
 ## Executive Summary
 
@@ -6,7 +6,7 @@ The **Career Openings & Live ATS Job Discovery Engine** transforms Resume Saathi
 
 ---
 
-## 1. Core Architecture & Features 🏗️
+## 1. Core Architecture & Features
 
 ```mermaid
 flowchart TD
@@ -112,7 +112,7 @@ sequenceDiagram
 
 ---
 
-## 2. Supported Platforms & Portals 🏢
+## 2. Supported Platforms & Portals
 
 | Portal / Source | Type | Extraction Method | Real-time Probe |
 |---|---|---|---|
@@ -125,7 +125,7 @@ sequenceDiagram
 
 ---
 
-## 2.1 Deep Dive: Tokenless LinkedIn Job Discovery 💼
+## 2.1 Deep Dive: Tokenless LinkedIn Job Discovery
 
 A key innovation of Resume Saathi is the ability to fetch verified, live company job postings from LinkedIn **without requiring user credentials, OAuth tokens, or scraping credentials**.
 
@@ -169,7 +169,7 @@ A key innovation of Resume Saathi is the ability to fetch verified, live company
 
 ---
 
-## 3. Inferred Roles & Tech Stacks Matching 🎯
+## 3. Inferred Roles & Tech Stacks Matching
 
 Traditional job boards fail when candidates with comprehensive skills don't match exact title strings. Resume Saathi's **Inference Engine** clusters candidate skills into recognized industry roles and stacks:
 
@@ -182,13 +182,13 @@ Traditional job boards fail when candidates with comprehensive skills don't matc
 - **Data & AI Engineer**: `Python` + `PyTorch` / `TensorFlow` + `Pandas` + `SQL`
 
 Candidates can choose to search by:
-- A specific inferred stack (e.g., *⚛️ MERN Stack* or *🐍 Python & Django*)
+- A specific inferred stack (e.g., *MERN Stack* or *Python & Django*)
 - A derived industry title (e.g., *Full Stack Developer*, *SDE-1*)
 - **"All Inferred Roles & Stacks"**: A unified single-click filter that matches across all detected candidate strengths.
 
 ---
 
-## 4. API Endpoints Reference 🔌
+## 4. API Endpoints Reference
 
 > **Authentication Required**: All `/api/v1/careers/*` endpoints enforce `verifyJwt` middleware. Requests must include an active user JWT session (via cookie or `Authorization: Bearer <token>`). Unauthenticated requests are rejected with `401 Unauthorized`. The `/api/v1/careers/health` endpoint remains accessible for cluster liveness probing.
 
@@ -220,7 +220,7 @@ Updates application stage (`"Bookmarked"`, `"Applied"`, `"Interviewing"`, `"Offe
 
 ---
 
-## 5. Frontend User Experience (AG-UI) 🎨
+## 5. Frontend User Experience (AG-UI)
 
 - **AG-UI Search Console**: Real-time shimmer feedback and active probe indicators when querying ATS portals.
 - **Country Tech Sector Ribbons**: Fast filtering across regional tech hubs (Bengaluru, Hyderabad, Pune, Delhi NCR, Mumbai, etc.).
@@ -229,7 +229,7 @@ Updates application stage (`"Bookmarked"`, `"Applied"`, `"Interviewing"`, `"Offe
 
 ---
 
-## 6. Model Standardization ⚡
+## 6. Model Standardization
 
 All backend AI processing uses **Google Gemini 3.5 Flash Lite** (`gemini-3.5-flash-lite`):
 - Typo-tolerance regex (`.replace(/3\.5l-/i, '3.5-')`) ensures seamless fallback from legacy model strings.

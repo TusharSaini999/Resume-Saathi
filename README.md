@@ -1,17 +1,21 @@
-# Resume Saathi 🚀
+# Resume Saathi
 
-Resume Saathi is an AI-powered ATS resume analysis and live job discovery platform. It helps users upload resumes, receive structured feedback, discover live verified requisitions from official ATS portals (Greenhouse, Lever, SmartRecruiters, LinkedIn), infer genuine industry roles and tech stacks, and match against job descriptions using Google Gemini 3.5 Flash Lite.
+Resume Saathi is an AI-powered ATS resume analysis and live job discovery platform.
+It enables candidates to upload resumes, receive structured scoring and gap analyses,
+discover live verified requisitions from official ATS portals (Greenhouse, Lever, SmartRecruiters, LinkedIn),
+infer candidate roles and technology stacks, and perform deep match scoring against job descriptions
+powered by Google Gemini 3.5 Flash Lite.
 
-## Technology Stack ⚙️
+## Technology Stack
 
 - Frontend: React, Vite, Redux Toolkit, Tailwind CSS
 - Backend: Node.js, Express, MongoDB (Mongoose)
-- AI integration: Google GenAI SDK (Gemini 3.5 Flash Lite)
+- AI Integration: Google GenAI SDK (Gemini 3.5 Flash Lite)
 - Authentication: JWT, Google OAuth, LinkedIn OAuth
-- File services: Multer, Cloudinary
-- Cloud & DevOps: AWS (CloudFront CDN, EC2,  ACM), Docker, Nginx
+- File Services: Multer, Cloudinary
+- Cloud & DevOps: AWS (CloudFront CDN, EC2, ACM), Docker, Nginx
 
-## Architecture Flow 📐
+## Architecture Flow
 
 ```mermaid
 flowchart TD
@@ -69,7 +73,7 @@ sequenceDiagram
 
 ---
 
-## Repository Structure 🗂️
+## Repository Structure
 
 ```
 Resume-Saathi/
@@ -86,13 +90,13 @@ Resume-Saathi/
 └── CHANGELOG.md
 ```
 
-## Prerequisites ✅
+## Prerequisites
 
 - Node.js 20 or later
 - npm 10 or later
 - MongoDB (local or cloud)
 
-## Quick Start 🚀
+## Quick Start
 
 ### 1. Start the backend
 
@@ -103,11 +107,11 @@ copy .env.sample .env
 npm start
 ```
 
-Backend default URL: http://localhost:5000 🌐
+Backend default URL: `http://localhost:5000`
 
 ### 2. Start the frontend
 
-Create Frontend/.env with:
+Create `Frontend/.env` with:
 
 ```env
 VITE_SERVER_URL=http://localhost:5000/api/v1
@@ -121,28 +125,28 @@ npm install
 npm run dev
 ```
 
-Frontend default URL: http://localhost:5173 🌐
+Frontend default URL: `http://localhost:5173`
 
-## Project Documentation 📚
+## Project Documentation
 
 - Career Openings & ATS Discovery: [Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md)
 - Career Openings Guide (DOCX): [Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx](file:///c:/Project/Resume-Saathi/Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx)
-- Backend guide: Backend/README.md
-- Frontend guide: Frontend/README.md
-- Deployment guide: Docs/DEPLOYMENT_GUIDE.md
-- AWS CloudFront & ACM guide: Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md
-- Contributing: CONTRIBUTING.md
-- Code of Conduct: CODE_OF_CONDUCT.md
-- Security policy: SECURITY.md
-- Support: SUPPORT.md
-- Changelog: CHANGELOG.md
+- Backend Guide: [Backend/README.md](file:///c:/Project/Resume-Saathi/Backend/README.md)
+- Frontend Guide: [Frontend/README.md](file:///c:/Project/Resume-Saathi/Frontend/README.md)
+- Deployment Guide: [Docs/DEPLOYMENT_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/DEPLOYMENT_GUIDE.md)
+- AWS CloudFront & ACM Guide: [Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md)
+- Contributing Guide: [CONTRIBUTING.md](file:///c:/Project/Resume-Saathi/CONTRIBUTING.md)
+- Code of Conduct: [CODE_OF_CONDUCT.md](file:///c:/Project/Resume-Saathi/CODE_OF_CONDUCT.md)
+- Security Policy: [SECURITY.md](file:///c:/Project/Resume-Saathi/SECURITY.md)
+- Support Guide: [SUPPORT.md](file:///c:/Project/Resume-Saathi/SUPPORT.md)
+- Changelog: [CHANGELOG.md](file:///c:/Project/Resume-Saathi/CHANGELOG.md)
 
-## GitHub Templates 🧩
+## GitHub Templates
 
-- Bug report: .github/ISSUE_TEMPLATE/bug_report.md
-- Feature request: .github/ISSUE_TEMPLATE/feature_request.md
-- Pull request: .github/pull_request_template.md
+- Bug Report: [.github/ISSUE_TEMPLATE/bug_report.md](file:///c:/Project/Resume-Saathi/.github/ISSUE_TEMPLATE/bug_report.md)
+- Feature Request: [.github/ISSUE_TEMPLATE/feature_request.md](file:///c:/Project/Resume-Saathi/.github/ISSUE_TEMPLATE/feature_request.md)
+- Pull Request Template: [.github/pull_request_template.md](file:///c:/Project/Resume-Saathi/.github/pull_request_template.md)
 
-## License 📄
+## License
 
-This project is licensed under the MIT License. See LICENSE for details.
+This project is licensed under the MIT License. See [LICENSE](file:///c:/Project/Resume-Saathi/LICENSE) for details.

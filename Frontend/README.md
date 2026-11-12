@@ -1,8 +1,8 @@
-# Frontend README 🎨
+# Frontend README
 
 This application is the user interface for Resume Saathi. It includes authentication flows, resume upload and analysis views, job matching pages, chat features, and user settings.
 
-## Technology ⚙️
+## Technology
 
 - React
 - Vite
@@ -10,19 +10,19 @@ This application is the user interface for Resume Saathi. It includes authentica
 - Tailwind CSS
 - Axios
 
-## Prerequisites ✅
+## Prerequisites
 
 - Node.js 20 or later
 - npm 10 or later
 - Running backend service
 
-## Installation 📦
+## Installation
 
 ```bash
 npm install
 ```
 
-## Environment Configuration 🔧
+## Environment Configuration
 
 Create a local environment file from the sample:
 
@@ -36,30 +36,30 @@ Set the backend API base URL:
 VITE_SERVER_URL=http://localhost:5000/api/v1
 ```
 
-## Run the App 🚀
+## Run the App
 
 ```bash
 npm run dev
 ```
 
-Default local URL: http://localhost:5173 🌐
+Default local URL: `http://localhost:5173`
 
-## Build for Production 🏗️
+## Build for Production
 
 ```bash
 npm run build
 ```
 
-Build output directory: dist
+Build output directory: `dist`
 
-## Available Scripts 📜
+## Available Scripts
 
 - npm run dev
 - npm run build
 - npm run preview
 - npm run lint
 
-## Troubleshooting 🛠️
+## Troubleshooting
 
 - Ensure VITE_SERVER_URL points to the backend API base path.
 - If API requests fail, verify that backend CORS includes the frontend origin.
