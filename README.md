@@ -18,25 +18,37 @@ powered by Google Gemini 3.5 Flash Lite.
 ## Architecture Flow
 
 ```mermaid
-flowchart TD
-  User(["Candidate Web Browser<br/>HTTPS Port 443"])
-  CF["AWS CloudFront CDN<br/>Global Edge POPs and WAF"]
-  Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL Termination"]
-  FE["React 19 Vite Container<br/>Frontend SPA (:3000)"]
-  BE["Node.js Express Container<br/>Backend REST API (:5000)"]
-  DB[("MongoDB Atlas<br/>Managed Database Cluster")]
-  AI["Google Gemini 3.5 Flash Lite<br/>ATS Scoring and Matching Engine"]
-  Cloudinary[("Cloudinary Storage CDN<br/>PDF File Vault")]
-  ATS["Live ATS Discovery Engine<br/>Greenhouse, Lever, and Ashby"]
 
-  User -->|HTTPS Request| CF
-  CF -->|Origin Cloaked Traffic| Nginx
-  Nginx -->|Proxy Pass :3000| FE
-  Nginx -->|"Proxy Pass /api (:5000)"| BE
-  BE <-->|Mongoose ODM| DB
-  BE <-->|GenAI SDK| AI
-  BE <-->|Signed Uploads| Cloudinary
-  BE <-->|Direct Ingestion| ATS
+flowchart TD
+    User(["Candidate Web Browser<br/>HTTPS :443"])
+
+    CF["AWS CloudFront CDN<br/>Global Edge Locations"]
+    WAF["AWS WAF<br/>Web Application Firewall"]
+
+    Nginx["Host Nginx Reverse Proxy<br/>SSL Termination :443"]
+
+    FE["React 19 Frontend<br/>Vite SPA Container :3000"]
+    BE["Node.js Express Backend<br/>REST API Container :5000"]
+
+    DB[("MongoDB Atlas<br/>Managed Database")]
+    AI["Google Gemini API<br/>ATS Scoring and Matching"]
+    Cloudinary[("Cloudinary<br/>PDF Storage and CDN")]
+    ATS["External ATS Platforms<br/>Greenhouse | Lever | Ashby"]
+
+    User -->|HTTPS Request| CF
+    CF --> WAF
+    WAF -->|Filtered Traffic| Nginx
+
+    Nginx -->|Frontend Routes| FE
+    Nginx -->|API Routes /api/*| BE
+
+    FE -->|REST API Requests| BE
+
+    BE <-->|Mongoose ODM| DB
+    BE <-->|Gemini SDK / API| AI
+    BE <-->|Signed Upload / Delivery| Cloudinary
+    BE <-->|Job Discovery / Ingestion| ATS
+
 ```
 
 ### End-to-End User & AI Analysis Flow (Sequence Diagram)
