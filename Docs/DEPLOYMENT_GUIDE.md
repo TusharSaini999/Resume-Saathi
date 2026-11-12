@@ -8,42 +8,41 @@ Comprehensive technical documentation covering the production architecture, auto
 
 The production environment is globally accelerated and secured via **AWS CloudFront CDN** and **AWS Certificate Manager (ACM)**, fronting an **AWS EC2 (Ubuntu 22.04 / 24.04)** instance running a containerized Docker Compose micro-service topology behind a host Nginx reverse proxy.
 
-```
-Global Users (Worldwide / Web Clients - Port 443)
-       │
-       ▼
- ┌────────────────────────────────────────────────────────┐
- │ AWS CloudFront CDN (Global Edge POPs e.g. DEL51)       │
- │  - Custom Domain: resumesaathi.tusharsaini.tech        │
- │  - SSL / TLS: AWS Certificate Manager (Auto-Renewing) │
- │  - AWS WAF: Rate Limiting & Bot Protection             │
- │  - SPA Fallback: 403 / 404 -> /index.html (200 OK)     │
- │  - Custom Origin Header: X-Origin-Verify: <SECRET>     │
- └───────┬──────────────────────────────────┬─────────────┘
-         │ Default (*) - CachingOptimized   │ /api/* - CachingDisabled
-         │ (Edge Cache HIT: JS, CSS, Media) │ (Dynamic Passthrough)
-         │ HTTPS (Port 443 - TLSv1.2/1.3)   │ HTTPS (Port 443 - TLSv1.2/1.3)
-         ▼                                  ▼
- ┌────────────────────────────────────────────────────────┐
- │ AWS EC2 Host Nginx Reverse Proxy (Ports 443 & 80)      │
- │  - Origin SSL: Let's Encrypt (Certbot TLSv1.2 / 1.3)   │
- │  - Origin Cloaking: Enforces X-Origin-Verify header   │
- │  - Drops direct IP/scanners immediately (HTTP 444)     │
- └───────┬──────────────────────────────────┬─────────────┘
-         │ (proxy_pass: 127.0.0.1:3000)     │ (proxy_pass: /api/ -> 127.0.0.1:3000)
-         ▼                                  ▼
- ┌─────────────────────────────┐    ┌──────────────────────────────────┐
- │ resume-frontend-container   │    │ resume-backend-container         │
- │ (React Vite SPA / Nginx)    │    │ (Node.js 20 Express REST API)    │
- │ Port: 127.0.0.1:3000 -> 80  │    │ Port: app-network:5000 (Internal)│
- └─────────────────────────────┘    └───────┬──────────────────────────┘
-                                            │
-                                            ▼
-                           External TLS Managed Services
-                           - MongoDB Atlas (Cluster)
-                           - Cloudinary (Resume PDF storage)
-                           - Google Gemini AI (LLM Analysis)
-                           - AWS SES SMTP (Email Delivery)
+```mermaid
+flowchart TD
+  subgraph Edge ["1. Client & Global Edge"]
+    Users["👥 Web Users (Worldwide)"]
+    WAF{"🛡️ AWS WAF (Anti-DDoS)"}
+    CF["⚡ CloudFront CDN (Global Edge POPs)"]
+  end
+
+  subgraph Origin ["2. EC2 Host & Security"]
+    Cloak{"🔒 Verify X-Origin-Verify"}
+    Nginx["🔀 Host Nginx Reverse Proxy (SSL)"]
+  end
+
+  subgraph Containers ["3. Docker Microservices"]
+    FE["🎨 Frontend Container (React Vite SPA)"]
+    BE["⚙️ Backend Container (Express REST API)"]
+  end
+
+  subgraph Services ["4. Managed Cloud Services"]
+    DB[("🍃 MongoDB Atlas")]
+    AI["🤖 Google Gemini 3.5 Flash Lite"]
+    Cloudinary["☁️ Cloudinary Storage"]
+    SES["📧 AWS SES SMTP"]
+  end
+
+  Users -->|HTTPS : 443| WAF
+  WAF --> CF
+  CF -->|Origin Secret| Cloak
+  Cloak -->|Authorized| Nginx
+  Nginx -->|proxy_pass :3000| FE
+  Nginx -->|proxy_pass :5000| BE
+  BE --> DB
+  BE --> AI
+  BE --> Cloudinary
+  BE --> SES
 ```
 
 ---
@@ -68,19 +67,16 @@ The architecture has been benchmarked for low cost, stability, and zero-downtime
 
 When running on `t3.small` (2.0 GB RAM), system memory is utilized as follows:
 
-```
-┌────────────────────────────────────────────────────────┐
-│ Total Available RAM: 2048 MB                            │
-├────────────────────────────┬───────────────────────────┤
-│ Ubuntu 22.04 / 24.04 OS    │ ~180 MB                   │
-│ AWS SSM Agent + Systemd    │ ~60 MB                    │
-│ Host Nginx Reverse Proxy   │ ~25 MB                    │
-│ Docker Engine + containerd │ ~120 MB                   │
-│ Frontend Container (Nginx) │ ~20 MB                    │
-│ Backend API (Node.js 20)   │ ~220 MB (idle) - 450 MB   │
-│ OS File Cache & Free Head  │ ~900 MB - 1100 MB         │
-└────────────────────────────┴───────────────────────────┘
-```
+| Component | Memory Allocation | Purpose |
+| :--- | :--- | :--- |
+| **Ubuntu 22.04 / 24.04 OS** | ~180 MB | Kernel, init, system daemons |
+| **AWS SSM Agent + Systemd** | ~60 MB | Secure AWS remote management |
+| **Host Nginx Reverse Proxy** | ~25 MB | SSL termination & origin cloaking |
+| **Docker Engine + containerd** | ~120 MB | Container runtime execution |
+| **Frontend Container (Nginx)** | ~20 MB | Serves static React bundle & SPA routing |
+| **Backend API (Node.js 20)** | ~220 MB (idle) – 450 MB | Express REST API & PDF extraction |
+| **OS File Cache & Free Headroom** | ~900 MB – 1100 MB | Buffer cache & PDF parsing burst margin |
+| **Total Available RAM** | **2048 MB** | **`t3.small` Baseline** |
 
 > [!TIP]
 > **Swap File Recommendation**: On both `t3.micro` and `t3.small`, always enable a 2 GB swapfile. This guarantees that temporary memory spikes during Docker pulls or PDF parsing never trigger the Linux Out-Of-Memory (OOM) killer:
@@ -151,17 +147,25 @@ The repository includes three deployment script variants designed for different 
 
 All scripts automate the 8-step server lifecycle with built-in idempotency tracking via `~/.rs_deploy_state`:
 
-```
-┌─────────┐   ┌──────────┐   ┌─────────┐   ┌──────────────┐
-│ Step 0  │──►│  Step 1  │──►│ Step 2  │──►│    Step 3    │
-│ Cleanup │   │ Packages │   │ Docker  │   │ Docker Login │
-└─────────┘   └──────────┘   └─────────┘   └──────────────┘
-                                                  │
-┌─────────┐   ┌──────────┐   ┌─────────┐          ▼
-│ Step 7  │◄──│  Step 6  │◄──│ Step 5  │◄──┌──────────────┐
-│ Nginx & │   │ Docker   │   │ Write   │   │    Step 4    │
-│   SSL   │   │ Compose  │   │ .env    │   │  Workspace   │
-└─────────┘   └──────────┘   └─────────┘   └──────────────┘
+```mermaid
+gantt
+  title Resume-Saathi 8-Step Automated Server Deployment Lifecycle
+  dateFormat X
+  axisFormat %s s
+
+  section 1. Host Preparation
+  Step 0 · Cleanup Legacy Containers    :done, s0, 0, 5
+  Step 1 · Core Packages & Firewall     :done, s1, 5, 20
+  Step 2 · Install Docker Engine v2     :done, s2, 20, 45
+  Step 3 · Docker Hub Registry Auth     :done, s3, 45, 55
+
+  section 2. App & Environment
+  Step 4 · Git Repository Workspace    :active, s4, 55, 75
+  Step 5 · Inject Production Secrets    :active, s5, 75, 80
+  Step 6 · Atomic Container Rollout     :crit, s6, 80, 110
+
+  section 3. Ingress & TLS
+  Step 7 · Host Nginx & Certbot SSL     :s7, 110, 130
 ```
 
 ---
@@ -395,26 +399,30 @@ Two distinct AWS IAM configurations are required:
 1. **EC2 IAM Role (`ResumeSaathi-EC2-SSM-Role`)**: Enables the EC2 instance's background SSM Agent to register with AWS Systems Manager.
 2. **GitHub Actions IAM Identity (`ResumeSaathi-GitHubActions-Deployer`)**: Grants GitHub Actions permissions to execute `ssm:SendCommand` against the target EC2 instance.
 
-```
-┌─────────────────────────┐                        ┌───────────────────────────────┐
-│  GitHub Actions Runner  │                        │         AWS Account           │
-├─────────────────────────┤                        ├───────────────────────────────┤
-│ cd.yml                  │                        │ AWS Systems Manager (SSM)     │
-│  - Authenticates via    │─── ssm:SendCommand ───►│  - Validates instance ID      │
-│    AWS_ACCESS_KEY_ID    │                        │  - Dispatches run command     │
-│  - Targets INSTANCE_ID  │                        └───────────────┬───────────────┘
-└─────────────────────────┘                                        │
-                                                            SSM Agent Polling
-                                                                   │
-                                                                   ▼
-                                                   ┌───────────────────────────────┐
-                                                   │     AWS EC2 Ubuntu Host       │
-                                                   │  (EC2 IAM Profile: SSM-Role)  │
-                                                   ├───────────────────────────────┤
-                                                   │ - Pulls Docker images         │
-                                                   │ - docker compose up -d        │
-                                                   │ - Zero-downtime container swap│
-                                                   └───────────────────────────────┘
+```mermaid
+sequenceDiagram
+  autonumber
+  actor Dev as 👨‍💻 Developer
+  participant GH as 🚀 GitHub Actions (cd.yml)
+  participant SSM as ⚡ AWS Systems Manager
+  participant Agent as 🤖 amazon-ssm-agent (EC2)
+  participant Docker as 🐳 Docker Compose
+  participant App as ✨ Live Containers
+  participant CDN as 🌐 CloudFront CDN
+
+  Dev->>GH: git push origin main
+  GH->>GH: Run Linter & Build Tests
+  GH->>GH: Build & Push Docker Images to Hub
+  GH->>SSM: ssm:SendCommand (AWS_ACCESS_KEY_ID)
+  Note over SSM,Agent: Secure polling over HTTPS port 443 (Zero open port 22)
+  SSM-->>Agent: Dispatch deployment command
+  Agent->>Docker: docker compose pull && up -d
+  Docker->>App: Atomic zero-downtime container swap
+  App-->>Agent: Health check passed (HTTP 200 OK)
+  Agent-->>SSM: Command status: Success (exit 0)
+  SSM-->>GH: Execution finished
+  GH->>CDN: aws cloudfront create-invalidation (/*)
+  CDN-->>Dev: Rollout live globally in < 30 seconds
 ```
 
 ---
@@ -622,21 +630,29 @@ A dedicated rollback workflow is available at `.github/workflows/rollback.yml`:
 
 When a production incident occurs, follow this decision tree to pick the optimal target version:
 
-```
-Incident Occurs (e.g. on v1.0.2)
-         │
-         ▼
-Did v1.0.2 introduce a breaking Database Migration?
-  ├── YES ──► Check if DB schema rollback script is required first.
-  └── NO  ──► Proceed directly to previous version:
-                 │
-                 ▼
-          Check Git Tags / Docker Hub:
-          Current:  v1.0.2 (Unhealthy)
-          Previous: v1.0.1 (Healthy / Stable)
-                 │
-                 ▼
-          Input "v1.0.1" into Rollback Workflow ➔ 30-Second Recovery
+```mermaid
+stateDiagram-v2
+  [*] --> Incident_Triggered: Error Spike / 5xx Alarm Detected
+  
+  state Incident_Triage {
+    [*] --> Inspect_DB_Schema
+    Inspect_DB_Schema --> Run_DB_Revert_Script: Breaking Migration Found
+    Inspect_DB_Schema --> Code_Rollback_Ready: Non-Breaking / Additive Change
+    Run_DB_Revert_Script --> Code_Rollback_Ready: Schema Reverted
+  }
+
+  Incident_Triggered --> Incident_Triage
+  
+  state Rollback_Execution {
+    [*] --> Select_Target_Tag: Identify Prior Stable (e.g. v1.0.1)
+    Select_Target_Tag --> Trigger_GitHub_Workflow: Input Tag in rollback.yml
+    Trigger_GitHub_Workflow --> Pull_Docker_Images: Pull Pre-built Hub Images
+    Pull_Docker_Images --> Container_Swap: Zero-Downtime Compose Up
+  }
+
+  Incident_Triage --> Rollback_Execution
+  Rollback_Execution --> Production_Restored: Healthcheck 200 OK (< 30s)
+  Production_Restored --> [*]
 ```
 
 #### Evaluation Checklist:

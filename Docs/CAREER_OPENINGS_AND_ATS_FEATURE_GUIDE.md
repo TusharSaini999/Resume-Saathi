@@ -8,20 +8,98 @@ The **Career Openings & Live ATS Job Discovery Engine** transforms Resume Saathi
 
 ## 1. Core Architecture & Features 🏗️
 
+```mermaid
+flowchart TD
+  Candidate["👤 Job Seeker / Candidate"]
+
+  subgraph Crawlers ["1. Official ATS Connectors"]
+    GH["🏢 Greenhouse Direct ATS"]
+    LV["⚡ Lever Direct ATS"]
+    SR["💼 SmartRecruiters"]
+    ASH["🚀 Ashby ATS"]
+    LI["🔗 LinkedIn Official Jobs"]
+    TCS["🏛️ Indian Tech Portals"]
+  end
+
+  subgraph Engine ["2. Processing & Verification"]
+    Infer["🎯 Role & Tech Stack Inference"]
+    Parser["🧹 Clean JD Parser"]
+    Probe{"🛡️ Live Portal Prober"}
+  end
+
+  subgraph Intelligence ["3. AI & Tracking"]
+    AI["🤖 Gemini 3.5 Flash Lite Scorer"]
+    Tracker[("📋 Application Tracker")]
+  end
+
+  Candidate --> Infer
+  Infer --> Crawlers
+  Crawlers --> Parser
+  Parser --> Probe
+  Probe -->|Verified Live| AI
+  Infer --> AI
+  AI --> Tracker
+  Candidate --> Tracker
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│                          RESUME SAATHI ATS ENGINE                      │
-├───────────────────────────────┬────────────────────────────────────────┤
-│     ATS & Job Connectors      │         Intelligent Processing         │
-├───────────────────────────────┼────────────────────────────────────────┤
-│ • Greenhouse Direct ATS       │ • Inferred Roles & Tech Stacks Engine  │
-│ • Lever Direct ATS            │ • HTML Sanitization & Clean JD Parser  │
-│ • SmartRecruiters Direct ATS  │ • Live Portal Online Prober            │
-│ • TCS iON Enterprise Portal   │ • External Job Link Inspector          │
-│ • LinkedIn Verified Jobs (API)│ • Application Pipeline Tracker         │
-│ • Startup Direct Posts        │ • Gemini 3.5 Flash Lite Match Scorer   │
-└───────────────────────────────┴────────────────────────────────────────┘
+
+### 1.1 Candidate Application Lifecycle & State Machine
+
+```mermaid
+stateDiagram-v2
+  [*] --> Discovered: Crawled from Greenhouse / Lever / Ashby / LinkedIn
+  Discovered --> Verified_Live: Probed HTTP 200 OK (Live Portal)
+  Discovered --> Expired_Closed: HTTP 404 / Requisition Inaccessible
+  Expired_Closed --> [*]
+  
+  Verified_Live --> AI_Evaluated: Scored by Gemini 3.5 Flash Lite
+  AI_Evaluated --> Saved: Bookmarked by Candidate
+  Saved --> Tailoring: Resume Tailored to Match JD
+  Tailoring --> Applied: Submitted on Official Portal
+  
+  state Application_Pipeline {
+    [*] --> Applied_Submitted
+    Applied_Submitted --> Screening: Recruiter Review
+    Screening --> Technical_Interview: Coding / System Design
+    Technical_Interview --> Final_Round: Culture / Leadership
+    Final_Round --> Offer_Received: 🎉 Official Offer Extended!
+    Final_Round --> Rejected: Closed / Position Filled
+  }
+
+  Applied --> Application_Pipeline
+  Offer_Received --> [*]
+  Rejected --> [*]
 ```
+
+### 1.2 Real-Time Online Verification Probe (Sequence Flow)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User as 👤 Candidate
+  participant UI as 🎨 Job Card (React)
+  participant Modal as 🔍 Verification Modal
+  participant API as ⚙️ Career API Service
+  participant Prober as 🛡️ ATS Online Prober
+  participant ATS as 🏢 Official ATS Server (Greenhouse/Lever/LinkedIn)
+
+  User->>UI: Click "Verify" Shield Icon
+  UI->>API: GET /api/v1/careers/probe-job-url?url=...
+  API->>Prober: probeJobRequisitionUrl(url)
+  Prober->>ATS: HTTP HEAD / GET Request (Custom UA & Headers)
+  alt Portal Responds HTTP 200 (Active Job Requisition)
+    ATS-->>Prober: HTTP 200 OK (Requisition Live)
+    Prober-->>API: { online: true, portalType: "Greenhouse", responseTimeMs: 142 }
+    API-->>UI: Verified Live Status
+    UI-->>User: Display Green Live Pulse Badge & Verified Requisition Notice
+  else Portal Closed / Expired / 404
+    ATS-->>Prober: HTTP 404 / 410 / Redirect to Careers Home
+    Prober-->>API: { online: false, statusSummary: "Requisition closed or expired" }
+    API-->>UI: Closed / Inaccessible Notice
+    UI-->>User: Display Amber Closed Notice (Prevents wasted application time)
+  end
+```
+
+---
 
 ### Key Pillars:
 1. **Direct Official ATS Openings**: Zero dead ends or third-party spam. Pulls live openings straight from official company career portals (`boards.greenhouse.io`, `jobs.lever.co`, `smartrecruiters.com`, etc.).

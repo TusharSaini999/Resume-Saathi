@@ -4,124 +4,101 @@
 
 ```mermaid
 flowchart LR
-  U[User] --> FE[Frontend - React/Vite]
-  FE --> API[Backend API - Express]
-  API --> DB[(MongoDB)]
-  API --> AI[Gemini AI]
-  API --> CL[Cloudinary]
-  API --> EM[Email SMTP]
-  API --> GX[Google OAuth]
-  API --> LX[LinkedIn OAuth]
-  API --> IP[IP/Location Services]
+  U["👤 User / Candidate"]
+  FE["🎨 Frontend (React / Vite)"]
+  API["⚙️ Backend API (Express)"]
+  DB[("🍃 MongoDB Atlas")]
+  AI["🤖 Gemini 3.5 AI"]
+  CL["☁️ Cloudinary Storage"]
+  EM["📧 SMTP Email"]
+  OAuth["🔐 Google & LinkedIn OAuth"]
 
-  FE <-->|JSON / Cookies / Redirects| API
+  U <-->|HTTP / HTTPS| FE
+  FE <-->|REST API / JWT| API
+  API <--> DB
+  API <--> AI
+  API <--> CL
+  API --> EM
+  API <--> OAuth
 ```
 
-## Level 1 Core Application Flows
+## Database Schema & Entity Relationship Diagram (ERD)
 
 ```mermaid
-flowchart TB
-  subgraph Frontend
-    L[Landing Page]
-    A[Auth Pages\nLogin / Signup / Verify / Forgot Password]
-    D[Dashboard Pages\nResume / Job Description / Chat / Settings]
-    S[API Client\naxios + credentials + X-Client-Public-IP]
-  end
+erDiagram
+  USER ||--o{ SESSION : "owns"
+  USER ||--o{ RESUME : "uploads"
+  USER ||--o{ JOB_DESCRIPTION : "analyzes"
+  USER ||--o{ CHAT_SESSION : "initiates"
+  USER ||--o{ TOKEN : "has"
+  RESUME ||--|| RESUME_ANALYSIS : "yields"
+  CHAT_SESSION ||--o{ CHAT_MESSAGE : "contains"
 
-  subgraph Backend[Backend - Express API]
-    R1[Auth Routes\n/api/v1/users + /api/v1/auth]
-    R2[Resume Routes\n/api/v1/resumes]
-    R3[Job Routes\n/api/v1/jobs]
-    R4[Chat Routes\n/api/v1/chating]
-    R5[Session + Profile Routes\n/api/v1/users/me, /sessions]
-    M[JWT Middleware]
-    P[Passport OAuth]
-  end
-
-  subgraph Processing
-    U1[Resume Parser\nPDF text extraction]
-    U2[Job Matcher\nResume vs JD analysis]
-    U3[Chat Engine\nResume-aware AI assistant]
-    U4[Session Generator\nIP, browser, OS, location]
-  end
-
-  subgraph Storage[Data Stores]
-    M1[(Users)]
-    M2[(Sessions)]
-    M3[(ResumeAnalysis)]
-    M4[(ResumesCollection)]
-    M5[(JobDescription)]
-    M6[(ChatSession)]
-    M7[(ChatMessage)]
-    M8[(Token)]
-  end
-
-  subgraph External[External Services]
-    G1[Gemini AI]
-    C1[Cloudinary]
-    E1[SMTP Email]
-    O1[Google OAuth]
-    O2[LinkedIn OAuth]
-    I1[ipify Public IP]
-    I2[ipapi / ipwho Location Lookup]
-  end
-
-  L --> FE1[Browse content]
-  A --> S
-  D --> S
-
-  S --> R1
-  S --> R2
-  S --> R3
-  S --> R4
-  S --> R5
-
-  R1 --> M
-  R2 --> M
-  R3 --> M
-  R4 --> M
-  R5 --> M
-
-  R1 --> P
-  P --> O1
-  P --> O2
-
-  R1 --> U4
-  U4 --> M1
-  U4 --> M2
-  U4 --> M8
-  U4 --> I1
-  U4 --> I2
-
-  R2 --> U1
-  U1 --> C1
-  U1 --> G1
-  U1 --> M4
-  U1 --> M3
-  U1 --> M1
-
-  R3 --> U2
-  U2 --> G1
-  U2 --> M5
-
-  R4 --> U3
-  U3 --> G1
-  U3 --> M6
-  U3 --> M7
-  U3 --> M4
-
-  R1 --> E1
-  R5 --> M1
-  R5 --> M2
-  R5 --> M5
-  R5 --> M3
-  R5 --> M6
-  R5 --> M7
-
-  M --> FE2[Response JSON / cookies / redirects]
-  FE2 --> D
-  FE2 --> A
+  USER {
+    ObjectId _id PK
+    string name
+    string email UK
+    string password
+    string role
+    boolean isVerified
+    date createdAt
+  }
+  SESSION {
+    ObjectId _id PK
+    ObjectId userId FK
+    string token
+    string ipAddress
+    string userAgent
+    string location
+    date expiresAt
+  }
+  RESUME {
+    ObjectId _id PK
+    ObjectId userId FK
+    string fileName
+    string fileUrl
+    string rawText
+    date uploadedAt
+  }
+  RESUME_ANALYSIS {
+    ObjectId _id PK
+    ObjectId resumeId FK
+    int atsScore
+    json strengths
+    json weaknesses
+    json recommendations
+  }
+  JOB_DESCRIPTION {
+    ObjectId _id PK
+    ObjectId userId FK
+    string title
+    string company
+    string jdText
+    int matchScore
+  }
+  CHAT_SESSION {
+    ObjectId _id PK
+    ObjectId userId FK
+    string title
+    date createdAt
+  }
+  CHAT_MESSAGE {
+    ObjectId _id PK
+    ObjectId sessionId FK
+    string sender
+    string message
+    date timestamp
+  }
+  TOKEN {
+    ObjectId _id PK
+    ObjectId userId FK
+    string token
+    string type
+    date expiresAt
+  }
 ```
+
+---
 
 ## Main User Journeys
 

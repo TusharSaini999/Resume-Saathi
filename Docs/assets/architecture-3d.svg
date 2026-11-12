@@ -1,0 +1,275 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 920" width="100%" height="100%">
+  <defs>
+    <!-- Gradients & Filters for 3D depth -->
+    <radialGradient id="bg-glow" cx="50%" cy="45%" r="75%">
+      <stop offset="0%" stop-color="#161824"/>
+      <stop offset="60%" stop-color="#0d0e15"/>
+      <stop offset="100%" stop-color="#07080c"/>
+    </radialGradient>
+
+    <linearGradient id="tier1-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="tier2-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2a1638"/>
+      <stop offset="100%" stop-color="#180d24"/>
+    </linearGradient>
+    <linearGradient id="tier3-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c2e28"/>
+      <stop offset="100%" stop-color="#061a16"/>
+    </linearGradient>
+
+    <!-- Block Gradients -->
+    <linearGradient id="client-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="cdn-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="waf-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+
+    <linearGradient id="nginx-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="fe-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff60a8"/>
+      <stop offset="100%" stop-color="#fe3e91"/>
+    </linearGradient>
+    <linearGradient id="be-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#7e22ce"/>
+    </linearGradient>
+
+    <linearGradient id="gemini-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="100%" stop-color="#be123c"/>
+    </linearGradient>
+    <linearGradient id="ats-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#0891b2"/>
+    </linearGradient>
+    <linearGradient id="db-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="cdn-cloud-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="slab-blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+    <filter id="shadow-small" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- Marker for 3D Connector lines -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fe3e91"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="920" fill="url(#bg-glow)"/>
+
+  <!-- Header & Title -->
+  <g transform="translate(50, 45)">
+    <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#ffffff" letter-spacing="0.5">
+      RESUME SAATHI <tspan fill="#fe3e91">3D CLOUD ARCHITECTURE</tspan>
+    </text>
+    <text x="0" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" fill="#94a3b8" font-family="monospace">
+      Global CloudFront CDN · ACM SSL · Cloaked EC2 Origin · Docker Microservices · Gemini 3.5 AI
+    </text>
+  </g>
+
+  <!-- ==================== TIER 3 (BOTTOM): INTELLIGENCE & PERSISTENCE ==================== -->
+  <g transform="translate(0, 570)">
+<polygon points="550,-56.0 980.6800000000001,184 550,434.0 119.32,184" fill="black" opacity="0.35" filter="url(#slab-blur)"/>
+<polygon points="134.32,140 550,380.0 550,404.0 134.32,164" fill="#031612" stroke="#059669" stroke-width="1.8"/>
+<polygon points="550,380.0 965.6800000000001,140 965.6800000000001,164 550,404.0" fill="#07221c" stroke="#059669" stroke-width="1.8"/>
+<polygon points="550,-100.0 965.6800000000001,140 550,380.0 134.32,140" fill="url(#tier3-top)" stroke="#059669" stroke-width="1.8"/>
+    <!-- Tier 3 Badge -->
+    <g transform="translate(180, 240)">
+      <rect x="0" y="0" width="280" height="28" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.2"/>
+      <text x="14" y="18" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#ecfdf5" letter-spacing="0.5">
+        🧠 TIER 3 · INTELLIGENCE & PERSISTENCE
+      </text>
+    </g>
+
+    <!-- Block 1: Gemini 3.5 Flash Lite -->
+    <g transform="translate(0, 0)">
+<polygon points="298.71,150.5 421.29,150.5 360,157.5" fill="black" opacity="0.4" filter="url(#shadow-small)"/>
+<polygon points="303.71,85 360,117.5 360,145.5 303.71,113" fill="#881337" stroke="#f43f5e" stroke-width="1.5"/>
+<polygon points="360,117.5 416.29,85 416.29,113 360,145.5" fill="#4c0519" stroke="#f43f5e" stroke-width="1.5"/>
+<polygon points="360,52.5 416.29,85 360,117.5 303.71,85" fill="url(#gemini-top)" stroke="#f43f5e" stroke-width="1.5"/>
+      <text x="360" y="140" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#ffffff">🤖 Google Gemini 3.5</text>
+      <text x="360" y="154" text-anchor="middle" font-family="monospace" font-size="9" fill="#fda4af">Flash Lite AI Model</text>
+    </g>
+
+    <!-- Block 2: Live ATS Engine -->
+    <g transform="translate(0, 0)">
+<polygon points="428.71,220.5 551.29,220.5 490,227.5" fill="black" opacity="0.4" filter="url(#shadow-small)"/>
+<polygon points="433.71,155 490,187.5 490,215.5 433.71,183" fill="#0e7490" stroke="#22d3ee" stroke-width="1.5"/>
+<polygon points="490,187.5 546.29,155 546.29,183 490,215.5" fill="#164e63" stroke="#22d3ee" stroke-width="1.5"/>
+<polygon points="490,122.5 546.29,155 490,187.5 433.71,155" fill="url(#ats-top)" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="490" y="210" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#ffffff">🏢 Live ATS Engine</text>
+      <text x="490" y="224" text-anchor="middle" font-family="monospace" font-size="9" fill="#67e8f9">Greenhouse · Lever · Ashby</text>
+    </g>
+
+    <!-- Block 3: MongoDB Atlas Cluster (3D Cylinders) -->
+    <g transform="translate(0, 0)">
+<path d="M 592 95 L 592 109 A 48 22 0 0 0 688 109 L 688 95 Z" fill="#047857" stroke="#10b981" stroke-width="1.5"/>
+<path d="M 592 109 A 48 22 0 0 0 688 109" fill="none" stroke="#10b981" stroke-width="2"/>
+<ellipse cx="640" cy="95" rx="48" ry="22" fill="url(#db-top)" stroke="#10b981" stroke-width="2"/><path d="M 592 75 L 592 89 A 48 22 0 0 0 688 89 L 688 75 Z" fill="#047857" stroke="#10b981" stroke-width="1.5"/>
+<path d="M 592 89 A 48 22 0 0 0 688 89" fill="none" stroke="#10b981" stroke-width="2"/>
+<ellipse cx="640" cy="75" rx="48" ry="22" fill="url(#db-top)" stroke="#10b981" stroke-width="2"/><path d="M 592 55 L 592 69 A 48 22 0 0 0 688 69 L 688 55 Z" fill="#047857" stroke="#10b981" stroke-width="1.5"/>
+<path d="M 592 69 A 48 22 0 0 0 688 69" fill="none" stroke="#10b981" stroke-width="2"/>
+<ellipse cx="640" cy="55" rx="48" ry="22" fill="url(#db-top)" stroke="#10b981" stroke-width="2"/>
+      <text x="640" y="130" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#ffffff">🍃 MongoDB Atlas</text>
+      <text x="640" y="144" text-anchor="middle" font-family="monospace" font-size="9" fill="#6ee7b7">Managed Cloud Cluster</text>
+    </g>
+
+    <!-- Block 4: Cloudinary Storage -->
+    <g transform="translate(0, 0)">
+<polygon points="713.04,215.0 826.96,215.0 770,222.0" fill="black" opacity="0.4" filter="url(#shadow-small)"/>
+<polygon points="718.04,155 770,185.0 770,210.0 718.04,180" fill="#9a3412" stroke="#fb923c" stroke-width="1.5"/>
+<polygon points="770,185.0 821.96,155 821.96,180 770,210.0" fill="#7c2d12" stroke="#fb923c" stroke-width="1.5"/>
+<polygon points="770,125.0 821.96,155 770,185.0 718.04,155" fill="url(#cdn-cloud-top)" stroke="#fb923c" stroke-width="1.5"/>
+      <text x="770" y="205" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#ffffff">☁️ Cloudinary</text>
+      <text x="770" y="219" text-anchor="middle" font-family="monospace" font-size="9" fill="#fed7aa">Encrypted PDF Storage</text>
+    </g>
+  </g>
+
+  <!-- ==================== TIER 2 (MIDDLE): CLOAKED EC2 ORIGIN & DOCKER ==================== -->
+  <g transform="translate(0, 310)">
+<polygon points="550,-66.0 980.6800000000001,174 550,424.0 119.32,174" fill="black" opacity="0.35" filter="url(#slab-blur)"/>
+<polygon points="134.32,130 550,370.0 550,394.0 134.32,154" fill="#1f092b" stroke="#a855f7" stroke-width="1.8"/>
+<polygon points="550,370.0 965.6800000000001,130 965.6800000000001,154 550,394.0" fill="#13061c" stroke="#a855f7" stroke-width="1.8"/>
+<polygon points="550,-110.0 965.6800000000001,130 550,370.0 134.32,130" fill="url(#tier2-top)" stroke="#a855f7" stroke-width="1.8"/>
+    <!-- Tier 2 Badge -->
+    <g transform="translate(180, 230)">
+      <rect x="0" y="0" width="310" height="28" rx="6" fill="#4a044e" stroke="#c026d3" stroke-width="1.2"/>
+      <text x="14" y="18" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#fae8ff" letter-spacing="0.5">
+        🏰 TIER 2 · CLOAKED EC2 ORIGIN &amp; CONTAINERS
+      </text>
+    </g>
+
+    <!-- Block 1: Host Nginx Reverse Proxy -->
+    <g transform="translate(0, 0)">
+<polygon points="314.38,142.0 445.62,142.0 380,149.0" fill="black" opacity="0.4" filter="url(#shadow-small)"/>
+<polygon points="319.38,70 380,105.0 380,137.0 319.38,102" fill="#3730a3" stroke="#818cf8" stroke-width="1.5"/>
+<polygon points="380,105.0 440.62,70 440.62,102 380,137.0" fill="#312e81" stroke="#818cf8" stroke-width="1.5"/>
+<polygon points="380,35.0 440.62,70 380,105.0 319.38,70" fill="url(#nginx-top)" stroke="#818cf8" stroke-width="1.5"/>
+      <text x="380" y="130" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#ffffff">🔀 Host Nginx</text>
+      <text x="380" y="144" text-anchor="middle" font-family="monospace" font-size="9" fill="#c7d2fe">SSL Term + Origin Cloak</text>
+    </g>
+
+    <!-- Block 2: Frontend Container (Vite SPA) -->
+    <g transform="translate(0, 0)">
+<polygon points="480.05,209.5 619.95,209.5 550,216.5" fill="black" opacity="0.4" filter="url(#shadow-small)"/>
+<polygon points="485.05,135 550,172.5 550,204.5 485.05,167" fill="#9d174d" stroke="#f43f5e" stroke-width="1.5"/>
+<polygon points="550,172.5 614.95,135 614.95,167 550,204.5" fill="#831843" stroke="#f43f5e" stroke-width="1.5"/>
+<polygon points="550,97.5 614.95,135 550,172.5 485.05,135" fill="url(#fe-top)" stroke="#f43f5e" stroke-width="1.5"/>
+      <text x="550" y="200" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#ffffff">🎨 resume-frontend</text>
+      <text x="550" y="214" text-anchor="middle" font-family="monospace" font-size="9" fill="#fbcfe8">React 19 Vite SPA · Port 3000</text>
+    </g>
+
+    <!-- Block 3: Backend Container (Express REST API) -->
+    <g transform="translate(0, 0)">
+<polygon points="650.05,144.5 789.95,144.5 720,151.5" fill="black" opacity="0.4" filter="url(#shadow-small)"/>
+<polygon points="655.05,70 720,107.5 720,139.5 655.05,102" fill="#581c87" stroke="#c084fc" stroke-width="1.5"/>
+<polygon points="720,107.5 784.95,70 784.95,102 720,139.5" fill="#3b0764" stroke="#c084fc" stroke-width="1.5"/>
+<polygon points="720,32.5 784.95,70 720,107.5 655.05,70" fill="url(#be-top)" stroke="#c084fc" stroke-width="1.5"/>
+      <text x="720" y="130" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#ffffff">⚙️ resume-backend</text>
+      <text x="720" y="144" text-anchor="middle" font-family="monospace" font-size="9" fill="#e9d5ff">Node.js 20 Express · Port 5000</text>
+    </g>
+  </g>
+
+  <!-- ==================== TIER 1 (TOP): GLOBAL CLIENTS & CLOUDFRONT CDN ==================== -->
+  <g transform="translate(0, 60)">
+<polygon points="550,-76.0 980.6800000000001,164 550,414.0 119.32,164" fill="black" opacity="0.35" filter="url(#slab-blur)"/>
+<polygon points="134.32,120 550,360.0 550,384.0 134.32,144" fill="#0f172a" stroke="#38bdf8" stroke-width="1.8"/>
+<polygon points="550,360.0 965.6800000000001,120 965.6800000000001,144 550,384.0" fill="#090d16" stroke="#38bdf8" stroke-width="1.8"/>
+<polygon points="550,-120.0 965.6800000000001,120 550,360.0 134.32,120" fill="url(#tier1-top)" stroke="#38bdf8" stroke-width="1.8"/>
+    <!-- Tier 1 Badge -->
+    <g transform="translate(180, 220)">
+      <rect x="0" y="0" width="310" height="28" rx="6" fill="#082f49" stroke="#0284c7" stroke-width="1.2"/>
+      <text x="14" y="18" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#e0f2fe" letter-spacing="0.5">
+        🌐 TIER 1 · CLIENTS &amp; CLOUDFRONT CDN
+      </text>
+    </g>
+
+    <!-- Block 1: Web Visitors / Client Browser -->
+    <g transform="translate(0, 0)">
+<polygon points="294.38,135.0 425.62,135.0 360,142.0" fill="black" opacity="0.4" filter="url(#shadow-small)"/>
+<polygon points="299.38,65 360,100.0 360,130.0 299.38,95" fill="#1e40af" stroke="#60a5fa" stroke-width="1.5"/>
+<polygon points="360,100.0 420.62,65 420.62,95 360,130.0" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1.5"/>
+<polygon points="360,30.0 420.62,65 360,100.0 299.38,65" fill="url(#client-top)" stroke="#60a5fa" stroke-width="1.5"/>
+      <text x="360" y="125" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#ffffff">👥 Global Visitors</text>
+      <text x="360" y="139" text-anchor="middle" font-family="monospace" font-size="9" fill="#93c5fd">HTTPS : 443 · Worldwide</text>
+    </g>
+
+    <!-- Block 2: CloudFront Edge POPs -->
+    <g transform="translate(0, 0)">
+<polygon points="475.72,205.0 624.28,205.0 550,212.0" fill="black" opacity="0.4" filter="url(#shadow-small)"/>
+<polygon points="480.72,125 550,165.0 550,200.0 480.72,160" fill="#0369a1" stroke="#38bdf8" stroke-width="1.5"/>
+<polygon points="550,165.0 619.28,125 619.28,160 550,200.0" fill="#075985" stroke="#38bdf8" stroke-width="1.5"/>
+<polygon points="550,85.0 619.28,125 550,165.0 480.72,125" fill="url(#cdn-top)" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="550" y="190" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#ffffff">⚡ CloudFront CDN</text>
+      <text x="550" y="204" text-anchor="middle" font-family="monospace" font-size="9" fill="#bae6fd">Global Edge Cache (DEL51)</text>
+    </g>
+
+    <!-- Block 3: AWS WAF -->
+    <g transform="translate(0, 0)">
+<polygon points="668.71,130.5 791.29,130.5 730,137.5" fill="black" opacity="0.4" filter="url(#shadow-small)"/>
+<polygon points="673.71,65 730,97.5 730,125.5 673.71,93" fill="#b45309" stroke="#fbbf24" stroke-width="1.5"/>
+<polygon points="730,97.5 786.29,65 786.29,93 730,125.5" fill="#78350f" stroke="#fbbf24" stroke-width="1.5"/>
+<polygon points="730,32.5 786.29,65 730,97.5 673.71,65" fill="url(#waf-top)" stroke="#fbbf24" stroke-width="1.5"/>
+      <text x="730" y="125" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#ffffff">🛡️ AWS WAF &amp; ACM</text>
+      <text x="730" y="139" text-anchor="middle" font-family="monospace" font-size="9" fill="#fde68a">Anti-DDoS · Auto SSL</text>
+    </g>
+  </g>
+
+  <!-- ==================== 3D VERTICAL FLOW PIPES & CONNECTORS ==================== -->
+  <!-- Pipe 1: Tier 1 to Tier 2 (Port 443 + X-Origin-Verify) -->
+  <g filter="url(#glow)">
+    <path d="M 550 325 L 550 405" fill="none" stroke="#fe3e91" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+    <rect x="440" y="352" width="220" height="22" rx="11" fill="#180d24" stroke="#fe3e91" stroke-width="1.2"/>
+    <text x="550" y="367" text-anchor="middle" font-family="monospace" font-size="9.5" font-weight="bold" fill="#fbcfe8">
+      HTTPS 443 + X-Origin-Verify
+    </text>
+  </g>
+
+  <!-- Pipe 2: Tier 2 to Tier 3 (Internal Microservice Bridges) -->
+  <g filter="url(#glow)">
+    <path d="M 550 580 L 550 670" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow-blue)"/>
+    <rect x="430" y="612" width="240" height="22" rx="11" fill="#0c1e28" stroke="#38bdf8" stroke-width="1.2"/>
+    <text x="550" y="627" text-anchor="middle" font-family="monospace" font-size="9.5" font-weight="bold" fill="#bae6fd">
+      TLS Mongoose + Gemini GenAI SDK
+    </text>
+  </g>
+
+  <!-- Footer Watermark / Status -->
+  <g transform="translate(50, 890)">
+    <circle cx="6" cy="-4" r="5" fill="#10b981"/>
+    <text x="18" y="0" font-family="-apple-system, sans-serif" font-size="11" fill="#a1a1aa">
+      Production Live Status: <tspan fill="#34d399" font-weight="bold">Operational (Zero-Downtime Resilience)</tspan> · Resumesaathi.tusharsaini.tech
+    </text>
+  </g>
+</svg>
