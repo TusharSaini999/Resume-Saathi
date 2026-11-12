@@ -18,41 +18,36 @@ powered by Google Gemini 3.5 Flash Lite.
 ## Architecture Flow
 
 ```mermaid
+
 flowchart TD
-  User(["Candidate Web Browser<br/>HTTPS Port 443"])
+    User(["Candidate Browser<br/>HTTPS :443"])
 
-  subgraph Edge["Edge & CDN Layer"]
-    CF("AWS CloudFront CDN<br/>Global Edge POPs<br/>& WAF")
-  end
+    subgraph Edge["Edge & CDN Layer"]
+        CF("AWS CloudFront CDN<br/>Global Edge POPs & WAF")
+    end
 
-  subgraph Host["Application Host"]
-    Nginx("Host Nginx Reverse Proxy<br/>Port 443 SSL<br/>Termination")
-    FE("React 19 Vite<br/>Container<br/>Frontend SPA (:3000)")
-    BE("Node.js Express<br/>Container<br/>Backend REST API (:5000)")
-  end
+    subgraph Host["Application Host"]
+        Nginx("Nginx Reverse Proxy<br/>SSL Termination :443")
+        FE("React 19 + Vite<br/>Frontend SPA :3000")
+        BE("Node.js + Express<br/>Backend REST API :5000")
+    end
 
-  subgraph Services["Managed Data, Storage & AI Services"]
-    DB[("MongoDB Atlas<br/>Managed Database<br/>Cluster")]
-    AI("Google Gemini 3.5<br/>Flash Lite<br/>ATS Scoring &<br/>Matching Engine")
-    Cloudinary[("Cloudinary Storage CDN<br/>PDF File Vault")]
-    ATS("Live ATS Discovery<br/>Engine<br/>Greenhouse, Lever<br/>& Ashby")
-  end
+    subgraph Services["Managed & External Services"]
+        DB[("MongoDB Atlas")]
+        AI("Google Gemini Flash Lite")
+        Cloudinary[("Cloudinary<br/>PDF Storage CDN")]
+        ATS("Live ATS Discovery<br/>Greenhouse, Lever & Ashby")
+    end
 
-  User -->|"HTTPS Request"| CF
-  CF -->|"Origin Cloaked Traffic"| Nginx
-  Nginx -->|"Proxy Pass :3000"| FE
-  Nginx -->|"Proxy Pass /api (:5000)"| BE
-  BE <-->|"Mongoose ODM"| DB
-  BE <-->|"GenAI SDK"| AI
-  BE <-->|"Signed Uploads"| Cloudinary
-  BE <-->|"Direct Ingestion"| ATS
+    User -->|"HTTPS Request"| CF
+    CF -->|"Origin Request"| Nginx
+    Nginx -->|"Proxy :3000"| FE
+    Nginx -->|"API Proxy :5000"| BE
 
-  classDef roundedBox rx:12px,ry:12px
-  class CF,Nginx,FE,BE,AI,ATS roundedBox
-
-  style Edge rx:16px,ry:16px
-  style Host rx:16px,ry:16px
-  style Services rx:16px,ry:16px
+    BE <-->|"Mongoose ODM"| DB
+    BE <-->|"GenAI SDK"| AI
+    BE <-->|"Signed Uploads"| Cloudinary
+    BE <-->|"Job Ingestion"| ATS
 ```
 
 ### End-to-End User & AI Analysis Flow (Sequence Diagram)
