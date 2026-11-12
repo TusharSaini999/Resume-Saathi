@@ -131,24 +131,24 @@ Frontend default URL: `http://localhost:5173`
 
 ## Project Documentation
 
-- Career Openings & ATS Discovery: [Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md)
-- Career Openings Guide (DOCX): [Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx](file:///c:/Project/Resume-Saathi/Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx)
-- Backend Guide: [Backend/README.md](file:///c:/Project/Resume-Saathi/Backend/README.md)
-- Frontend Guide: [Frontend/README.md](file:///c:/Project/Resume-Saathi/Frontend/README.md)
-- Deployment Guide: [Docs/DEPLOYMENT_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/DEPLOYMENT_GUIDE.md)
-- AWS CloudFront & ACM Guide: [Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md)
-- Contributing Guide: [CONTRIBUTING.md](file:///c:/Project/Resume-Saathi/CONTRIBUTING.md)
-- Code of Conduct: [CODE_OF_CONDUCT.md](file:///c:/Project/Resume-Saathi/CODE_OF_CONDUCT.md)
-- Security Policy: [SECURITY.md](file:///c:/Project/Resume-Saathi/SECURITY.md)
-- Support Guide: [SUPPORT.md](file:///c:/Project/Resume-Saathi/SUPPORT.md)
-- Changelog: [CHANGELOG.md](file:///c:/Project/Resume-Saathi/CHANGELOG.md)
+- [Career Openings & ATS Discovery](Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md)
+- [Career Openings Guide (DOCX)](Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx)
+- [Backend Guide](Backend/README.md)
+- [Frontend Guide](Frontend/README.md)
+- [Deployment Guide](Docs/DEPLOYMENT_GUIDE.md)
+- [AWS CloudFront & ACM Guide](Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+- [Support Guide](SUPPORT.md)
+- [Changelog](CHANGELOG.md)
 
 ## GitHub Templates
 
-- Bug Report: [.github/ISSUE_TEMPLATE/bug_report.md](file:///c:/Project/Resume-Saathi/.github/ISSUE_TEMPLATE/bug_report.md)
-- Feature Request: [.github/ISSUE_TEMPLATE/feature_request.md](file:///c:/Project/Resume-Saathi/.github/ISSUE_TEMPLATE/feature_request.md)
-- Pull Request Template: [.github/pull_request_template.md](file:///c:/Project/Resume-Saathi/.github/pull_request_template.md)
+- [Bug Report](.github/ISSUE_TEMPLATE/bug_report.md)
+- [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md)
+- [Pull Request Template](.github/pull_request_template.md)
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](file:///c:/Project/Resume-Saathi/LICENSE) for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
