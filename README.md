@@ -22,20 +22,20 @@ flowchart TD
   User(["Candidate Web Browser<br/>HTTPS Port 443"])
 
   subgraph Edge["Edge & CDN Layer"]
-    CF["AWS CloudFront CDN<br/>Global Edge POPs<br/>and WAF"]
+    CF("AWS CloudFront CDN<br/>Global Edge POPs<br/>& WAF")
   end
 
   subgraph Host["Application Host"]
-    Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL<br/>Termination"]
-    FE["React 19 Vite<br/>Container<br/>Frontend SPA (:3000)"]
-    BE["Node.js Express<br/>Container<br/>Backend REST API (:5000)"]
+    Nginx("Host Nginx Reverse Proxy<br/>Port 443 SSL<br/>Termination")
+    FE("React 19 Vite<br/>Container<br/>Frontend SPA (:3000)")
+    BE("Node.js Express<br/>Container<br/>Backend REST API (:5000)")
   end
 
   subgraph Services["Managed Data, Storage & AI Services"]
     DB[("MongoDB Atlas<br/>Managed Database<br/>Cluster")]
-    AI["Google Gemini 3.5<br/>Flash Lite<br/>ATS Scoring & Matching"]
+    AI("Google Gemini 3.5<br/>Flash Lite<br/>ATS Scoring &<br/>Matching Engine")
     Cloudinary[("Cloudinary Storage CDN<br/>PDF File Vault")]
-    ATS["Live ATS Discovery<br/>Engine<br/>Greenhouse, Lever & Ashby"]
+    ATS("Live ATS Discovery<br/>Engine<br/>Greenhouse, Lever<br/>& Ashby")
   end
 
   User -->|"HTTPS Request"| CF
@@ -46,6 +46,13 @@ flowchart TD
   BE <-->|"GenAI SDK"| AI
   BE <-->|"Signed Uploads"| Cloudinary
   BE <-->|"Direct Ingestion"| ATS
+
+  classDef roundedBox rx:12px,ry:12px
+  class CF,Nginx,FE,BE,AI,ATS roundedBox
+
+  style Edge rx:16px,ry:16px
+  style Host rx:16px,ry:16px
+  style Services rx:16px,ry:16px
 ```
 
 ### End-to-End User & AI Analysis Flow (Sequence Diagram)
