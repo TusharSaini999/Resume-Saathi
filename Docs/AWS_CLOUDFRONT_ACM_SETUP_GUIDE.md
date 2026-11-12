@@ -8,37 +8,38 @@ A complete, end-to-end technical guide for configuring **AWS CloudFront CDN**, *
 
 ```mermaid
 flowchart TD
-  subgraph Edge ["1. Global Edge & DNS"]
-    Users["👥 Global Visitors"]
-    Route53["🗺️ Amazon Route 53 DNS"]
-    WAF{"🛡️ AWS WAF & ACM"}
-    CF["⚡ CloudFront CDN Edge"]
+  subgraph EdgeLayer ["1. Global Edge and DNS Routing"]
+    Users(["Global Web Visitors<br/>HTTPS Port 443"])
+    Route53["Amazon Route 53 DNS<br/>Anycast Routing"]
+    WAF{"AWS WAF and ACM<br/>Rate Limiting and SSL"}
+    CF["AWS CloudFront CDN<br/>Global Edge POPs"]
   end
 
-  subgraph Host ["2. AWS EC2 Origin Server"]
-    Cloak{"🔒 X-Origin-Verify Check"}
-    Nginx["🔀 Host Nginx Reverse Proxy (SSL)"]
+  subgraph OriginHost ["2. EC2 Origin Server"]
+    Cloak{"Origin Shield Verification<br/>Validate X-Origin-Verify Header"}
+    Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL Termination"]
   end
 
-  subgraph App ["3. Docker Containers"]
-    FE["🎨 Frontend (React Vite SPA)"]
-    BE["⚙️ Backend (Express API)"]
+  subgraph Containers ["3. Docker Microservices"]
+    FE["React 19 Vite Container<br/>Frontend SPA (:3000)"]
+    BE["Node.js Express Container<br/>Backend REST API (:5000)"]
   end
 
-  subgraph Cloud ["4. Cloud Services"]
-    DB[("🍃 MongoDB Atlas")]
-    AI["🤖 Gemini 3.5 AI"]
+  subgraph CloudServices ["4. Cloud Data and AI Services"]
+    DB[("MongoDB Atlas<br/>Managed Database Cluster")]
+    AI["Google Gemini 3.5 Flash Lite<br/>ATS Scoring Engine"]
   end
 
-  Users --> Route53
-  Route53 --> WAF
-  WAF --> CF
-  CF -->|Origin Secret| Cloak
-  Cloak -->|Authorized| Nginx
+  Users -->|DNS Query| Route53
+  Route53 -->|Edge Anycast IP| WAF
+  WAF -->|Validated Traffic| CF
+  CF -->|Forward Request with Secret| Cloak
+  Cloak -->|Authorized Ingress| Nginx
+  Cloak -->|Unauthorized Scanner| Drop["HTTP 444 Drop"]
   Nginx -->|proxy_pass :3000| FE
   Nginx -->|proxy_pass :5000| BE
-  BE --> DB
-  BE --> AI
+  BE <-->|Mongoose Driver| DB
+  BE <-->|GenAI SDK| AI
 ```
 
 ### 1.1 Request & Edge Cache Resolution Lifecycle
@@ -46,42 +47,42 @@ flowchart TD
 ```mermaid
 sequenceDiagram
   autonumber
-  actor User as 👤 Global Visitor
-  participant DNS as 🗺️ Route 53 DNS
-  participant CF as ⚡ CloudFront CDN Edge (DEL51)
-  participant WAF as 🛡️ AWS WAF & ACM
-  participant Nginx as 🔀 EC2 Host Nginx
-  participant FE as 🎨 React Vite SPA (:3000)
-  participant BE as ⚙️ Express REST API (:5000)
-  participant DB as 🍃 MongoDB Atlas
-  participant AI as 🤖 Gemini 3.5 AI
+  actor User as Global Web Visitor
+  participant DNS as Route 53 DNS
+  participant CF as CloudFront CDN Edge (DEL51)
+  participant WAF as AWS WAF and ACM
+  participant Nginx as EC2 Host Nginx
+  participant FE as React Vite SPA (:3000)
+  participant BE as Express REST API (:5000)
+  participant DB as MongoDB Atlas
+  participant AI as Gemini 3.5 AI Engine
 
   User->>DNS: Resolve resumesaathi.tusharsaini.tech
-  DNS-->>User: CloudFront Anycast Edge IP
+  DNS-->>User: Return CloudFront Anycast Edge IP
   User->>CF: HTTPS GET / (Port 443)
-  CF->>WAF: Verify IP & Anti-DDoS Rate Limits
-  WAF-->>CF: Request Approved
+  CF->>WAF: Check IP Reputation and Rate Limits
+  WAF-->>CF: Ingress Approved
 
-  alt Cache HIT (Static JS, CSS, Media Assets)
-    CF-->>User: 200 OK (Served from Edge POP in < 20ms)
+  alt Edge Cache HIT (Static JS, CSS, Media Assets)
+    CF-->>User: HTTP 200 OK (Served from Edge POP in < 20ms)
   else Dynamic API Request (/api/v1/*)
-    CF->>Nginx: HTTPS Port 443 + X-Origin-Verify Header
-    Nginx->>Nginx: Verify Secret (Drop scanners ➔ HTTP 444)
+    CF->>Nginx: HTTPS Port 443 with X-Origin-Verify Header
+    Nginx->>Nginx: Verify Header Secret<br/>(Drop scanners with HTTP 444)
     Nginx->>BE: proxy_pass http://127.0.0.1:5000
-    BE->>DB: Query User / Resume Collections
+    BE->>DB: Query User and Resume Collections
     DB-->>BE: Return Documents
     opt AI Inference Required
       BE->>AI: Gemini GenAI SDK Analysis
-      AI-->>BE: ATS Score & Match Feedback
+      AI-->>BE: Return ATS Score and Keyword Match
     end
-    BE-->>Nginx: 200 OK JSON Body
-    Nginx-->>CF: Forward Dynamic Payload
+    BE-->>Nginx: HTTP 200 OK JSON Body
+    Nginx-->>CF: Forward Dynamic Response
     CF-->>User: TLS Encrypted Response
   else SPA Frontend Routing (/dashboard, /career)
     CF->>Nginx: Forward Route Request
     Nginx->>FE: proxy_pass http://127.0.0.1:3000
-    FE-->>Nginx: index.html (SPA Fallback)
-    Nginx-->>CF: 200 OK HTML
+    FE-->>Nginx: Return index.html (SPA Fallback)
+    Nginx-->>CF: HTTP 200 OK HTML
     CF-->>User: Rendered Application View
   end
 ```

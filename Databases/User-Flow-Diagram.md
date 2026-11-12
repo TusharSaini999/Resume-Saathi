@@ -2,21 +2,21 @@
 
 ```mermaid
 flowchart TD
-  Start(["Start"]) --> Landing["Landing Page"]
-  Landing --> AuthCheck{"Logged In?"}
+  Start(["Start Journey"]) --> Landing["Landing Page"]
+  Landing --> AuthCheck{"Authenticated Session?"}
   
-  AuthCheck -->|No| AuthPages["Auth Pages (Login / Signup)"]
-  AuthPages --> Verify["Verify Email / Complete OAuth"]
-  Verify --> Dashboard["Dashboard"]
+  AuthCheck -->|No| AuthPages["Authentication Pages<br/>Login and Signup"]
+  AuthPages --> Verify["Email Verification<br/>or OAuth Callback"]
+  Verify --> Dashboard["Candidate Dashboard"]
   AuthCheck -->|Yes| Dashboard
 
-  Dashboard --> Resume["📄 Resume Upload & ATS Feedback"]
-  Dashboard --> Jobs["💼 Job Matcher (Compare JD)"]
-  Dashboard --> Career["🌐 Career Openings & Live ATS"]
-  Dashboard --> Chat["💬 Resume-Aware AI Chat"]
-  Dashboard --> Settings["⚙️ Session & Account Settings"]
+  Dashboard --> Resume["Resume Intelligence<br/>Upload PDF and ATS Analysis"]
+  Dashboard --> Jobs["Job Matcher<br/>Compare Resume vs Job Description"]
+  Dashboard --> Career["Career Openings<br/>Live ATS Discovery Engine"]
+  Dashboard --> Chat["AI Assistant<br/>Resume-Aware Contextual Chat"]
+  Dashboard --> Settings["User Settings<br/>Security and Session Management"]
   
-  Settings --> Logout(["Logout"])
+  Settings --> Logout(["Terminate Session<br/>Logout"])
   Logout --> Landing
 ```
 
@@ -28,23 +28,23 @@ stateDiagram-v2
   
   state Authentication_Flow {
     [*] --> Auth_Gateway
-    Auth_Gateway --> Local_Login: Password Auth
-    Auth_Gateway --> OAuth_Provider: Google / LinkedIn
-    Local_Login --> Email_Verification: Unverified Token
-    Email_Verification --> Authenticated_Session: Verified OK
-    OAuth_Provider --> Authenticated_Session: Token Verified
+    Auth_Gateway --> Local_Login: Password Authentication
+    Auth_Gateway --> OAuth_Provider: Google or LinkedIn OAuth
+    Local_Login --> Email_Verification: Unverified Account
+    Email_Verification --> Authenticated_Session: Token Verified
+    OAuth_Provider --> Authenticated_Session: OAuth Token Verified
   }
 
-  Landing_Page --> Authentication_Flow: Click Sign In / Join
+  Landing_Page --> Authentication_Flow: Click Sign In or Join
   Authentication_Flow --> Dashboard: Session Cookie Established
 
   state Dashboard_Hub {
     [*] --> Overview
-    Overview --> Resume_Intelligence: Upload & Score
-    Overview --> Job_Matching: Compare JD
+    Overview --> Resume_Intelligence: Upload and Score Resume
+    Overview --> Job_Matching: Compare Against Job Description
     Overview --> Career_Explorer: Live ATS Discovery
     Overview --> AI_Assistant: Resume-Aware Chat
-    Overview --> Account_Settings: Security & Devices
+    Overview --> Account_Settings: Security and Active Sessions
     
     Resume_Intelligence --> Parse_PDF_Text
     Parse_PDF_Text --> Gemini_Analysis
@@ -58,13 +58,11 @@ stateDiagram-v2
     Probe_Live_Status --> Pipeline_Tracker
     
     AI_Assistant --> Contextual_Prompting
-    Contextual_Prompting --> AI_Coaching_Response
-    
-    Account_Settings --> Inspect_Sessions
-    Inspect_Sessions --> Revoke_Session
+    Contextual_Prompting --> Stream_AI_Response
   }
 
-  Dashboard_Hub --> Landing_Page: Logout / Revoke Active Session
+  Dashboard --> Logout: Revoke Session
+  Logout --> Landing_Page
 ```
 
 ---

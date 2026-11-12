@@ -1,46 +1,50 @@
-# Resume Saathi 🚀
+# Resume Saathi
 
-Resume Saathi is an AI-powered ATS resume analysis and live job discovery platform. It helps users upload resumes, receive structured feedback, discover live verified requisitions from official ATS portals (Greenhouse, Lever, SmartRecruiters, LinkedIn), infer genuine industry roles and tech stacks, and match against job descriptions using Google Gemini 3.5 Flash Lite.
+Resume Saathi is an AI-powered ATS resume analysis and live job discovery platform.
+It enables candidates to upload resumes, receive structured scoring and gap analyses,
+discover live verified requisitions from official ATS portals (Greenhouse, Lever, SmartRecruiters, LinkedIn),
+infer candidate roles and technology stacks, and perform deep match scoring against job descriptions
+powered by Google Gemini 3.5 Flash Lite.
 
-## Technology Stack ⚙️
+## Technology Stack
 
 - Frontend: React, Vite, Redux Toolkit, Tailwind CSS
 - Backend: Node.js, Express, MongoDB (Mongoose)
-- AI integration: Google GenAI SDK (Gemini 3.5 Flash Lite)
+- AI Integration: Google GenAI SDK (Gemini 3.5 Flash Lite)
 - Authentication: JWT, Google OAuth, LinkedIn OAuth
-- File services: Multer, Cloudinary
-- Cloud & DevOps: AWS (CloudFront CDN, EC2,  ACM), Docker, Nginx
+- File Services: Multer, Cloudinary
+- Cloud & DevOps: AWS (CloudFront CDN, EC2, ACM), Docker, Nginx
 
-## Architecture Flow 📐
+## Architecture Flow
 
 ```mermaid
 flowchart TD
-  subgraph Edge ["1. Edge Ingress & CDN"]
-    User["👥 Web Visitors (Worldwide)"]
-    CF["⚡ AWS CloudFront CDN + WAF"]
+  subgraph EdgeLayer ["Edge Ingress and CDN Layer"]
+    User(["Candidate Web Browser<br/>HTTPS Port 443"])
+    CF["AWS CloudFront CDN<br/>Global Edge POPs and WAF"]
   end
 
-  subgraph Host ["2. AWS EC2 Origin Host"]
-    Nginx["🔀 Host Nginx Reverse Proxy (SSL)"]
-    FE["🎨 React 19 / Vite SPA Container"]
-    BE["⚙️ Node.js Express API Container"]
+  subgraph OriginHost ["AWS EC2 Origin Host"]
+    Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL Termination"]
+    FE["React 19 Vite Container<br/>Frontend SPA (:3000)"]
+    BE["Node.js Express Container<br/>Backend REST API (:5000)"]
   end
 
-  subgraph Cloud ["3. Cloud & Intelligence Services"]
-    DB[("🍃 MongoDB Atlas Managed DB")]
-    AI["🤖 Google Gemini 3.5 Flash Lite"]
-    Cloudinary["☁️ Cloudinary Storage CDN"]
-    ATS["🏢 Live ATS Engine (Greenhouse / Lever)"]
+  subgraph CloudServices ["Cloud and Intelligence Services"]
+    DB[("MongoDB Atlas<br/>Managed Database Cluster")]
+    AI["Google Gemini 3.5 Flash Lite<br/>ATS Scoring and Matching Engine"]
+    Cloudinary[("Cloudinary Storage CDN<br/>PDF File Vault")]
+    ATS["Live ATS Discovery Engine<br/>Greenhouse, Lever, and Ashby"]
   end
 
-  User -->|HTTPS : 443| CF
-  CF -->|Origin Cloaked| Nginx
-  Nginx -->|Port 3000| FE
-  Nginx -->|Port 5000| BE
-  BE <--> DB
-  BE <--> AI
-  BE <--> Cloudinary
-  BE <--> ATS
+  User -->|HTTPS Request| CF
+  CF -->|Origin Cloaked Traffic| Nginx
+  Nginx -->|Proxy Pass (:3000)| FE
+  Nginx -->|Proxy Pass /api (:5000)| BE
+  BE <-->|Mongoose ODM| DB
+  BE <-->|GenAI SDK| AI
+  BE <-->|Signed Uploads| Cloudinary
+  BE <-->|Direct Ingestion| ATS
 ```
 
 ### End-to-End User & AI Analysis Flow (Sequence Diagram)
@@ -48,28 +52,28 @@ flowchart TD
 ```mermaid
 sequenceDiagram
   autonumber
-  actor User as 👤 Candidate
-  participant FE as 🎨 React Frontend
-  participant Nginx as 🔀 Nginx / CloudFront
-  participant BE as ⚙️ Express Backend API
-  participant DB as 🍃 MongoDB Atlas
-  participant AI as 🤖 Gemini 3.5 Flash Lite
+  actor User as Candidate Browser
+  participant FE as React Frontend (:3000)
+  participant Nginx as CloudFront / Nginx
+  participant BE as Express Backend (:5000)
+  participant DB as MongoDB Atlas
+  participant AI as Gemini 3.5 AI Engine
 
-  User->>FE: Upload Resume PDF
-  FE->>Nginx: POST /api/v1/resumes/upload (FormData)
-  Nginx->>BE: proxy_pass 127.0.0.1:5000
-  BE->>BE: Extract Text with pdfjs-dist
-  BE->>AI: Send Resume Text + ATS Rubric Prompt
-  AI-->>BE: Structured JSON (Score, Weaknesses, Bullets)
-  BE->>DB: Save Resume & Analysis Record
-  DB-->>BE: Saved Confirmation
-  BE-->>FE: HTTP 200 (ATS Score & Detailed Analysis)
-  FE-->>User: Render Interactive Score Gauge & Recommendations
+  User->>FE: Select and Upload Resume PDF
+  FE->>Nginx: POST /api/v1/resumes/upload<br/>(Multipart Form Data)
+  Nginx->>BE: Forward to API Service (Port 5000)
+  BE->>BE: Extract Raw Text<br/>via pdfjs-dist
+  BE->>AI: Send Resume Text with<br/>ATS Evaluation Rubric
+  AI-->>BE: Return Structured JSON<br/>(Score, Keywords, Suggestions)
+  BE->>DB: Store Resume and Analysis Records
+  DB-->>BE: Acknowledge Persistence
+  BE-->>FE: HTTP 200 OK<br/>(Analysis Payload)
+  FE-->>User: Render Interactive Score Gauge<br/>and Improvement Recommendations
 ```
 
 ---
 
-## Repository Structure 🗂️
+## Repository Structure
 
 ```
 Resume-Saathi/
@@ -86,13 +90,13 @@ Resume-Saathi/
 └── CHANGELOG.md
 ```
 
-## Prerequisites ✅
+## Prerequisites
 
 - Node.js 20 or later
 - npm 10 or later
 - MongoDB (local or cloud)
 
-## Quick Start 🚀
+## Quick Start
 
 ### 1. Start the backend
 
@@ -103,11 +107,11 @@ copy .env.sample .env
 npm start
 ```
 
-Backend default URL: http://localhost:5000 🌐
+Backend default URL: `http://localhost:5000`
 
 ### 2. Start the frontend
 
-Create Frontend/.env with:
+Create `Frontend/.env` with:
 
 ```env
 VITE_SERVER_URL=http://localhost:5000/api/v1
@@ -121,28 +125,28 @@ npm install
 npm run dev
 ```
 
-Frontend default URL: http://localhost:5173 🌐
+Frontend default URL: `http://localhost:5173`
 
-## Project Documentation 📚
+## Project Documentation
 
 - Career Openings & ATS Discovery: [Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md)
 - Career Openings Guide (DOCX): [Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx](file:///c:/Project/Resume-Saathi/Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx)
-- Backend guide: Backend/README.md
-- Frontend guide: Frontend/README.md
-- Deployment guide: Docs/DEPLOYMENT_GUIDE.md
-- AWS CloudFront & ACM guide: Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md
-- Contributing: CONTRIBUTING.md
-- Code of Conduct: CODE_OF_CONDUCT.md
-- Security policy: SECURITY.md
-- Support: SUPPORT.md
-- Changelog: CHANGELOG.md
+- Backend Guide: [Backend/README.md](file:///c:/Project/Resume-Saathi/Backend/README.md)
+- Frontend Guide: [Frontend/README.md](file:///c:/Project/Resume-Saathi/Frontend/README.md)
+- Deployment Guide: [Docs/DEPLOYMENT_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/DEPLOYMENT_GUIDE.md)
+- AWS CloudFront & ACM Guide: [Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md)
+- Contributing Guide: [CONTRIBUTING.md](file:///c:/Project/Resume-Saathi/CONTRIBUTING.md)
+- Code of Conduct: [CODE_OF_CONDUCT.md](file:///c:/Project/Resume-Saathi/CODE_OF_CONDUCT.md)
+- Security Policy: [SECURITY.md](file:///c:/Project/Resume-Saathi/SECURITY.md)
+- Support Guide: [SUPPORT.md](file:///c:/Project/Resume-Saathi/SUPPORT.md)
+- Changelog: [CHANGELOG.md](file:///c:/Project/Resume-Saathi/CHANGELOG.md)
 
-## GitHub Templates 🧩
+## GitHub Templates
 
-- Bug report: .github/ISSUE_TEMPLATE/bug_report.md
-- Feature request: .github/ISSUE_TEMPLATE/feature_request.md
-- Pull request: .github/pull_request_template.md
+- Bug Report: [.github/ISSUE_TEMPLATE/bug_report.md](file:///c:/Project/Resume-Saathi/.github/ISSUE_TEMPLATE/bug_report.md)
+- Feature Request: [.github/ISSUE_TEMPLATE/feature_request.md](file:///c:/Project/Resume-Saathi/.github/ISSUE_TEMPLATE/feature_request.md)
+- Pull Request Template: [.github/pull_request_template.md](file:///c:/Project/Resume-Saathi/.github/pull_request_template.md)
 
-## License 📄
+## License
 
-This project is licensed under the MIT License. See LICENSE for details.
+This project is licensed under the MIT License. See [LICENSE](file:///c:/Project/Resume-Saathi/LICENSE) for details.

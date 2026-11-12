@@ -10,39 +10,40 @@ The production environment is globally accelerated and secured via **AWS CloudFr
 
 ```mermaid
 flowchart TD
-  subgraph Edge ["1. Client & Global Edge"]
-    Users["👥 Web Users (Worldwide)"]
-    WAF{"🛡️ AWS WAF (Anti-DDoS)"}
-    CF["⚡ CloudFront CDN (Global Edge POPs)"]
+  subgraph EdgeLayer ["1. Client and Global Edge Layer"]
+    Users(["Web Clients and Visitors<br/>HTTPS Port 443"])
+    WAF{"AWS WAF Rules<br/>Anti-DDoS and Rate Limiting"}
+    CF["AWS CloudFront CDN<br/>Global Edge POPs and Edge Cache"]
   end
 
-  subgraph Origin ["2. EC2 Host & Security"]
-    Cloak{"🔒 Verify X-Origin-Verify"}
-    Nginx["🔀 Host Nginx Reverse Proxy (SSL)"]
+  subgraph OriginHost ["2. EC2 Host and Security Gateway"]
+    Cloak{"Origin Cloak Verification<br/>Validate X-Origin-Verify Header"}
+    Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL and Routing"]
   end
 
-  subgraph Containers ["3. Docker Microservices"]
-    FE["🎨 Frontend Container (React Vite SPA)"]
-    BE["⚙️ Backend Container (Express REST API)"]
+  subgraph DockerServices ["3. Docker Compose Microservices"]
+    FE["Frontend Container<br/>React 19 Vite SPA (:3000)"]
+    BE["Backend Container<br/>Node.js 20 Express REST API (:5000)"]
   end
 
-  subgraph Services ["4. Managed Cloud Services"]
-    DB[("🍃 MongoDB Atlas")]
-    AI["🤖 Google Gemini 3.5 Flash Lite"]
-    Cloudinary["☁️ Cloudinary Storage"]
-    SES["📧 AWS SES SMTP"]
+  subgraph ManagedCloud ["4. Managed Cloud and AI Services"]
+    DB[("MongoDB Atlas<br/>Multi-Tenant Cloud Database")]
+    AI["Google Gemini 3.5 Flash Lite<br/>ATS Intelligence Engine"]
+    Cloudinary[("Cloudinary Storage CDN<br/>Encrypted PDF Storage")]
+    SES["AWS SES SMTP Service<br/>Transactional Email Delivery"]
   end
 
-  Users -->|HTTPS : 443| WAF
-  WAF --> CF
-  CF -->|Origin Secret| Cloak
-  Cloak -->|Authorized| Nginx
+  Users -->|HTTPS Request| WAF
+  WAF -->|Filtered Traffic| CF
+  CF -->|Forward with Origin Secret| Cloak
+  Cloak -->|Authorized Request| Nginx
+  Cloak -->|Missing Secret| Drop["HTTP 444 Connection Drop"]
   Nginx -->|proxy_pass :3000| FE
   Nginx -->|proxy_pass :5000| BE
-  BE --> DB
-  BE --> AI
-  BE --> Cloudinary
-  BE --> SES
+  BE -->|Persist Data| DB
+  BE -->|ATS Analysis| AI
+  BE -->|Upload PDFs| Cloudinary
+  BE -->|Send Emails| SES
 ```
 
 ---
@@ -59,9 +60,9 @@ The architecture has been benchmarked for low cost, stability, and zero-downtime
 
 | Instance Type | vCPU | RAM | Cost (ap-south-1) | Suitability | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`t3.micro`** | 2 | 1.0 GB | ~$7.50 / mo (Free Tier) | ⚠️ Dev / Minimal | Risk of Out-of-Memory (OOM) during concurrent resume uploads or simultaneous Docker image extraction unless a 2GB swapfile is added. |
-| **`t3.small`** | 2 | 2.0 GB | ~$15.00 / mo | ✅ **Recommended Production** | Sweet-spot for production. Ample memory headroom for Node.js, Nginx, Docker daemon, and SSM agent without memory pressure. |
-| **`t3.medium`** | 2 | 4.0 GB | ~$30.00 / mo | 🚀 High Scale | Recommended when running local background jobs, Redis caching, or >100 concurrent active users. |
+| **`t3.micro`** | 2 | 1.0 GB | ~$7.50 / mo (Free Tier) | Dev / Minimal | Risk of Out-of-Memory (OOM) during concurrent resume uploads or simultaneous Docker image extraction unless a 2GB swapfile is added. |
+| **`t3.small`** | 2 | 2.0 GB | ~$15.00 / mo | **Recommended Production** | Sweet-spot for production. Ample memory headroom for Node.js, Nginx, Docker daemon, and SSM agent without memory pressure. |
+| **`t3.medium`** | 2 | 4.0 GB | ~$30.00 / mo | High Scale | Recommended when running local background jobs, Redis caching, or >100 concurrent active users. |
 
 #### 2. RAM & Memory Allocation Breakdown (2.0 GB Baseline)
 
@@ -149,23 +150,23 @@ All scripts automate the 8-step server lifecycle with built-in idempotency track
 
 ```mermaid
 gantt
-  title Resume-Saathi 8-Step Automated Server Deployment Lifecycle
+  title Resume-Saathi Automated Server Deployment Lifecycle
   dateFormat X
   axisFormat %s s
 
   section 1. Host Preparation
-  Step 0 · Cleanup Legacy Containers    :done, s0, 0, 5
-  Step 1 · Core Packages & Firewall     :done, s1, 5, 20
-  Step 2 · Install Docker Engine v2     :done, s2, 20, 45
-  Step 3 · Docker Hub Registry Auth     :done, s3, 45, 55
+  Step 0: Cleanup Legacy Containers      :done, s0, 0, 5
+  Step 1: Core Packages and Firewall     :done, s1, 5, 20
+  Step 2: Install Docker Engine v2       :done, s2, 20, 45
+  Step 3: Docker Hub Registry Auth       :done, s3, 45, 55
 
-  section 2. App & Environment
-  Step 4 · Git Repository Workspace    :active, s4, 55, 75
-  Step 5 · Inject Production Secrets    :active, s5, 75, 80
-  Step 6 · Atomic Container Rollout     :crit, s6, 80, 110
+  section 2. Application and Secrets
+  Step 4: Git Repository Workspace       :active, s4, 55, 75
+  Step 5: Inject Production Secrets      :active, s5, 75, 80
+  Step 6: Atomic Container Rollout       :crit, s6, 80, 110
 
-  section 3. Ingress & TLS
-  Step 7 · Host Nginx & Certbot SSL     :s7, 110, 130
+  section 3. Ingress and SSL
+  Step 7: Host Nginx and Certbot SSL     :s7, 110, 130
 ```
 
 ---
@@ -402,27 +403,27 @@ Two distinct AWS IAM configurations are required:
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Dev as 👨‍💻 Developer
-  participant GH as 🚀 GitHub Actions (cd.yml)
-  participant SSM as ⚡ AWS Systems Manager
-  participant Agent as 🤖 amazon-ssm-agent (EC2)
-  participant Docker as 🐳 Docker Compose
-  participant App as ✨ Live Containers
-  participant CDN as 🌐 CloudFront CDN
+  actor Dev as Developer
+  participant GH as GitHub Actions CI/CD
+  participant SSM as AWS Systems Manager
+  participant Agent as Amazon SSM Agent (EC2)
+  participant Docker as Docker Compose Engine
+  participant App as Application Containers
+  participant CDN as CloudFront CDN
 
   Dev->>GH: git push origin main
-  GH->>GH: Run Linter & Build Tests
-  GH->>GH: Build & Push Docker Images to Hub
-  GH->>SSM: ssm:SendCommand (AWS_ACCESS_KEY_ID)
+  GH->>GH: Run Linter and Build Tests
+  GH->>GH: Build and Push Docker Images to Hub
+  GH->>SSM: Send Command via AWS IAM Credentials
   Note over SSM,Agent: Secure polling over HTTPS port 443 (Zero open port 22)
-  SSM-->>Agent: Dispatch deployment command
+  SSM-->>Agent: Dispatch Deployment Command
   Agent->>Docker: docker compose pull && up -d
-  Docker->>App: Atomic zero-downtime container swap
-  App-->>Agent: Health check passed (HTTP 200 OK)
-  Agent-->>SSM: Command status: Success (exit 0)
-  SSM-->>GH: Execution finished
-  GH->>CDN: aws cloudfront create-invalidation (/*)
-  CDN-->>Dev: Rollout live globally in < 30 seconds
+  Docker->>App: Atomic Zero-Downtime Container Swap
+  App-->>Agent: Healthcheck Passed (HTTP 200 OK)
+  Agent-->>SSM: Command Execution Success (exit 0)
+  SSM-->>GH: Report Deployment Finished
+  GH->>CDN: Invalidate Cache (/*)
+  CDN-->>Dev: Live Worldwide in Less Than 30 Seconds
 ```
 
 ---
@@ -606,7 +607,7 @@ CloudFront connects to the EC2 origin over HTTP (Port 80) and handles SSL termin
 
 ---
 
-## 11. Production Rollback Strategy & Version Management 🔄
+## 11. Production Rollback Strategy & Version Management
 
 Resume-Saathi features an automated, zero-rebuild rollback pipeline enabled by immutable versioned Docker images and AWS Systems Manager (SSM).
 
@@ -614,7 +615,7 @@ Resume-Saathi features an automated, zero-rebuild rollback pipeline enabled by i
 A dedicated rollback workflow is available at `.github/workflows/rollback.yml`:
 
 1. Go to the **Actions** tab in your GitHub repository.
-2. Select **"Rollback Production Version 🔄"** from the left workflow sidebar.
+2. Select **"Rollback Production Version"** from the left workflow sidebar.
 3. Click the **"Run workflow"** button.
 4. Input:
    - **Target Version**: Enter the desired version tag (e.g. `v1.0.1` or `1.0.1`).
@@ -632,20 +633,20 @@ When a production incident occurs, follow this decision tree to pick the optimal
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Incident_Triggered: Error Spike / 5xx Alarm Detected
+  [*] --> Incident_Triggered: Error Spike or 5xx Alarm Detected
   
   state Incident_Triage {
     [*] --> Inspect_DB_Schema
     Inspect_DB_Schema --> Run_DB_Revert_Script: Breaking Migration Found
-    Inspect_DB_Schema --> Code_Rollback_Ready: Non-Breaking / Additive Change
-    Run_DB_Revert_Script --> Code_Rollback_Ready: Schema Reverted
+    Inspect_DB_Schema --> Code_Rollback_Ready: Non-Breaking or Additive Change
+    Run_DB_Revert_Script --> Code_Rollback_Ready: Schema Revert Completed
   }
 
   Incident_Triggered --> Incident_Triage
   
   state Rollback_Execution {
-    [*] --> Select_Target_Tag: Identify Prior Stable (e.g. v1.0.1)
-    Select_Target_Tag --> Trigger_GitHub_Workflow: Input Tag in rollback.yml
+    [*] --> Select_Target_Tag: Identify Prior Stable Release (e.g. v1.0.3)
+    Select_Target_Tag --> Trigger_GitHub_Workflow: Dispatch rollback.yml Workflow
     Trigger_GitHub_Workflow --> Pull_Docker_Images: Pull Pre-built Hub Images
     Pull_Docker_Images --> Container_Swap: Zero-Downtime Compose Up
   }
