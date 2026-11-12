@@ -13,53 +13,61 @@ Resume Saathi is an AI-powered ATS resume analysis and live job discovery platfo
 
 ## Architecture Flow 📐
 
-<p align="center">
-  <img src="./Docs/assets/architecture-3d.svg" alt="Resume Saathi 3D Cloud Architecture" width="100%" />
-</p>
-
-<details>
-<summary><b>View Architecture Mermaid Flowchart</b></summary>
-
 ```mermaid
 flowchart TD
-  classDef client fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,rx:12,ry:12
-  classDef cdn fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef app fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef ai fill:#be185d,stroke:#fe3e91,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef ext fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff,rx:8,ry:8
+  classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:3px,color:#ffffff
+  classDef cdn fill:#0369a1,stroke:#38bdf8,stroke-width:3px,color:#ffffff
+  classDef shield fill:#78350f,stroke:#f59e0b,stroke-width:3px,color:#ffffff
+  classDef origin fill:#312e81,stroke:#818cf8,stroke-width:3px,color:#ffffff
+  classDef frontend fill:#831843,stroke:#fe3e91,stroke-width:3px,color:#ffffff
+  classDef backend fill:#581c87,stroke:#c084fc,stroke-width:3px,color:#ffffff
+  classDef ai fill:#701a75,stroke:#f472b6,stroke-width:3px,color:#ffffff
+  classDef db fill:#064e3b,stroke:#34d399,stroke-width:3px,color:#ffffff
+  classDef slab fill:#0f172a,stroke:#64748b,stroke-width:2px,color:#94a3b8
 
-  subgraph ClientLayer["🌐 Client & Edge Acceleration"]
-    User(["👥 Candidate Web App"]):::client
-    CDN[["⚡ AWS CloudFront CDN + WAF<br/>Global Edge POPs"]]:::cdn
+  subgraph Tier1[" "]
+    Slab1[/ "🌐 3D TIER 1 · CLIENT & EDGE ACCELERATION LAYER" \]:::slab
+    Users([ "👥 Global Visitors & Candidate Web App<br/>HTTPS Port 443" ]):::client
+    CDN[[ "⚡ AWS CloudFront CDN Edge POPs<br/>DEL51 Edge Cache HIT" ]]:::cdn
+    WAF{{ "🛡️ AWS WAF & ACM SSL Certificate<br/>Rate Limiting & Anti-DDoS" }}:::shield
   end
 
-  subgraph AppTier["⚙️ Application & Microservices Topology"]
-    Nginx[["🔀 Host Nginx Reverse Proxy<br/>Port 443 HTTPS & SSL Termination"]]:::app
-    FE[["🎨 React 19 / Vite SPA Container<br/>Tailwind CSS & Redux Toolkit"]]:::app
-    BE[["⚙️ Node.js Express REST API Container<br/>JWT Auth, Multer & Controllers"]]:::app
+  subgraph Tier2[" "]
+    Slab2[/ "🏰 3D TIER 2 · CLOAKED EC2 ORIGIN GATEWAY" \]:::slab
+    Nginx[[ "🔀 Host Nginx Reverse Proxy<br/>Let's Encrypt TLSv1.3 & X-Origin-Verify" ]]:::origin
   end
 
-  subgraph IntelligenceTier["✨ Intelligence & Discovery Engine"]
-    Gemini[["🤖 Google Gemini 3.5 Flash Lite<br/>ATS Resume Scoring & Job Matching"]]:::ai
-    ATS[["🏢 Live ATS Engine<br/>Greenhouse, Lever, Ashby, LinkedIn"]]:::ai
+  subgraph Tier3[" "]
+    Slab3[/ "⚡ 3D TIER 3 · CONTAINERIZED DOCKER MICROSERVICES" \]:::slab
+    FE[[ "🎨 resume-frontend Container<br/>React 19 Vite SPA · Port 3000" ]]:::frontend
+    BE[[ "⚙️ resume-backend Container<br/>Node.js 20 Express REST API · Port 5000" ]]:::backend
   end
 
-  subgraph PersistenceTier["💾 Cloud Persistence"]
-    DB[("🍃 MongoDB Atlas Managed Database")]:::ext
-    Cloudinary[["☁️ Cloudinary Storage CDN"]]:::ext
+  subgraph Tier4[" "]
+    Slab4[\ "💾 3D TIER 4 · INTELLIGENCE & PERSISTENCE STACK" /]:::slab
+    Gemini[[ "🤖 Google Gemini 3.5 Flash Lite<br/>ATS Resume Scoring Engine" ]]:::ai
+    ATS[[ "🏢 Live ATS Discovery Crawler<br/>Greenhouse · Lever · Ashby · LinkedIn" ]]:::ai
+    DB[( "🍃 MongoDB Atlas Cloud Cluster<br/>Multi-Tenant Document Store" )]::db
+    Cloudinary[( "☁️ Cloudinary Storage CDN<br/>Encrypted PDF File Vault" )]::db
   end
 
-  User -->|HTTPS : 443| CDN
-  CDN --> Nginx
-  Nginx --> FE
-  Nginx --> BE
-  BE <--> DB
-  BE <--> Cloudinary
-  BE <--> Gemini
-  BE <--> ATS
+  Users ==>|DNS & HTTPS: 443| WAF
+  WAF ==>|Filtered Ingress| CDN
+  CDN ==>|Port 443 + X-Origin-Verify Secret| Nginx
+
+  Nginx ==>|proxy_pass: 127.0.0.1:3000| FE
+  Nginx ==>|proxy_pass: /api/ -> :5000| BE
+
+  BE <==>|Gemini GenAI SDK| Gemini
+  BE <==>|Real ATS Requisitions| ATS
+  BE <==>|Mongoose TLS Driver| DB
+  BE <==>|Signed Uploads| Cloudinary
+
+  style Tier1 fill:#0b132b,stroke:#1e40af,stroke-width:3px,color:#fff
+  style Tier2 fill:#160f29,stroke:#4338ca,stroke-width:3px,color:#fff
+  style Tier3 fill:#22051e,stroke:#fe3e91,stroke-width:3px,color:#fff
+  style Tier4 fill:#051b14,stroke:#059669,stroke-width:3px,color:#fff
 ```
-
-</details>
 
 ## Repository Structure 🗂️
 

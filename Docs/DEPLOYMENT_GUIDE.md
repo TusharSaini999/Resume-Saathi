@@ -8,75 +8,66 @@ Comprehensive technical documentation covering the production architecture, auto
 
 The production environment is globally accelerated and secured via **AWS CloudFront CDN** and **AWS Certificate Manager (ACM)**, fronting an **AWS EC2 (Ubuntu 22.04 / 24.04)** instance running a containerized Docker Compose micro-service topology behind a host Nginx reverse proxy.
 
-<p align="center">
-  <img src="./assets/architecture-3d.svg" alt="Resume Saathi 3D Cloud Architecture" width="100%" />
-</p>
-
-<details>
-<summary><b>View Architecture Mermaid Flowchart</b></summary>
-
 ```mermaid
 flowchart TD
-  classDef client fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,rx:12,ry:12
-  classDef cdn fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef shield fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff,rx:8,ry:8
-  classDef origin fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef container fill:#fe3e91,stroke:#be185d,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef ext fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:3px,color:#ffffff
+  classDef cdn fill:#0369a1,stroke:#38bdf8,stroke-width:3px,color:#ffffff
+  classDef shield fill:#78350f,stroke:#f59e0b,stroke-width:3px,color:#ffffff
+  classDef origin fill:#312e81,stroke:#818cf8,stroke-width:3px,color:#ffffff
+  classDef frontend fill:#831843,stroke:#fe3e91,stroke-width:3px,color:#ffffff
+  classDef backend fill:#581c87,stroke:#c084fc,stroke-width:3px,color:#ffffff
+  classDef ext fill:#064e3b,stroke:#34d399,stroke-width:3px,color:#ffffff
+  classDef slab fill:#0f172a,stroke:#64748b,stroke-width:2px,color:#94a3b8
 
-  subgraph Tier1["🌐 Tier 1 · Global Ingress & Edge Acceleration"]
-    Users(["👥 Global Users (Worldwide Web Clients - Port 443)"]):::client
-    
-    subgraph CF["AWS CloudFront CDN (Global Edge POPs)"]
-      WAF{{"🛡️ AWS WAF (Rate Limiting & Bot Protection)"}}:::shield
-      ACM["🔐 ACM Auto-Renewing SSL"]:::shield
-      EdgeDefault["📦 Default (*) CachingOptimized<br/>Serves JS, CSS, Media from Edge"]:::cdn
-      EdgeAPI["⚡ /api/* CachingDisabled<br/>Direct Dynamic Passthrough"]:::cdn
-      EdgeHeader["> X-Origin-Verify: Secret Header]"]:::shield
-    end
+  subgraph Tier1[" "]
+    Slab1[/ "🌐 3D TIER 1 · CLIENTS & GLOBAL CLOUDFRONT EDGE" \]:::slab
+    Users([ "👥 Global Users (Worldwide Web Clients - Port 443)" ]):::client
+    WAF{{ "🛡️ AWS WAF & ACM SSL Certificate" }}:::shield
+    EdgeDefault[[ "📦 Default (*) CachingOptimized (Edge Cache)" ]]:::cdn
+    EdgeAPI[[ "⚡ /api/* CachingDisabled (Dynamic Passthrough)" ]]:::cdn
   end
 
-  subgraph Tier2["🏰 Tier 2 · Cloaked AWS EC2 Host (Ubuntu Linux)"]
-    subgraph HostNginx["Host Nginx Reverse Proxy (Ports 443 & 80)"]
-      HostSSL[["🔑 Let's Encrypt TLSv1.2/1.3"]]:::shield
-      CloakingCheck{{"🛡️ Verify X-Origin-Verify Header<br/>Direct IP / Scanners ➔ HTTP 444 Drop"}}:::shield
-      NginxPass[["🔀 Reverse Proxy (proxy_pass)"]]:::origin
-    end
+  subgraph Tier2[" "]
+    Slab2[/ "🏰 3D TIER 2 · CLOAKED EC2 NGINX REVERSE PROXY" \]:::slab
+    Cloak{{ "🛡️ Validate X-Origin-Verify Header<br/>Direct Scanners ➔ HTTP 444 Drop" }}:::shield
+    HostNginx[[ "🔀 Host Nginx (Ports 443 & 80)<br/>Let's Encrypt TLSv1.2/1.3 Termination" ]]:::origin
   end
 
-  subgraph Tier3["⚡ Tier 3 · Docker Microservices Topology"]
-    FrontendApp[["🎨 resume-frontend-container<br/>React Vite SPA (Nginx)<br/>Port 127.0.0.1:3000 ➔ 80"]]:::container
-    BackendApp[["⚙️ resume-backend-container<br/>Node.js 20 Express REST API<br/>Port: app-network:5000 (Internal)"]]:::container
+  subgraph Tier3[" "]
+    Slab3[/ "⚡ 3D TIER 3 · DOCKER MICROSERVICES TOPOLOGY" \]:::slab
+    FrontendApp[[ "🎨 resume-frontend-container<br/>React Vite SPA (Port 127.0.0.1:3000)" ]]:::frontend
+    BackendApp[[ "⚙️ resume-backend-container<br/>Node.js 20 Express (app-network:5000)" ]]:::backend
   end
 
-  subgraph Tier4["☁️ Tier 4 · Managed External Cloud Services"]
-    DB[("🍃 MongoDB Atlas Managed Database")]:::ext
-    Cloudinary[["☁️ Cloudinary (Resume Storage & CDN)"]]:::ext
-    GeminiAI[["🤖 Google Gemini 3.5 Flash Lite (AI Scoring)"]]:::ext
-    SES[["📧 AWS SES SMTP (Transactional Emails)"]]:::ext
+  subgraph Tier4[" "]
+    Slab4[\ "💾 3D TIER 4 · MANAGED CLOUD PERSISTENCE & AI SERVICES" /]:::slab
+    DB[( "🍃 MongoDB Atlas Cloud Cluster" )]::ext
+    Cloudinary[( "☁️ Cloudinary Storage CDN (PDF Vault)" )]::ext
+    GeminiAI[[ "🤖 Google Gemini 3.5 Flash Lite" ]]:::ext
+    SES[[ "📧 AWS SES SMTP Email Delivery" ]]:::ext
   end
 
-  Users -->|HTTPS: 443| WAF
-  WAF --> EdgeDefault
-  WAF --> EdgeAPI
-  ACM -.-> CF
-  EdgeDefault --> EdgeHeader
-  EdgeAPI --> EdgeHeader
+  Users ==>|HTTPS : 443| WAF
+  WAF ==> EdgeDefault
+  WAF ==> EdgeAPI
 
-  EdgeHeader -->|HTTPS: 443 + Origin Secret| CloakingCheck
-  CloakingCheck -->|Valid Header| NginxPass
-  CloakingCheck -.->|Missing/Invalid| Drop[("🚫 HTTP 444 Closed")]:::shield
+  EdgeDefault ==>|HTTPS 443 + Origin Secret| Cloak
+  EdgeAPI ==>|HTTPS 443 + Origin Secret| Cloak
+  Cloak ==>|Authorized| HostNginx
 
-  NginxPass -->|proxy_pass: 127.0.0.1:3000| FrontendApp
-  NginxPass -->|proxy_pass: /api/ ➔ backend:5000| BackendApp
+  HostNginx ==>|proxy_pass: 127.0.0.1:3000| FrontendApp
+  HostNginx ==>|proxy_pass: /api/ -> :5000| BackendApp
 
-  BackendApp --> DB
-  BackendApp --> Cloudinary
-  BackendApp --> GeminiAI
-  BackendApp --> SES
+  BackendApp <==> DB
+  BackendApp <==> Cloudinary
+  BackendApp <==> GeminiAI
+  BackendApp <==> SES
+
+  style Tier1 fill:#0b132b,stroke:#1e40af,stroke-width:3px,color:#fff
+  style Tier2 fill:#160f29,stroke:#4338ca,stroke-width:3px,color:#fff
+  style Tier3 fill:#22051e,stroke:#fe3e91,stroke-width:3px,color:#fff
+  style Tier4 fill:#051b14,stroke:#059669,stroke-width:3px,color:#fff
 ```
-
-</details>
 
 ---
 

@@ -1,50 +1,50 @@
 # ResumeSaathi Data Flow Diagram
 
-<p align="center">
-  <img src="./DataFlow.png" alt="ResumeSaathi Data Flow Diagram" width="100%" />
-</p>
-
-
 ## Level 0 Overview
 
 ```mermaid
-flowchart LR
-  classDef client fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,rx:12,ry:12
-  classDef fe fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef be fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef db fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff,rx:8,ry:8
-  classDef ai fill:#9333ea,stroke:#7e22ce,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef ext fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff,rx:8,ry:8
+flowchart TD
+  classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:3px,color:#ffffff
+  classDef fe fill:#0369a1,stroke:#38bdf8,stroke-width:3px,color:#ffffff
+  classDef be fill:#312e81,stroke:#818cf8,stroke-width:3px,color:#ffffff
+  classDef db fill:#064e3b,stroke:#34d399,stroke-width:3px,color:#ffffff
+  classDef ai fill:#701a75,stroke:#f472b6,stroke-width:3px,color:#ffffff
+  classDef ext fill:#78350f,stroke:#f59e0b,stroke-width:3px,color:#ffffff
+  classDef slab fill:#0f172a,stroke:#64748b,stroke-width:2px,color:#94a3b8
 
-  subgraph UserTier["👤 Client Tier"]
-    U(["Candidate / User"]):::client
+  subgraph Tier1[" "]
+    Slab1[/ "👤 3D TIER 1 · CLIENT & PRESENTATION PLATFORM" \]:::slab
+    U([ "Candidate / User Browser" ]):::client
+    FE[[ "🎨 React 19 / Vite SPA Frontend" ]]:::fe
   end
 
-  subgraph Presentation["🎨 Presentation Layer"]
-    FE[["React 19 / Vite SPA<br/>Tailwind CSS + Redux"]]:::fe
+  subgraph Tier2[" "]
+    Slab2[/ "⚙️ 3D TIER 2 · APPLICATION ROUTER & SECURITY GATEWAY" \]:::slab
+    API[[ "⚙️ Express.js REST API Ingress<br/>JWT Auth, Multer & Controllers" ]]:::be
   end
 
-  subgraph Application["⚙️ Application Tier"]
-    API[["Express.js REST API<br/>JWT & Session Ingress"]]:::be
+  subgraph Tier3[" "]
+    Slab3[\ "💾 3D TIER 3 · PERSISTENCE & CLOUD SERVICES STACK" /]:::slab
+    DB[( "🍃 MongoDB Atlas Multi-Tenant Clusters" )]::db
+    AI[[ "🤖 Google Gemini 3.5 Flash Lite" ]]:::ai
+    CL[( "☁️ Cloudinary PDF Storage Vault" )]::ext
+    EM[[ "📧 SMTP Verification Mailer" ]]:::ext
+    OAuth[[ "🔐 OAuth Providers (Google & LinkedIn)" ]]:::ext
+    GEO[[ "🌍 GeoIP Services (ipify + ipapi)" ]]:::ext
   end
 
-  subgraph DataTier["💾 Persistence & Cloud Services"]
-    DB[("🍃 MongoDB Atlas<br/>Multi-Tenant Clusters")]:::db
-    AI[["🤖 Google Gemini 3.5<br/>Flash Lite Model"]]:::ai
-    CL[["☁️ Cloudinary<br/>PDF Storage CDN"]]:::ext
-    EM[["📧 SMTP Mailer<br/>Verification & Alerts"]]:::ext
-    OAuth[["🔐 OAuth Providers<br/>Google & LinkedIn"]]:::ext
-    GEO[["🌍 GeoIP Services<br/>ipify + ipapi"]]:::ext
-  end
+  U <==>|HTTPS / Interactive UI| FE
+  FE <==>|JSON REST / Credentials / Cookies| API
+  API <==> DB
+  API <==> AI
+  API <==> CL
+  API ==> EM
+  API <==> OAuth
+  API <==> GEO
 
-  U <-->|HTTPS / Interactive UI| FE
-  FE <-->|JSON REST / Credentials / Cookies| API
-  API <--> DB
-  API <--> AI
-  API <--> CL
-  API --> EM
-  API <--> OAuth
-  API <--> GEO
+  style Tier1 fill:#0b132b,stroke:#1e40af,stroke-width:3px,color:#fff
+  style Tier2 fill:#160f29,stroke:#4338ca,stroke-width:3px,color:#fff
+  style Tier3 fill:#051b14,stroke:#059669,stroke-width:3px,color:#fff
 ```
 
 ## Level 1 Core Application Flows

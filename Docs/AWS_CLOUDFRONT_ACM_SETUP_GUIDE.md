@@ -6,74 +6,70 @@ A complete, end-to-end technical guide for configuring **AWS CloudFront CDN**, *
 
 ## 1. Architecture Overview
 
-<p align="center">
-  <img src="./assets/architecture-3d.svg" alt="Resume Saathi 3D Cloud Architecture" width="100%" />
-</p>
-
-<details>
-<summary><b>View CloudFront &amp; EC2 Architecture Mermaid Flowchart</b></summary>
-
 ```mermaid
 flowchart TD
-  classDef client fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,rx:12,ry:12
-  classDef cdn fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef shield fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff,rx:8,ry:8
-  classDef origin fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef container fill:#fe3e91,stroke:#be185d,stroke-width:2px,color:#ffffff,rx:10,ry:10
-  classDef ext fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff,rx:10,ry:10
+  classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:3px,color:#ffffff
+  classDef cdn fill:#0369a1,stroke:#38bdf8,stroke-width:3px,color:#ffffff
+  classDef shield fill:#78350f,stroke:#f59e0b,stroke-width:3px,color:#ffffff
+  classDef origin fill:#312e81,stroke:#818cf8,stroke-width:3px,color:#ffffff
+  classDef frontend fill:#831843,stroke:#fe3e91,stroke-width:3px,color:#ffffff
+  classDef backend fill:#581c87,stroke:#c084fc,stroke-width:3px,color:#ffffff
+  classDef ext fill:#064e3b,stroke:#34d399,stroke-width:3px,color:#ffffff
+  classDef slab fill:#0f172a,stroke:#64748b,stroke-width:2px,color:#94a3b8
 
-  subgraph Tier1["🌐 Tier 1 · Global Clients & Edge Ingress"]
-    Users(["👥 Global Visitors (HTTPS : 443)"]):::client
-    Route53["🗺️ Amazon Route 53 DNS<br/>resumesaathi.tusharsaini.tech"]:::client
+  subgraph Tier1[" "]
+    Slab1[/ "🌐 3D TIER 1 · GLOBAL EDGE INGRESS & ROUTE 53" \]:::slab
+    Users([ "👥 Global Visitors (HTTPS : 443)" ]):::client
+    Route53[[ "🗺️ Amazon Route 53 DNS<br/>resumesaathi.tusharsaini.tech" ]]:::client
+    WAF{{ "🛡️ AWS WAF (Anti-DDoS & Rate Limiting)" }}:::shield
+    ACM[[ "🔐 AWS Certificate Manager (Auto-Renewing TLSv1.3)" ]]:::shield
   end
 
-  subgraph Tier2["⚡ Tier 2 · AWS CloudFront CDN & Perimeter Defense (us-east-1)"]
-    WAF{{"🛡️ AWS WAF (Rate Limiting & Anti-DDoS)"}}:::shield
-    ACM["🔐 AWS Certificate Manager (Auto-Renewing TLSv1.3)"]:::shield
-    
-    subgraph CF_POPs["CloudFront Global Edge POPs (e.g. DEL51 Delhi)"]
-      CF_Default["📦 Default Cache Behavior (*)<br/>Managed-CachingOptimized<br/>Serves JS, CSS, Media from Edge"]:::cdn
-      CF_API["⚡ /api/* Dynamic Passthrough<br/>Managed-CachingDisabled<br/>Immediate Origin Forwarding"]:::cdn
-      CF_Fallback["🔄 SPA Error Redirection<br/>403 & 404 ➔ /index.html (200 OK)"]:::cdn
-    end
+  subgraph Tier2[" "]
+    Slab2[/ "⚡ 3D TIER 2 · CLOUDFRONT CDN CACHE TIERS (us-east-1)" \]:::slab
+    CF_Default[[ "📦 Default Cache (*)<br/>Managed-CachingOptimized<br/>Serves JS, CSS, Media" ]]:::cdn
+    CF_API[[ "⚡ /api/* Passthrough<br/>Managed-CachingDisabled<br/>Immediate Forwarding" ]]:::cdn
+    CF_Fallback([ "🔄 SPA Error Fallback<br/>403 & 404 ➔ /index.html (200 OK)" ]):::cdn
   end
 
-  subgraph Tier3["🏰 Tier 3 · Cloaked AWS EC2 Origin (Ubuntu 22.04 / 24.04)"]
-    SG["🔒 EC2 Security Group<br/>Restricted to CloudFront Origin Prefix List"]:::shield
-    
-    subgraph Host_Nginx["Host Nginx Reverse Proxy (Port 443 SSL)"]
-      Certbot[["🔑 Let's Encrypt Certbot SSL<br/>TLSv1.2 & TLSv1.3"]]:::shield
-      Cloak{{"🛡️ X-Origin-Verify Secret<br/>Drops direct IP scanners (HTTP 444)"}}:::shield
-      NginxRouter[["🔀 Nginx Upstream Dispatcher"]]:::origin
-    end
+  subgraph Tier3[" "]
+    Slab3[/ "🏰 3D TIER 3 · CLOAKED EC2 ORIGIN (Ubuntu 22.04 / 24.04)" \]:::slab
+    SG{{ "🔒 Security Group: CloudFront Origin Prefix List" }}:::shield
+    Cloak{{ "🛡️ X-Origin-Verify Secret Header Check<br/>Direct IP Scanners ➔ HTTP 444 Drop" }}:::shield
+    Nginx[[ "🔀 Host Nginx Reverse Proxy (Port 443 SSL)<br/>Certbot TLSv1.2/1.3 Termination" ]]:::origin
   end
 
-  subgraph Tier4["📦 Tier 4 · Docker Microservices & Upstream Services"]
-    FrontendApp[["🎨 resume-frontend<br/>React Vite SPA + Nginx<br/>Port 127.0.0.1:3000 ➔ 80"]]:::container
-    BackendApp[["⚙️ resume-backend<br/>Node.js 20 Express REST API<br/>Internal app-network:5000"]]:::container
-    DB[("🍃 MongoDB Atlas<br/>Mongoose Schemas")]:::ext
-    AI[["🤖 Google Gemini 3.5 Flash Lite<br/>Resume & ATS Scorer"]]:::ext
+  subgraph Tier4[" "]
+    Slab4[\ "📦 3D TIER 4 · CONTAINERIZED SERVICES & UPSTREAMS" /]:::slab
+    FrontendApp[[ "🎨 resume-frontend Container<br/>React 19 Vite SPA + Nginx (Port 3000)" ]]:::frontend
+    BackendApp[[ "⚙️ resume-backend Container<br/>Node.js 20 Express REST API (Port 5000)" ]]:::backend
+    DB[( "🍃 MongoDB Atlas Managed Database" )]::ext
+    AI[[ "🤖 Google Gemini 3.5 Flash Lite" ]]:::ext
   end
 
-  Users -->|DNS Resolution| Route53
-  Route53 -->|HTTPS:443| WAF
-  WAF --> CF_POPs
-  ACM -.->|Auto-Provision SSL| CF_POPs
+  Users ==>|DNS Query| Route53
+  Route53 ==>|HTTPS: 443| WAF
+  WAF ==> CF_Default
+  WAF ==> CF_API
+  ACM -.->|Auto SSL| CF_Default
 
-  CF_Default -->|Port 443 + X-Origin-Verify| SG
-  CF_API -->|Port 443 + X-Origin-Verify| SG
-  
-  SG --> Cloak
-  Cloak -->|Authorized| NginxRouter
-  
-  NginxRouter -->|proxy_pass: 127.0.0.1:3000| FrontendApp
-  NginxRouter -->|proxy_pass: /api/ ➔ backend:5000| BackendApp
-  
-  BackendApp --> DB
-  BackendApp --> AI
+  CF_Default ==>|Port 443 + Origin Secret| SG
+  CF_API ==>|Port 443 + Origin Secret| SG
+
+  SG ==> Cloak
+  Cloak ==>|Authorized Traffic| Nginx
+
+  Nginx ==>|proxy_pass: 127.0.0.1:3000| FrontendApp
+  Nginx ==>|proxy_pass: /api/ -> :5000| BackendApp
+
+  BackendApp <==> DB
+  BackendApp <==> AI
+
+  style Tier1 fill:#0b132b,stroke:#1e40af,stroke-width:3px,color:#fff
+  style Tier2 fill:#072b38,stroke:#0284c7,stroke-width:3px,color:#fff
+  style Tier3 fill:#160f29,stroke:#4338ca,stroke-width:3px,color:#fff
+  style Tier4 fill:#22051e,stroke:#fe3e91,stroke-width:3px,color:#fff
 ```
-
-</details>
 
 ---
 
