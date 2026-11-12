@@ -19,24 +19,34 @@ powered by Google Gemini 3.5 Flash Lite.
 
 ```mermaid
 flowchart TD
-  User(["Candidate Web Browser<br/>HTTPS Port 443"])
-  CF["AWS CloudFront CDN<br/>Global Edge POPs and WAF"]
-  Nginx["Host Nginx Reverse Proxy<br/>Port 443 SSL Termination"]
-  FE["React 19 Vite Container<br/>Frontend SPA (:3000)"]
-  BE["Node.js Express Container<br/>Backend REST API (:5000)"]
-  DB[("MongoDB Atlas<br/>Managed Database Cluster")]
-  AI["Google Gemini 3.5 Flash Lite<br/>ATS Scoring and Matching Engine"]
-  Cloudinary[("Cloudinary Storage CDN<br/>PDF File Vault")]
-  ATS["Live ATS Discovery Engine<br/>Greenhouse, Lever, and Ashby"]
+  User(["Candidate Browser<br/>HTTPS :443"])
 
-  User -->|HTTPS Request| CF
-  CF -->|Origin Cloaked Traffic| Nginx
-  Nginx -->|Proxy Pass Port 3000| FE
-  Nginx -->|Proxy Pass API Port 5000| BE
-  BE <-->|Mongoose ODM| DB
-  BE <-->|GenAI SDK| AI
-  BE <-->|Signed Uploads| Cloudinary
-  BE <-->|Direct Ingestion| ATS
+  subgraph Edge ["Edge & CDN Layer"]
+    CF("AWS CloudFront CDN<br/>Global Edge POPs & WAF")
+  end
+
+  subgraph Host ["Application Host"]
+    Nginx("Nginx Reverse Proxy<br/>SSL Termination :443")
+    FE("React 19 + Vite<br/>Frontend SPA :3000")
+    BE("Node.js + Express<br/>Backend REST API :5000")
+  end
+
+  subgraph Services ["Managed & External Services"]
+    DB[("MongoDB Atlas")]
+    AI("Google Gemini Flash Lite")
+    Cloudinary[("Cloudinary<br/>PDF Storage CDN")]
+    ATS("Live ATS Discovery<br/>Greenhouse, Lever & Ashby")
+  end
+
+  User -->|"HTTPS Request"| CF
+  CF -->|"Origin Request"| Nginx
+  Nginx -->|"Proxy :3000"| FE
+  Nginx -->|"API Proxy :5000"| BE
+
+  BE <-->|"Mongoose ODM"| DB
+  BE <-->|"GenAI SDK"| AI
+  BE <-->|"Signed Uploads"| Cloudinary
+  BE <-->|"Job Ingestion"| ATS
 ```
 
 ### End-to-End User & AI Analysis Flow (Sequence Diagram)
@@ -121,24 +131,24 @@ Frontend default URL: `http://localhost:5173`
 
 ## Project Documentation
 
-- Career Openings & ATS Discovery: [Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md)
-- Career Openings Guide (DOCX): [Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx](file:///c:/Project/Resume-Saathi/Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx)
-- Backend Guide: [Backend/README.md](file:///c:/Project/Resume-Saathi/Backend/README.md)
-- Frontend Guide: [Frontend/README.md](file:///c:/Project/Resume-Saathi/Frontend/README.md)
-- Deployment Guide: [Docs/DEPLOYMENT_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/DEPLOYMENT_GUIDE.md)
-- AWS CloudFront & ACM Guide: [Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md)
-- Contributing Guide: [CONTRIBUTING.md](file:///c:/Project/Resume-Saathi/CONTRIBUTING.md)
-- Code of Conduct: [CODE_OF_CONDUCT.md](file:///c:/Project/Resume-Saathi/CODE_OF_CONDUCT.md)
-- Security Policy: [SECURITY.md](file:///c:/Project/Resume-Saathi/SECURITY.md)
-- Support Guide: [SUPPORT.md](file:///c:/Project/Resume-Saathi/SUPPORT.md)
-- Changelog: [CHANGELOG.md](file:///c:/Project/Resume-Saathi/CHANGELOG.md)
+- [Career Openings & ATS Discovery](Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md)
+- [Career Openings Guide (DOCX)](Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx)
+- [Backend Guide](Backend/README.md)
+- [Frontend Guide](Frontend/README.md)
+- [Deployment Guide](Docs/DEPLOYMENT_GUIDE.md)
+- [AWS CloudFront & ACM Guide](Docs/AWS_CLOUDFRONT_ACM_SETUP_GUIDE.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+- [Support Guide](SUPPORT.md)
+- [Changelog](CHANGELOG.md)
 
 ## GitHub Templates
 
-- Bug Report: [.github/ISSUE_TEMPLATE/bug_report.md](file:///c:/Project/Resume-Saathi/.github/ISSUE_TEMPLATE/bug_report.md)
-- Feature Request: [.github/ISSUE_TEMPLATE/feature_request.md](file:///c:/Project/Resume-Saathi/.github/ISSUE_TEMPLATE/feature_request.md)
-- Pull Request Template: [.github/pull_request_template.md](file:///c:/Project/Resume-Saathi/.github/pull_request_template.md)
+- [Bug Report](.github/ISSUE_TEMPLATE/bug_report.md)
+- [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md)
+- [Pull Request Template](.github/pull_request_template.md)
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](file:///c:/Project/Resume-Saathi/LICENSE) for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

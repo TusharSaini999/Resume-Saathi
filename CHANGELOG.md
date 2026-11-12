@@ -14,13 +14,13 @@ All notable changes to this project are documented in this file.
   - Application Pipeline Tracker for managing job application stages.
   - Standardized AI scoring exclusively using Google Gemini 3.5 Flash Lite (`gemini-3.5-flash-lite`).
 - **Welcome / Landing Page Updates**:
-  - Live ATS discovery statistics and direct "Explore Live Openings" action in [Hero.jsx](file:///c:/Project/Resume-Saathi/Frontend/src/components/landing/Hero.jsx).
-  - New "Live ATS Job Discovery & Verification" and "Inferred Roles & Tech Stacks Matching" feature cards in [Features.jsx](file:///c:/Project/Resume-Saathi/Frontend/src/components/landing/Features.jsx).
-  - 4-step job pipeline workflow in [HowItWorks.jsx](file:///c:/Project/Resume-Saathi/Frontend/src/components/landing/HowItWorks.jsx).
-  - Direct "Careers" navbar navigation in [Header.jsx](file:///c:/Project/Resume-Saathi/Frontend/src/components/layout/Header.jsx).
+  - Live ATS discovery statistics and direct "Explore Live Openings" action in [Hero.jsx](Frontend/src/components/landing/Hero.jsx).
+  - New "Live ATS Job Discovery & Verification" and "Inferred Roles & Tech Stacks Matching" feature cards in [Features.jsx](Frontend/src/components/landing/Features.jsx).
+  - 4-step job pipeline workflow in [HowItWorks.jsx](Frontend/src/components/landing/HowItWorks.jsx).
+  - Direct "Careers" navbar navigation in [Header.jsx](Frontend/src/components/layout/Header.jsx).
 - **Documentation**:
-  - Added comprehensive feature guide [Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md](file:///c:/Project/Resume-Saathi/Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md).
-  - Generated [Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx](file:///c:/Project/Resume-Saathi/Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx).
+  - Added comprehensive feature guide [Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md](Docs/CAREER_OPENINGS_AND_ATS_FEATURE_GUIDE.md).
+  - Generated [Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx](Docs/Resume-Saathi_Career_Openings_and_ATS_Discovery_Guide.docx).
 
 ## [1.0.0] - Initial Release
 
