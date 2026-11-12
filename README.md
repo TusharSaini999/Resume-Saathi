@@ -15,60 +15,33 @@ Resume Saathi is an AI-powered ATS resume analysis and live job discovery platfo
 
 ```mermaid
 flowchart TD
-  classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:3px,color:#ffffff
-  classDef cdn fill:#0369a1,stroke:#38bdf8,stroke-width:3px,color:#ffffff
-  classDef shield fill:#78350f,stroke:#f59e0b,stroke-width:3px,color:#ffffff
-  classDef origin fill:#312e81,stroke:#818cf8,stroke-width:3px,color:#ffffff
-  classDef frontend fill:#831843,stroke:#fe3e91,stroke-width:3px,color:#ffffff
-  classDef backend fill:#581c87,stroke:#c084fc,stroke-width:3px,color:#ffffff
-  classDef ai fill:#701a75,stroke:#f472b6,stroke-width:3px,color:#ffffff
-  classDef db fill:#064e3b,stroke:#34d399,stroke-width:3px,color:#ffffff
-  classDef slab fill:#0f172a,stroke:#64748b,stroke-width:2px,color:#94a3b8
-
-  subgraph Tier1[" "]
-    Slab1[/ "🌐 3D TIER 1 · CLIENT & EDGE ACCELERATION LAYER" \]:::slab
-    Users([ "👥 Global Visitors & Candidate Web App<br/>HTTPS Port 443" ]):::client
-    CDN[[ "⚡ AWS CloudFront CDN Edge POPs<br/>DEL51 Edge Cache HIT" ]]:::cdn
-    WAF{{ "🛡️ AWS WAF & ACM SSL Certificate<br/>Rate Limiting & Anti-DDoS" }}:::shield
+  subgraph Edge ["1. Edge Ingress & CDN"]
+    User["👥 Web Visitors (Worldwide)"]
+    CF["⚡ AWS CloudFront CDN + WAF"]
   end
 
-  subgraph Tier2[" "]
-    Slab2[/ "🏰 3D TIER 2 · CLOAKED EC2 ORIGIN GATEWAY" \]:::slab
-    Nginx[[ "🔀 Host Nginx Reverse Proxy<br/>Let's Encrypt TLSv1.3 & X-Origin-Verify" ]]:::origin
+  subgraph Host ["2. AWS EC2 Origin Host"]
+    Nginx["🔀 Host Nginx Reverse Proxy (SSL)"]
+    FE["🎨 React 19 / Vite SPA Container"]
+    BE["⚙️ Node.js Express API Container"]
   end
 
-  subgraph Tier3[" "]
-    Slab3[/ "⚡ 3D TIER 3 · CONTAINERIZED DOCKER MICROSERVICES" \]:::slab
-    FE[[ "🎨 resume-frontend Container<br/>React 19 Vite SPA · Port 3000" ]]:::frontend
-    BE[[ "⚙️ resume-backend Container<br/>Node.js 20 Express REST API · Port 5000" ]]:::backend
+  subgraph Cloud ["3. Cloud & Intelligence Services"]
+    DB[("🍃 MongoDB Atlas Managed DB")]
+    AI["🤖 Google Gemini 3.5 Flash Lite"]
+    Cloudinary["☁️ Cloudinary Storage CDN"]
+    ATS["🏢 Live ATS Engine (Greenhouse / Lever)"]
   end
 
-  subgraph Tier4[" "]
-    Slab4[\ "💾 3D TIER 4 · INTELLIGENCE & PERSISTENCE STACK" /]:::slab
-    Gemini[[ "🤖 Google Gemini 3.5 Flash Lite<br/>ATS Resume Scoring Engine" ]]:::ai
-    ATS[[ "🏢 Live ATS Discovery Crawler<br/>Greenhouse · Lever · Ashby · LinkedIn" ]]:::ai
-    DB[( "🍃 MongoDB Atlas Cloud Cluster<br/>Multi-Tenant Document Store" )]::db
-    Cloudinary[( "☁️ Cloudinary Storage CDN<br/>Encrypted PDF File Vault" )]::db
-  end
-
-  Users ==>|DNS & HTTPS: 443| WAF
-  WAF ==>|Filtered Ingress| CDN
-  CDN ==>|Port 443 + X-Origin-Verify Secret| Nginx
-
-  Nginx ==>|proxy_pass: 127.0.0.1:3000| FE
-  Nginx ==>|proxy_pass: /api/ -> :5000| BE
-
-  BE <==>|Gemini GenAI SDK| Gemini
-  BE <==>|Real ATS Requisitions| ATS
-  BE <==>|Mongoose TLS Driver| DB
-  BE <==>|Signed Uploads| Cloudinary
-
-  style Tier1 fill:#0b132b,stroke:#1e40af,stroke-width:3px,color:#fff
-  style Tier2 fill:#160f29,stroke:#4338ca,stroke-width:3px,color:#fff
-  style Tier3 fill:#22051e,stroke:#fe3e91,stroke-width:3px,color:#fff
-  style Tier4 fill:#051b14,stroke:#059669,stroke-width:3px,color:#fff
+  User -->|HTTPS : 443| CF
+  CF -->|Origin Cloaked| Nginx
+  Nginx -->|Port 3000| FE
+  Nginx -->|Port 5000| BE
+  BE <--> DB
+  BE <--> AI
+  BE <--> Cloudinary
+  BE <--> ATS
 ```
-
 
 ### End-to-End User & AI Analysis Flow (Sequence Diagram)
 

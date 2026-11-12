@@ -10,67 +10,37 @@ The **Career Openings & Live ATS Job Discovery Engine** transforms Resume Saathi
 
 ```mermaid
 flowchart TD
-  classDef ats fill:#0369a1,stroke:#38bdf8,stroke-width:3px,color:#ffffff
-  classDef ai fill:#701a75,stroke:#f472b6,stroke-width:3px,color:#ffffff
-  classDef engine fill:#831843,stroke:#fe3e91,stroke-width:3px,color:#ffffff
-  classDef store fill:#064e3b,stroke:#34d399,stroke-width:3px,color:#ffffff
-  classDef user fill:#1e3a8a,stroke:#3b82f6,stroke-width:3px,color:#ffffff
-  classDef slab fill:#0f172a,stroke:#64748b,stroke-width:2px,color:#94a3b8
+  Candidate["👤 Job Seeker / Candidate"]
 
-  Candidate([ "👤 Job Seeker / Candidate Profile" ]):::user
-
-  subgraph Tier1[" "]
-    Slab1[/ "🌐 3D LAYER 1 · DIRECT OFFICIAL ATS & REQUISITION CRAWLERS" \]:::slab
-    GH[[ "🏢 Greenhouse Direct ATS API (boards-api)" ]]:::ats
-    LV[[ "⚡ Lever Direct ATS API (api.lever.co)" ]]:::ats
-    SR[[ "💼 SmartRecruiters Requisition API" ]]:::ats
-    ASH[[ "🚀 Ashby Direct ATS (jobs.ashbyhq)" ]]:::ats
-    LI[[ "🔗 LinkedIn Official Company Requisitions" ]]:::ats
-    TCS[[ "🏛️ Indian Enterprise Career Portals" ]]:::ats
+  subgraph Crawlers ["1. Official ATS Connectors"]
+    GH["🏢 Greenhouse Direct ATS"]
+    LV["⚡ Lever Direct ATS"]
+    SR["💼 SmartRecruiters"]
+    ASH["🚀 Ashby ATS"]
+    LI["🔗 LinkedIn Official Jobs"]
+    TCS["🏛️ Indian Tech Portals"]
   end
 
-  subgraph Tier2[" "]
-    Slab2[/ "🧠 3D LAYER 2 · INTELLIGENCE, PARSING & VALIDATION ENGINE" \]:::slab
-    Infer[[ "🎯 Inferred Roles & Tech Stacks Engine" ]]:::engine
-    Sanitizer[[ "🧹 HTML Sanitizer & Clean JD Parser" ]]:::engine
-    Probe{{ "🛡️ Live Portal Online Prober (HTTP Health Check)" }}:::engine
-    Checker[[ "🔍 Universal External Link Inspector" ]]:::engine
+  subgraph Engine ["2. Processing & Verification"]
+    Infer["🎯 Role & Tech Stack Inference"]
+    Parser["🧹 Clean JD Parser"]
+    Probe{"🛡️ Live Portal Prober"}
   end
 
-  subgraph Tier3[" "]
-    Slab3[/ "✨ 3D LAYER 3 · GOOGLE GEMINI 3.5 FLASH LITE AI SCORER" \]:::slab
-    Scorer[[ "🤖 Deep ATS Fit & Compatibility Scorer<br/>Match %, Gap Analysis & Bullet Suggestions" ]]:::ai
+  subgraph Intelligence ["3. AI & Tracking"]
+    AI["🤖 Gemini 3.5 Flash Lite Scorer"]
+    Tracker[("📋 Application Tracker")]
   end
 
-  subgraph Tier4[" "]
-    Slab4[\ "📊 3D LAYER 4 · CANDIDATE PIPELINE TRACKER" /]:::slab
-    Tracker[( "📋 Real-Time Application Tracker<br/>Applied ➔ Interview ➔ Offer" )]::store
-  end
-
-  Candidate ==>|Resume Upload & Target Roles| Infer
-  Infer ==>|Direct Requisition Queries| Tier1
-
-  GH ==> Sanitizer
-  LV ==> Sanitizer
-  SR ==> Sanitizer
-  ASH ==> Sanitizer
-  LI ==> Sanitizer
-  TCS ==> Sanitizer
-
-  Sanitizer ==> Probe
-  Probe ==>|Verified Live Openings| Scorer
-  Checker ==> Sanitizer
-
-  Infer ==> Scorer
-  Scorer ==> Tracker
-  Candidate <==>|Manage Applications| Tracker
-
-  style Tier1 fill:#072b38,stroke:#0284c7,stroke-width:3px,color:#fff
-  style Tier2 fill:#22051e,stroke:#fe3e91,stroke-width:3px,color:#fff
-  style Tier3 fill:#160f29,stroke:#c026d3,stroke-width:3px,color:#fff
-  style Tier4 fill:#051b14,stroke:#059669,stroke-width:3px,color:#fff
+  Candidate --> Infer
+  Infer --> Crawlers
+  Crawlers --> Parser
+  Parser --> Probe
+  Probe -->|Verified Live| AI
+  Infer --> AI
+  AI --> Tracker
+  Candidate --> Tracker
 ```
-
 
 ### 1.1 Candidate Application Lifecycle & State Machine
 

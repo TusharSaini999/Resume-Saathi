@@ -10,65 +10,42 @@ The production environment is globally accelerated and secured via **AWS CloudFr
 
 ```mermaid
 flowchart TD
-  classDef client fill:#1e3a8a,stroke:#3b82f6,stroke-width:3px,color:#ffffff
-  classDef cdn fill:#0369a1,stroke:#38bdf8,stroke-width:3px,color:#ffffff
-  classDef shield fill:#78350f,stroke:#f59e0b,stroke-width:3px,color:#ffffff
-  classDef origin fill:#312e81,stroke:#818cf8,stroke-width:3px,color:#ffffff
-  classDef frontend fill:#831843,stroke:#fe3e91,stroke-width:3px,color:#ffffff
-  classDef backend fill:#581c87,stroke:#c084fc,stroke-width:3px,color:#ffffff
-  classDef ext fill:#064e3b,stroke:#34d399,stroke-width:3px,color:#ffffff
-  classDef slab fill:#0f172a,stroke:#64748b,stroke-width:2px,color:#94a3b8
-
-  subgraph Tier1[" "]
-    Slab1[/ "🌐 3D TIER 1 · CLIENTS & GLOBAL CLOUDFRONT EDGE" \]:::slab
-    Users([ "👥 Global Users (Worldwide Web Clients - Port 443)" ]):::client
-    WAF{{ "🛡️ AWS WAF & ACM SSL Certificate" }}:::shield
-    EdgeDefault[[ "📦 Default (*) CachingOptimized (Edge Cache)" ]]:::cdn
-    EdgeAPI[[ "⚡ /api/* CachingDisabled (Dynamic Passthrough)" ]]:::cdn
+  subgraph Edge ["1. Client & Global Edge"]
+    Users["👥 Web Users (Worldwide)"]
+    WAF{"🛡️ AWS WAF (Anti-DDoS)"}
+    CF["⚡ CloudFront CDN (Global Edge POPs)"]
   end
 
-  subgraph Tier2[" "]
-    Slab2[/ "🏰 3D TIER 2 · CLOAKED EC2 NGINX REVERSE PROXY" \]:::slab
-    Cloak{{ "🛡️ Validate X-Origin-Verify Header<br/>Direct Scanners ➔ HTTP 444 Drop" }}:::shield
-    HostNginx[[ "🔀 Host Nginx (Ports 443 & 80)<br/>Let's Encrypt TLSv1.2/1.3 Termination" ]]:::origin
+  subgraph Origin ["2. EC2 Host & Security"]
+    Cloak{"🔒 Verify X-Origin-Verify"}
+    Nginx["🔀 Host Nginx Reverse Proxy (SSL)"]
   end
 
-  subgraph Tier3[" "]
-    Slab3[/ "⚡ 3D TIER 3 · DOCKER MICROSERVICES TOPOLOGY" \]:::slab
-    FrontendApp[[ "🎨 resume-frontend-container<br/>React Vite SPA (Port 127.0.0.1:3000)" ]]:::frontend
-    BackendApp[[ "⚙️ resume-backend-container<br/>Node.js 20 Express (app-network:5000)" ]]:::backend
+  subgraph Containers ["3. Docker Microservices"]
+    FE["🎨 Frontend Container (React Vite SPA)"]
+    BE["⚙️ Backend Container (Express REST API)"]
   end
 
-  subgraph Tier4[" "]
-    Slab4[\ "💾 3D TIER 4 · MANAGED CLOUD PERSISTENCE & AI SERVICES" /]:::slab
-    DB[( "🍃 MongoDB Atlas Cloud Cluster" )]::ext
-    Cloudinary[( "☁️ Cloudinary Storage CDN (PDF Vault)" )]::ext
-    GeminiAI[[ "🤖 Google Gemini 3.5 Flash Lite" ]]:::ext
-    SES[[ "📧 AWS SES SMTP Email Delivery" ]]:::ext
+  subgraph Services ["4. Managed Cloud Services"]
+    DB[("🍃 MongoDB Atlas")]
+    AI["🤖 Google Gemini 3.5 Flash Lite"]
+    Cloudinary["☁️ Cloudinary Storage"]
+    SES["📧 AWS SES SMTP"]
   end
 
-  Users ==>|HTTPS : 443| WAF
-  WAF ==> EdgeDefault
-  WAF ==> EdgeAPI
-
-  EdgeDefault ==>|HTTPS 443 + Origin Secret| Cloak
-  EdgeAPI ==>|HTTPS 443 + Origin Secret| Cloak
-  Cloak ==>|Authorized| HostNginx
-
-  HostNginx ==>|proxy_pass: 127.0.0.1:3000| FrontendApp
-  HostNginx ==>|proxy_pass: /api/ -> :5000| BackendApp
-
-  BackendApp <==> DB
-  BackendApp <==> Cloudinary
-  BackendApp <==> GeminiAI
-  BackendApp <==> SES
-
-  style Tier1 fill:#0b132b,stroke:#1e40af,stroke-width:3px,color:#fff
-  style Tier2 fill:#160f29,stroke:#4338ca,stroke-width:3px,color:#fff
-  style Tier3 fill:#22051e,stroke:#fe3e91,stroke-width:3px,color:#fff
-  style Tier4 fill:#051b14,stroke:#059669,stroke-width:3px,color:#fff
+  Users -->|HTTPS : 443| WAF
+  WAF --> CF
+  CF -->|Origin Secret| Cloak
+  Cloak -->|Authorized| Nginx
+  Nginx -->|proxy_pass :3000| FE
+  Nginx -->|proxy_pass :5000| BE
+  BE --> DB
+  BE --> AI
+  BE --> Cloudinary
+  BE --> SES
 ```
 
+---
 
 ## 2. Prerequisites & Server Preparation
 
